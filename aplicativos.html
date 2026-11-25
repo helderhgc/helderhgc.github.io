@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR" data-lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aplicativos — Helder Gomes Costa</title>
+  <meta name="title-pt" content="Aplicativos — Helder Gomes Costa">
+  <meta name="title-en" content="Apps — Helder Gomes Costa">
+  <meta name="description" content="Aplicativos web gratuitos de apoio à decisão e análise de dados desenvolvidos por Helder Gomes Costa (UFF).">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">Helder Gomes Costa</a>
+    <nav class="nav">
+      <a href="index.html"><span lang="pt">Início</span><span lang="en">Home</span></a>
+      <a href="publicacoes.html"><span lang="pt">Publicações</span><span lang="en">Publications</span></a>
+      <a href="aplicativos.html" aria-current="page"><span lang="pt">Aplicativos</span><span lang="en">Apps</span></a>
+      <a href="index.html#contato"><span lang="pt">Contato</span><span lang="en">Contact</span></a>
+    </nav>
+    <button class="lang-toggle" type="button">EN</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2><span lang="pt">Aplicativos</span><span lang="en">Apps</span></h2>
+    <p class="lead">
+      <span lang="pt">Ferramentas web gratuitas que implementam métodos desenvolvidos em nossas pesquisas.</span>
+      <span lang="en">Free web tools implementing methods developed in our research.</span>
+    </p>
+    <p class="note">
+      <span lang="pt">A maioria dos aplicativos está hospedada no Streamlit Community Cloud. Se um aplicativo estiver “adormecido”, clique no botão para ativá-lo; o primeiro acesso pode levar até um minuto. Todos são de acesso livre; quando houver tela de login, é possível entrar como visitante (o cadastro opcional serve apenas para estatísticas de uso).</span>
+      <span lang="en">Most apps are hosted on Streamlit Community Cloud. If an app is “asleep”, click the button to wake it up; the first load may take up to a minute. All apps are free to use; where a login screen appears, you can enter as a guest (optional registration is used only for usage statistics).</span>
+    </p>
+
+    <div class="cards">
+      <!-- ============================================================
+           Para adicionar um aplicativo, copie um bloco <article> abaixo
+           e troque nome, descrição e links.
+           ============================================================ -->
+      <article class="card">
+        <h3>Visual OutDecK</h3>
+        <p>
+          <span lang="pt">Apoio à modelagem multicritério de problemas de escolha por sobreclassificação (outranking), com visualização gráfica dos resultados.</span>
+          <span lang="en">Supports multi-criteria modelling of outranking choice problems, with graphical visualization of the results.</span>
+        </p>
+        <div class="actions">
+          <a href="https://visualoutranking.streamlit.app"><span lang="pt">Abrir aplicativo →</span><span lang="en">Open app →</span></a>
+          <a href="https://doi.org/10.1007/978-3-031-27409-1_83"><span lang="pt">Artigo</span><span lang="en">Paper</span></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Visual Clustering</h3>
+        <p>
+          <span lang="pt">Agrupamento (clustering) de dados com visualização interativa dos grupos formados.</span>
+          <span lang="en">Data clustering with interactive visualization of the resulting groups.</span>
+        </p>
+        <div class="actions">
+          <a href="https://visualclustering.streamlit.app"><span lang="pt">Abrir aplicativo →</span><span lang="en">Open app →</span></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Visual TriQ</h3>
+        <p>
+          <span lang="pt">Classificação multicritério não compensatória pelo método ELECTRE TRI-Q, em que os perfis que separam as classes são derivados dos próprios dados. O analista informa apenas o número de classes e um parâmetro de forma. (Artigo em preparação.)</span>
+          <span lang="en">Non-compensatory multi-criteria sorting with the ELECTRE TRI-Q method, in which the boundary profiles between classes are derived from the data. The analyst sets only the number of classes and one shape parameter. (Paper in preparation.)</span>
+        </p>
+        <div class="actions">
+          <a href="https://visualtriq.streamlit.app"><span lang="pt">Abrir aplicativo →</span><span lang="en">Open app →</span></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>TOPSIS Ranking</h3>
+        <p>
+          <span lang="pt">Ordenação de alternativas pelo método TOPSIS, a partir da similaridade com a solução ideal.</span>
+          <span lang="en">Ranks alternatives with the TOPSIS method, by similarity to the ideal solution.</span>
+        </p>
+        <div class="actions">
+          <a href="https://topsis-ranking.vercel.app/"><span lang="pt">Abrir aplicativo →</span><span lang="en">Open app →</span></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>IntRef</h3>
+        <p>
+          <span lang="pt">Verifica a integridade das referências bibliográficas de um texto. Cole o texto ou envie um arquivo (PDF, BibTeX ou Word). Cada referência é classificada como validada, não validada ou com problemas de integridade, e o relatório pode ser exportado para Word, PDF ou Excel.</span>
+          <span lang="en">Checks the integrity of the bibliographic references in a text. Paste the text or upload a file (PDF, BibTeX or Word). Each reference is classified as validated, not validated or with integrity issues, and the report can be exported to Word, PDF or Excel.</span>
+        </p>
+        <div class="actions">
+          <a href="https://intref.streamlit.app/"><span lang="pt">Abrir aplicativo →</span><span lang="en">Open app →</span></a>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">© <span id="year">2026</span> Helder Gomes Costa</div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+</body>
+</html>

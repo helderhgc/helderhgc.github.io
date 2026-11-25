@@ -1,0 +1,145 @@
+/* ==========================================================
+   Site pessoal — Helder Gomes Costa
+   Estilos globais. Cores definidas em variáveis (claro/escuro).
+   ========================================================== */
+
+:root {
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --text: #1f2328;
+  --muted: #5b6470;
+  --line: #e4e1da;
+  --accent: #1d4e89;
+  --accent-soft: #e8eef7;
+  --radius: 10px;
+  --maxw: 960px;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171c;
+    --surface: #1b1f26;
+    --text: #e6e8eb;
+    --muted: #9aa3ae;
+    --line: #2c323b;
+    --accent: #8db4ea;
+    --accent-soft: #1f2a3a;
+  }
+}
+
+/* ---------- Bilíngue: mostra só o idioma ativo ---------- */
+html[data-lang="pt"] body [lang="en"],
+html[data-lang="en"] body [lang="pt"] { display: none !important; }
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.25; }
+h2 { font-size: 1.55rem; margin: 0 0 1rem; }
+h3 { font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+
+/* ---------- Cabeçalho ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap { display: flex; align-items: center; gap: 1.25rem; min-height: 60px; }
+.brand { font-family: var(--serif); font-weight: 600; font-size: 1.1rem; color: var(--text); text-decoration: none; margin-right: auto; }
+.nav { display: flex; gap: 1.1rem; flex-wrap: wrap; }
+.nav a { color: var(--muted); text-decoration: none; font-size: .95rem; }
+.nav a:hover, .nav a[aria-current="page"] { color: var(--text); }
+.lang-toggle {
+  font: inherit; font-size: .85rem; font-weight: 600;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text);
+  border-radius: 999px; padding: .25rem .7rem; cursor: pointer;
+}
+.lang-toggle:hover { border-color: var(--accent); }
+
+/* ---------- Seções ---------- */
+main section { padding: 3rem 0; border-bottom: 1px solid var(--line); }
+main section:last-child { border-bottom: 0; }
+.lead { font-size: 1.1rem; color: var(--muted); max-width: 60ch; }
+
+/* ---------- Apresentação (hero) ---------- */
+.hero { display: grid; grid-template-columns: 160px 1fr; gap: 2rem; align-items: center; }
+.avatar {
+  width: 160px; height: 160px; border-radius: 50%; object-fit: cover;
+  background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center;
+  font-family: var(--serif); font-size: 2.6rem; font-weight: 600;
+}
+.hero h1 { font-size: 2.2rem; margin: 0 0 .35rem; }
+.hero .role { margin: 0; color: var(--muted); }
+.profiles { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; padding: 0; list-style: none; }
+.profiles a {
+  display: inline-block; padding: .3rem .75rem; font-size: .88rem;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  color: var(--text); text-decoration: none;
+}
+.profiles a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- Listas e cartões ---------- */
+.tags { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; list-style: none; }
+.tags li { background: var(--accent-soft); color: var(--accent); border-radius: 6px; padding: .2rem .65rem; font-size: .92rem; }
+
+.timeline { list-style: none; padding: 0; margin: 0; }
+.timeline li { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; padding: .55rem 0; border-top: 1px solid var(--line); }
+.timeline li:first-child { border-top: 0; }
+.timeline .when { color: var(--muted); font-variant-numeric: tabular-nums; }
+.timeline .org { color: var(--muted); font-size: .93rem; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; }
+.card h3 { margin: 0 0 .4rem; font-size: 1.05rem; }
+.card p { margin: 0 0 .8rem; color: var(--muted); font-size: .95rem; }
+.card .actions { margin-top: auto; display: flex; gap: .8rem; flex-wrap: wrap; font-size: .92rem; }
+.note { font-size: .9rem; color: var(--muted); border-left: 3px solid var(--line); padding-left: .8rem; }
+
+/* ---------- Publicações ---------- */
+.pub-tools { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin: 1rem 0 1.5rem; }
+.pub-tools input[type="search"] {
+  flex: 1 1 260px; font: inherit; font-size: .95rem;
+  padding: .5rem .8rem; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--text);
+}
+.filter { font: inherit; font-size: .88rem; padding: .35rem .8rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; }
+.filter[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.pub-count { color: var(--muted); font-size: .9rem; margin: 0 0 1rem; }
+
+.pub-year h3 { font-size: 1.3rem; margin: 2rem 0 .6rem; color: var(--muted); }
+.pub-list { list-style: none; padding: 0; margin: 0; }
+.pub { padding: .7rem 0; border-top: 1px solid var(--line); font-size: .96rem; }
+.pub-title { font-weight: 600; }
+.pub-authors { color: var(--muted); }
+.pub-authors b { color: var(--text); font-weight: 600; }
+.pub-venue { font-style: italic; }
+.pub-meta { display: flex; gap: .7rem; align-items: center; margin-top: .25rem; font-size: .85rem; }
+.badge { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: .05rem .45rem; font-size: .78rem; }
+.updated { font-size: .85rem; color: var(--muted); }
+
+/* ---------- Rodapé ---------- */
+.site-footer { border-top: 1px solid var(--line); padding: 2rem 0; color: var(--muted); font-size: .88rem; }
+
+/* ---------- Telas pequenas ---------- */
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .hero { grid-template-columns: 1fr; text-align: left; }
+  .avatar { width: 110px; height: 110px; font-size: 1.9rem; }
+  .hero h1 { font-size: 1.8rem; }
+  .timeline li { grid-template-columns: 1fr; gap: 0; }
+  .site-header .wrap { flex-wrap: wrap; padding-top: .5rem; padding-bottom: .5rem; }
+}
