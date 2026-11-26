@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SNA + PROMETHEE II for Beginners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<!--
+  Beginner's tutorial for the paper:
+  Linhares LF, Costa HG & Eufrazio EP. Integrating Social Network Analysis and PROMETHEE II for
+  Prioritizing International Cooperation Partners in Net-Zero Technology Projects (INSID 2026).
+  LabDEC visual identity. Self-contained file: only the fonts come from Google Fonts.
+  The simulator reproduces Tables 2, 3 and 4 of the paper. Portuguese version: Tutorial_para_leigos_SNA_PROMETHEE_NetZero.html
+-->
+<style>
+  /* Layout: navy opening band, ~70ch reading column, simulator and charts at column width */
+  :root {
+    --bg: #F6F8FC; --surface: #FFFFFF; --ink: #101B33; --muted: #516079; --line: #D5DDEA; --grid: #E6EBF3;
+    --heading: #0B1F4D; --blue: #1D5FBF; --green: #13865A; --orange: #C9641A; --magenta: #B0286C;
+    --pos: #1D5FBF; --neg: #C9641A;
+    --blue-soft: #E4EDFB; --green-soft: #DDF2E8; --orange-soft: #FBEADB; --magenta-soft: #F8E1EC;
+    --band: #0B1F4D; --band-muted: #B8C7E6;
+    --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A1226; --surface: #111C36; --ink: #E5EBF6; --muted: #9DAAC2; --line: #263453; --grid: #1C2944;
+      --heading: #DCE6FA; --blue: #5C98F2; --green: #3FC98F; --orange: #F09A4D; --magenta: #E2609F;
+      --pos: #3F80E0; --neg: #CC6E22;
+      --blue-soft: #172B52; --green-soft: #12382B; --orange-soft: #3A2716; --magenta-soft: #3A1729;
+      --band: #071431; --band-muted: #9FB2D8;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0A1226; --surface: #111C36; --ink: #E5EBF6; --muted: #9DAAC2; --line: #263453; --grid: #1C2944;
+    --heading: #DCE6FA; --blue: #5C98F2; --green: #3FC98F; --orange: #F09A4D; --magenta: #E2609F;
+    --pos: #3F80E0; --neg: #CC6E22;
+    --blue-soft: #172B52; --green-soft: #12382B; --orange-soft: #3A2716; --magenta-soft: #3A1729;
+    --band: #071431; --band-muted: #9FB2D8;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16.5px; line-height: 1.62; }
+  .wrap { max-width: 880px; margin: 0 auto;
+          padding-left: max(16px, env(safe-area-inset-left, 0px));
+          padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+  .band { background: var(--band); color: #FFFFFF; }
+  .band .wrap { padding-block: 40px 34px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--band-muted); font-weight: 600; margin: 0 0 14px; }
+  .eyebrow b { color: #7FB2FF; }
+  h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 4.6vw, 2.75rem); line-height: 1.12; margin: 0 0 14px; text-wrap: balance; letter-spacing: -.01em; }
+  .lede { font-size: 1.12rem; color: #DCE5F7; max-width: 62ch; margin: 0 0 16px; }
+  .cite { font-size: .88rem; color: var(--band-muted); margin: 0; max-width: 80ch; }
+
+  main .wrap { padding-block: 8px 56px; }
+  section { padding-top: 34px; }
+  h2 { font-family: var(--font-display); color: var(--heading); font-size: 1.5rem; line-height: 1.25; margin: 0 0 12px; text-wrap: balance; }
+  h2 .n { color: var(--blue); margin-right: .35em; }
+  h3 { font-family: var(--font-display); color: var(--heading); font-size: 1.08rem; margin: 22px 0 8px; }
+  p { margin: 0 0 12px; max-width: 70ch; }
+  ul, ol { margin: 0 0 12px; padding-left: 1.3em; max-width: 68ch; }
+  li { margin-bottom: 6px; }
+  strong { color: var(--heading); }
+  a { color: var(--blue); }
+  .muted { color: var(--muted); font-size: .9rem; }
+
+  .tldr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .tldr > div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  .tldr .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+  .tldr > div:nth-child(1) .k { color: var(--blue); }
+  .tldr > div:nth-child(2) .k { color: var(--orange); }
+  .tldr > div:nth-child(3) .k { color: var(--green); }
+  .tldr p { margin: 0; font-size: .97rem; }
+
+  .stages { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: stretch; margin: 12px 0; }
+  .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+  .stage .k { font-family: var(--font-display); font-weight: 700; color: var(--heading); }
+  .stage p { margin: 4px 0 0; font-size: .93rem; }
+  .arrow { align-self: center; font-size: 1.6rem; color: var(--blue); font-weight: 700; }
+
+  .callout { border-radius: 10px; padding: 14px 16px; margin: 14px 0; background: var(--blue-soft); max-width: 74ch; }
+  .callout.warn { background: var(--orange-soft); }
+  .callout.ok { background: var(--green-soft); }
+  .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
+  .callout .t { font-weight: 700; color: var(--heading); display: block; margin-bottom: 4px; }
+
+  .figure { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 12px 0; }
+  .figure svg { display: block; width: 100%; height: auto; }
+  .figcap { font-size: .85rem; color: var(--muted); margin: 8px 2px 0; }
+  .twocol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .twocol > div { min-width: 0; }
+
+  svg .ax { stroke: var(--line); stroke-width: 1; fill: none; }
+  svg .gr { stroke: var(--grid); stroke-width: 1; fill: none; }
+  svg .tick { fill: var(--muted); font: 500 11px var(--font-body); }
+  svg .axt { fill: var(--muted); font: 600 12px var(--font-body); }
+  svg .lab { fill: var(--ink); font: 600 12px var(--font-body); }
+  svg .val { fill: var(--muted); font: 500 11px var(--font-body); font-variant-numeric: tabular-nums; }
+  svg .dot { fill: var(--pos); stroke: var(--surface); stroke-width: 2; }
+  svg .dot.br { fill: var(--neg); }
+  svg .edge { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+  svg .nd { fill: var(--surface); stroke: var(--muted); stroke-width: 1.5; }
+  svg .nd.hub { fill: var(--blue-soft); stroke: var(--blue); }
+  svg .nd.focus { fill: var(--pos); stroke: var(--pos); }
+  svg .nd.focus2 { fill: var(--neg); stroke: var(--neg); }
+  svg .ndl { fill: #FFFFFF; font: 700 12px var(--font-body); }
+  #bars .lab { font-size: 14px; }
+  #bars .val, #bars .tick { font-size: 13px; }
+  svg .bar-pos { fill: var(--pos); }
+  svg .bar-neg { fill: var(--neg); }
+  svg .hit { fill: transparent; }
+  svg .row:hover .hit { fill: var(--grid); }
+
+  .trl { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 3px; margin: 10px 0 4px; max-width: 640px; }
+  .trl div { text-align: center; font-weight: 700; font-size: .85rem; padding: 6px 0; border-radius: 4px; color: var(--heading); }
+  .trl .a { background: var(--grid); } .trl .b { background: var(--blue-soft); } .trl .c { background: var(--green-soft); }
+  .trl-leg { display: grid; grid-template-columns: 3fr 3fr 3fr; gap: 3px; max-width: 640px; font-size: .78rem; color: var(--muted); text-align: center; }
+
+  .tbl { overflow-x: auto; margin: 10px 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .92rem; }
+  th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { font-weight: 700; color: var(--heading); background: var(--blue-soft); font-size: .84rem; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.wrapc { white-space: normal; text-align: left; }
+  td.top { font-weight: 700; color: var(--blue); }
+  tr.br td { background: var(--orange-soft); }
+
+  .steps { list-style: none; padding: 0; counter-reset: s; max-width: none; }
+  .steps > li { counter-increment: s; position: relative; padding: 2px 0 12px 46px; margin: 0; }
+  .steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%;
+     background: var(--blue); color: #FFFFFF; font-family: var(--font-display); font-weight: 700; display: grid; place-items: center; font-size: .95rem; }
+  .steps ul { margin-top: 6px; }
+  .steps ul li { margin-bottom: 4px; }
+  .formula { font-family: var(--font-display); background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; padding: 9px 14px; margin: 6px 0; display: inline-block; max-width: 100%; }
+
+  .sim { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-top: 12px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .presets button { font: inherit; font-size: .85rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .presets button[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #FFFFFF; }
+  .presets button:focus-visible, .ctrl input:focus-visible, .ctrl select:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .sim-grid { display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 20px; }
+  .ctrl label { display: flex; justify-content: space-between; gap: 8px; font-size: .88rem; font-weight: 600; margin-top: 10px; }
+  .ctrl label span { color: var(--blue); font-variant-numeric: tabular-nums; }
+  .ctrl input[type=range] { width: 100%; accent-color: var(--blue); }
+  .ctrl .sub { font-size: .76rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; margin: 16px 0 0; }
+  .ctrl .chk { justify-content: flex-start; align-items: flex-start; font-weight: 500; color: var(--muted); }
+  .ctrl .chk span { color: var(--muted); }
+  .ctrl .chk input { margin-top: 4px; accent-color: var(--blue); }
+  .ctrl select { width: 100%; font: inherit; font-size: .9rem; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); margin-top: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .82rem; color: var(--muted); margin: 0 0 6px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .note { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+
+  dl.gloss { display: grid; grid-template-columns: minmax(0, 14em) minmax(0, 1fr); gap: 8px 16px; margin: 8px 0; }
+  dl.gloss dt { font-weight: 700; color: var(--heading); }
+  dl.gloss dd { margin: 0; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin: 8px 0; max-width: 74ch; }
+  summary { cursor: pointer; font-weight: 600; color: var(--heading); }
+  details p { margin: 8px 0 2px; }
+  footer { border-top: 1px solid var(--line); margin-top: 40px; padding-top: 16px; font-size: .85rem; color: var(--muted); }
+
+  @media (max-width: 720px) {
+    .tldr, .twocol, .sim-grid { grid-template-columns: minmax(0, 1fr); }
+    .stages { grid-template-columns: minmax(0, 1fr); }
+    .arrow { transform: rotate(90deg); justify-self: center; }
+    dl.gloss { grid-template-columns: minmax(0, 1fr); }
+    dl.gloss dd { margin-bottom: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="band">
+  <div class="wrap">
+    <p class="eyebrow"><b>LabDEC</b> · INSID 2026 · Teaching material</p>
+    <h1>Who should we partner with in the race to net zero?</h1>
+    <p class="lede">A beginner's guide to the paper that combines <b>network analysis</b> with the <b>PROMETHEE II</b> method to decide which countries are the most attractive partners in net-zero technology projects. No prerequisites: if you know what a circle of friends is and how a league table works, you can follow along.</p>
+    <p class="cite">Linhares, L. F.; Costa, H. G.; Eufrazio, E. P. <i>Integrating Social Network Analysis and PROMETHEE II for Prioritizing International Cooperation Partners in Net-Zero Technology Projects.</i> Universidade Federal Fluminense, INSID 2026.</p>
+  </div>
+</div>
+
+<main>
+<div class="wrap">
+
+<section id="summary">
+  <h2>The paper in 30 seconds</h2>
+  <div class="tldr">
+    <div><div class="k">The question</div><p>With limited resources, <b>which countries</b> are most worth deepening cooperation with to develop clean-energy technologies?</p></div>
+    <div><div class="k">The method</div><p>First, a <b>network</b> of who works with whom (168 projects, 53 countries). Then <b>PROMETHEE II</b> ranks 15 countries on three criteria.</p></div>
+    <div><div class="k">The answer</div><p><b>United States, Germany, Japan, the Netherlands and China</b> lead. If technological maturity matters most, <b>South Korea, Canada and Denmark</b> move up.</p></div>
+  </div>
+</section>
+
+<section id="problem">
+  <h2><span class="n">1</span>The problem in plain words</h2>
+  <p>To meet the Paris Agreement, countries need low-carbon technologies: hydrogen, CO₂ capture, batteries, offshore wind… Almost no country does this alone. The projects are run by <b>multinational consortia</b>.</p>
+  <p>The International Energy Agency (IEA) keeps a public database, the <a href="https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide" target="_blank" rel="noopener"><i>ETP Clean Energy Technology Guide</i></a>, that records these projects, the countries taking part and how mature each technology is.</p>
+  <p>Imagine you work at a ministry or an innovation agency. Budget, diplomatic staff and time are limited. The practical question is: <strong>who should we invest in partnering with?</strong></p>
+  <p>The paper answers in two stages:</p>
+  <div class="stages">
+    <div class="stage"><div class="k">Stage 1 · The network</div><p>Turns the IEA database into a map of who collaborates with whom and measures each country's position on that map.</p></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="stage"><div class="k">Stage 2 · The decision</div><p>Uses those measures, plus technological maturity, as PROMETHEE II criteria to rank the countries.</p></div>
+  </div>
+</section>
+
+<section id="network">
+  <h2><span class="n">2</span>Stage 1: the cooperation network</h2>
+  <p>A network (or <b>graph</b>) has two ingredients: <b>nodes</b> and <b>links</b>. Here each node is a country, and two countries are linked when they take part in at least one project together. With the IEA's 168 multinational projects, the network has <b>53 countries and 470 links</b>.</p>
+  <p>As in a circle of friends, a few countries are very well connected (the <i>hubs</i>) and many sit on the periphery. To measure each country's position, the paper uses two <b>centralities</b>:</p>
+
+  <div class="twocol">
+    <div class="figure">
+      <svg viewBox="0 0 300 200" role="img" aria-label="Country A linked to six peripheral countries">
+        <g id="toyA"></g>
+      </svg>
+      <p class="figcap"><b>Degree centrality</b>: <i>how many doors a country opens.</i> A has 6 direct partners, but all of them are peripheral.</p>
+    </div>
+    <div class="figure">
+      <svg viewBox="0 0 300 200" role="img" aria-label="Country B linked to only two countries, both highly connected">
+        <g id="toyB"></g>
+      </svg>
+      <p class="figcap"><b>Eigenvector centrality</b>: <i>how close a country sits to the influential core.</i> B has only 2 partners, but they are hubs.</p>
+    </div>
+  </div>
+  <ul>
+    <li><b>C1 · Degree centrality</b>: the number of direct partners divided by the maximum possible (52). It measures <b>breadth of access</b>. The United States has 47 partners: 47/52 = 0.904.</li>
+    <li><b>C2 · Eigenvector centrality</b>: a country is influential when it is linked to other influential countries, as in “you are known by the company you keep”. It measures <b>closeness to the core of the network</b>.</li>
+  </ul>
+
+  <h3>The third criterion: technological maturity (TRL)</h3>
+  <p><b>TRL</b> (<i>Technology Readiness Level</i>) is a scale created by NASA that runs from 1 (an idea on paper) to 9 (a technology sold and running commercially).</p>
+  <div class="trl" aria-hidden="true"><div class="a">1</div><div class="a">2</div><div class="a">3</div><div class="b">4</div><div class="b">5</div><div class="b">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div></div>
+  <div class="trl-leg"><span>basic research</span><span>prototype and lab</span><span>demonstration and market</span></div>
+  <p style="margin-top:12px"><b>C3 · Average TRL</b>: the average TRL of the projects a country takes part in. It measures <b>portfolio maturity</b>, that is, how close to market the technologies a partnership gives access to are.</p>
+  <div class="callout warn">
+    <span class="t">Be careful with the TRL average</span>
+    <p>TRL is an ordinal scale: the steps are ordered, but they are not equal distances. The authors use the average because it is practical and common, but they warn that two countries with the same average can have very different portfolios.</p>
+  </div>
+</section>
+
+<section id="conflict">
+  <h2><span class="n">3</span>The key finding: you can't have it all</h2>
+  <p>Do the most connected countries have the most mature technologies? No. The chart shows the opposite: countries with more partners have, on average, <b>less mature</b> portfolios.</p>
+  <div class="figure">
+    <svg id="scatter" viewBox="0 0 640 330" role="img" aria-label="Scatter plot: average TRL against degree centrality for the 15 countries"></svg>
+    <p class="figcap">Each dot is a country (hover to see its name). Spearman correlation ρ = −0.66 (p &lt; 0.01). Brazil in orange. Data: Table 1 of the paper.</p>
+  </div>
+  <p>The explanation is intuitive: a country that joins many projects also joins many early-stage ones, which pulls its average down. South Korea, Canada and Brazil take part in fewer projects, but more mature ones.</p>
+  <p>The consequence: <strong>choosing partners by a single indicator is misleading</strong>. Breadth of access, influence and maturity pull in different directions. This is exactly the kind of conflict that multi-criteria methods exist for.</p>
+  <p class="muted">Other findings: eigenvector centrality is practically unrelated to TRL (ρ = −0.12), and the two centralities are only moderately associated. Each criterion carries its own information.</p>
+</section>
+
+<section id="matrix">
+  <h2><span class="n">4</span>The decision table</h2>
+  <p>The candidates are the <b>15 most connected countries</b>, all with a degree above the network average. All three criteria are “higher is better”.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Country</th><th>Partners</th><th>C1 · Degree</th><th>C2 · Eigenvector</th><th>C3 · Avg. TRL</th></tr></thead>
+    <tbody id="dataBody"></tbody>
+  </table></div>
+  <p class="muted">Source: Table 1 of the paper. Brazil highlighted. Countries outside this list of 15 are not evaluated, so the model cannot recommend them.</p>
+</section>
+
+<section id="promethee">
+  <h2><span class="n">5</span>Stage 2: PROMETHEE II step by step</h2>
+  <p>Think of a <b>round-robin league</b>: each country “plays” each of the other 14. In every match, we measure how much one beats the other on each criterion. At the end, what counts is the <b>goal difference</b>.</p>
+  <ol class="steps">
+    <li><b>Difference on each criterion.</b> For the pair (a, b) and criterion j: d<sub>j</sub> = g<sub>j</sub>(a) − g<sub>j</sub>(b).</li>
+    <li><b>Preference degree on each criterion.</b> The difference becomes a number between 0 and 1 through a <b>V-shape function</b>: if a loses, it is 0; if a wins, it is the difference divided by the criterion's <b>range</b> (largest value minus smallest).
+      <div class="formula">P<sub>j</sub>(a, b) = max(0, d<sub>j</sub>) ÷ range<sub>j</sub></div><br>
+      Winning by the whole range is worth 1; winning by half of it is worth 0.5.</li>
+    <li><b>Global outranking index.</b> Combine the criteria with the weights (which add up to 1):
+      <div class="formula">π(a, b) = Σ w<sub>j</sub> · P<sub>j</sub>(a, b)</div><br>
+      It is how much a beats b <i>considering all criteria</i>.<sup>1</sup></li>
+    <li><b>Flows.</b> Average over all opponents:
+      <ul>
+        <li><b>φ⁺ (leaving flow)</b>: how much the country beats the others, like goals scored.</li>
+        <li><b>φ⁻ (entering flow)</b>: how much the country is beaten, like goals conceded.</li>
+        <li><b>φ = φ⁺ − φ⁻ (net flow)</b>: the goal difference.</li>
+      </ul></li>
+    <li><b>Ranking.</b> Sort the countries from highest to lowest φ. A positive balance means the country outranks more than it is outranked.</li>
+  </ol>
+  <p class="muted"><sup>1</sup> In the PROMETHEE literature, π(a, b) is usually called the “aggregated preference index”. Here “preference” is reserved for the comparison on a single criterion and “outranking” for the global comparison.</p>
+
+  <h3>Worked example: Japan vs Germany (equal weights, 1/3 each)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Criterion</th><th>Japan</th><th>Germany</th><th>Range</th><th>P(Japan, Germany)</th><th>P(Germany, Japan)</th></tr></thead>
+    <tbody>
+      <tr><td>C1 · Degree</td><td>0.596</td><td>0.808</td><td>0.539</td><td>0</td><td>0.212 ÷ 0.539 = 0.393</td></tr>
+      <tr><td>C2 · Eigenvector</td><td>0.309</td><td>0.355</td><td>0.433</td><td>0</td><td>0.046 ÷ 0.433 = 0.106</td></tr>
+      <tr><td>C3 · TRL</td><td>7.40</td><td>7.03</td><td>1.01</td><td>0.37 ÷ 1.01 = 0.366</td><td>0</td></tr>
+      <tr><td><b>π with weights 1/3</b></td><td></td><td></td><td></td><td><b>0.122</b></td><td><b>0.167</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>In this head-to-head, Germany comes out ahead (0.167 vs 0.122). But the ranking depends on <i>all</i> the matches. Against the whole field, Japan ends up 3rd because it combines good eigenvector centrality with one of the highest TRLs (7.40), even though it is only 8th in number of partners.</p>
+</section>
+
+<section id="simulator">
+  <h2><span class="n">6</span>Try it: the simulator</h2>
+  <p>The simulator reruns PROMETHEE II on the paper's data. Pick a weighting scenario, move the sliders, switch the preference function or remove a country, and watch the ranking change.</p>
+  <div class="sim">
+    <div class="presets" role="group" aria-label="Weighting scenarios from the paper" id="presets"></div>
+    <div class="sim-grid">
+      <div class="ctrl">
+        <p class="sub" style="margin-top:0">Weights (normalized to sum to 1)</p>
+        <div id="weights"></div>
+        <p class="sub">Variations</p>
+        <label class="chk" for="usual"><input type="checkbox" id="usual"><span>Use the usual preference function (the winner scores 1, regardless of the margin)</span></label>
+        <label for="drop" style="margin-top:12px">Remove a country from the set</label>
+        <select id="drop"></select>
+        <p class="note" id="scenarioText"></p>
+      </div>
+      <div style="min-width:0">
+        <div class="legend"><span><i style="background:var(--pos)"></i>φ &gt; 0: outranks more than it is outranked</span><span><i style="background:var(--neg)"></i>φ &lt; 0: outranked more</span></div>
+        <svg id="bars" viewBox="0 0 660 437" role="img" aria-label="Country ranking by net flow φ"></svg>
+        <p class="note">Next to each country: current position and change relative to scenario S1 (equal weights, V-shape function) with the same set of countries. Hover over a bar to see φ⁺, φ⁻ and φ.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <h2><span class="n">7</span>What the results show</h2>
+  <h3>The baseline ranking (equal weights)</h3>
+  <ul>
+    <li>The <b>United States</b> leads by a wide margin (φ = 0.347): it is the strongest on both centralities and has a mid-range TRL.</li>
+    <li>Next come <b>Germany</b> (0.158), <b>Japan</b> (0.110), the <b>Netherlands</b> (0.088) and <b>China</b> (0.077).</li>
+    <li><b>South Korea</b> has the most polarized profile: high φ⁺ and high φ⁻ at the same time, because it has the highest TRL but sits on the periphery of the network.</li>
+    <li><b>Brazil</b> is 14th: its high TRL (7.50) does not make up for the lowest eigenvector centrality in the group (0.044). Brazil takes part in mature projects, but far from the influential core.</li>
+  </ul>
+
+  <h3>The five weighting scenarios</h3>
+  <p>Since no real decision maker was interviewed, the authors test five policy profiles:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Scenario</th><th style="text-align:left">Who would think this way</th><th>C1</th><th>C2</th><th>C3</th></tr></thead>
+    <tbody>
+      <tr><td><b>S1 · Equal</b></td><td class="wrapc">No preference information (baseline)</td><td>0.333</td><td>0.333</td><td>0.333</td></tr>
+      <tr><td><b>S2 · Entropy</b></td><td class="wrapc">Objective weights: the criterion that best separates the countries in the data weighs more</td><td>0.261</td><td>0.338</td><td>0.401</td></tr>
+      <tr><td><b>S3 · Network</b></td><td class="wrapc">A peripheral country that wants to broaden its ties</td><td>0.400</td><td>0.400</td><td>0.200</td></tr>
+      <tr><td><b>S4 · Maturity</b></td><td class="wrapc">An agency funding demonstration and deployment</td><td>0.200</td><td>0.200</td><td>0.600</td></tr>
+      <tr><td><b>S5 · Influence</b></td><td class="wrapc">Someone who wants to join the consortia that set agendas and standards</td><td>0.200</td><td>0.500</td><td>0.300</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Country</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th></tr></thead>
+    <tbody id="rankBody"></tbody>
+  </table></div>
+  <p class="muted">Rank in each scenario (Table 4 of the paper, reproduced by the simulator). Top five in blue.</p>
+  <p>Two <b>partner archetypes</b> emerge:</p>
+  <ul>
+    <li><b>Gateway hubs</b> (United States, Germany, Netherlands, China, Japan): attractive whenever access to the network matters.</li>
+    <li><b>Maturity specialists</b> (South Korea, Canada, Denmark): attractive to those who want near-market technologies. In scenario S4, South Korea climbs from 8th to 1st, and Germany drops from 2nd to 9th.</li>
+  </ul>
+</section>
+
+<section id="robustness">
+  <h2><span class="n">8</span>Can we trust the result? The robustness checks</h2>
+  <ul>
+    <li><b>A different method, TOPSIS.</b> TOPSIS ranks each country by its distance to an “ideal” and an “anti-ideal” country. The two rankings agree closely (ρ = 0.85). The differences appear in the middle of the table, where net flows are close to zero; the United Kingdom, for example, is 11th under PROMETHEE II and 6th under TOPSIS.</li>
+    <li><b>A different preference function.</b> Replacing the V-shape with the usual function changes almost nothing (ρ = 0.971): the leader is the same and only France replaces Japan in the top five. Try it in the simulator.</li>
+    <li><b>Removing one country at a time.</b> In 12 of the 15 removals, the order of the rest does not change. The exceptions are the United States, South Korea and Brazil, precisely the countries that set the range of some criterion. Even then, the top five never changes in the baseline scenario.</li>
+    <li><b>Shrinking or enlarging the set.</b> With only the 10 most connected countries, the order repeats. In a simulated larger set, the United States, Germany, Japan and China always stay in the top five.</li>
+  </ul>
+  <div class="callout">
+    <span class="t">Robustness is not validation</span>
+    <p>PROMETHEE II and TOPSIS reason differently. Their agreement increases confidence, but it does not prove the ranking is “right”, and disagreement would not prove it wrong.</p>
+  </div>
+</section>
+
+<section id="brazil">
+  <h2><span class="n">9</span>What does this mean for Brazil?</h2>
+  <p>Brazil has a mature portfolio but little influence in the network. The model suggests a <strong>two-track strategy</strong>:</p>
+  <ul>
+    <li><b>Consolidate ties with the hubs</b> (United States, Germany, Japan), which give indirect access to the rest of the network and to the main knowledge flows.</li>
+    <li><b>Explore agreements with the maturity specialists</b> (South Korea, Canada, Denmark), whose portfolios match deployment priorities.</li>
+  </ul>
+  <p>When Brazil is removed from the list (it cannot partner with itself), the order of the other 14 barely changes: only Italy and the United Kingdom swap places. Try it in the simulator by choosing “Brazil” under “Remove a country”.</p>
+  <div class="callout warn">
+    <span class="t">A shortlist, not the final answer</span>
+    <p>The criteria describe each country in the global network, not its relationship with Brazil. Choosing a bilateral partner also requires pair-specific criteria: technological complementarity, existing agreements and institutional compatibility.</p>
+  </div>
+</section>
+
+<section id="limits">
+  <h2><span class="n">10</span>Limitations the authors point out</h2>
+  <ul>
+    <li>Only the 15 most connected countries were evaluated, and that selection used one of the criteria itself (degree).</li>
+    <li>No real decision maker was consulted: the weights are scenarios, and each ranking holds for its own scenario.</li>
+    <li>The network is unweighted (a link counts the same with 1 or 10 joint projects) and is a snapshot of a single moment.</li>
+    <li>The average TRL hides the distribution of projects and differences across sectors.</li>
+    <li>With the V-shape function and p equal to the range, PROMETHEE II becomes fully compensatory (equivalent to a weighted sum of normalized scores). That is why the usual function was also tested.</li>
+  </ul>
+  <p>Future work: evaluate all 53 countries, use a weighted network, add other centralities (betweenness, closeness), measure maturity by the full TRL distribution and elicit the weights directly from policymakers.</p>
+</section>
+
+<section id="glossary">
+  <h2><span class="n">11</span>Quick glossary</h2>
+  <dl class="gloss">
+    <dt>Net zero</dt><dd>Net-zero emissions: the CO₂ emitted is balanced by the CO₂ removed.</dd>
+    <dt>SNA (social network analysis)</dt><dd>A set of techniques for studying who is connected to whom in a network.</dd>
+    <dt>Graph</dt><dd>A network made of nodes (here, countries) and links (joint projects).</dd>
+    <dt>Degree centrality</dt><dd>The share of the other countries a country cooperates with directly.</dd>
+    <dt>Eigenvector centrality</dt><dd>A country's importance measured by the importance of its partners.</dd>
+    <dt>TRL</dt><dd>A 1-to-9 scale of technology maturity, from basic research to market.</dd>
+    <dt>Criterion</dt><dd>A point of view used to compare the alternatives.</dd>
+    <dt>Preference degree P<sub>j</sub>(a, b)</dt><dd>From 0 to 1, how much a is preferred to b <i>on a single criterion</i> j.</dd>
+    <dt>Global outranking index π(a, b)</dt><dd>The weighted average of the preference degrees: how much a outranks b considering all criteria.</dd>
+    <dt>Flows φ⁺, φ⁻, φ</dt><dd>Strength, weakness and balance of each country against all the others.</dd>
+    <dt>Entropy</dt><dd>A way to derive weights from the data: the criterion that best separates the alternatives weighs more.</dd>
+    <dt>TOPSIS</dt><dd>A method that ranks by closeness to an ideal solution and distance from an anti-ideal one.</dd>
+    <dt>Spearman ρ</dt><dd>Correlation between two rankings: 1 means identical orders, −1 opposite orders.</dd>
+    <dt>Rank reversal</dt><dd>When adding or removing an alternative swaps the order of two others.</dd>
+  </dl>
+</section>
+
+<section id="faq">
+  <h2><span class="n">12</span>Questions every beginner asks</h2>
+  <details><summary>Why not just rank by number of partners?</summary>
+    <p>Because number of partners and maturity move in opposite directions in this data (ρ = −0.66). Ranking by a single indicator hides that conflict and always favors the same kind of country.</p></details>
+  <details><summary>So the United States is “the best partner” for any country?</summary>
+    <p>No. The ranking measures each country's general attractiveness in the network. For a specific country, you still need to look at technological complementarity, existing agreements and institutional compatibility.</p></details>
+  <details><summary>Who chose the weights?</summary>
+    <p>Nobody in particular, on purpose. The five scenarios cover plausible policy orientations. The useful result is knowing which countries do well in every scenario (the hubs) and which depend on the profile (the maturity specialists).</p></details>
+  <details><summary>Why can removing one country change the order of the others?</summary>
+    <p>Because the preference degree is divided by the criterion's range. If the removed country had the highest or lowest value on a criterion, the range changes and so do the comparisons among the rest. That is why only the United States, South Korea and Brazil change the order when removed.</p></details>
+  <details><summary>Isn't PROMETHEE II an outranking, non-compensatory method?</summary>
+    <p>It is an outranking method, but how compensatory it is depends on the preference functions. With the V-shape function and threshold p equal to the range, the net flow is equivalent to a weighted sum of normalized scores, so it becomes compensatory. The usual function reduces this effect, and the paper shows the ranking barely changes with it.</p></details>
+</section>
+
+<footer>
+  LabDEC · Decision Laboratory · Universidade Federal Fluminense. Tutorial based on Linhares, Costa &amp; Eufrazio, <i>Integrating Social Network Analysis and PROMETHEE II for Prioritizing International Cooperation Partners in Net-Zero Technology Projects</i> (INSID 2026). Data: International Energy Agency (IEA), ETP Clean Energy Technology Guide, <a href="https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide" target="_blank" rel="noopener" style="overflow-wrap:anywhere">https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide</a>. Portuguese version: Tutorial_para_leigos_SNA_PROMETHEE_NetZero.html.
+</footer>
+
+</div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var NAMES = ["United States", "Germany", "Netherlands", "Norway", "Australia", "Italy", "France", "China", "Denmark", "Spain", "United Kingdom", "Japan", "Canada", "South Korea", "Brazil"];
+  var DEG = [47, 42, 40, 37, 34, 33, 33, 32, 32, 32, 31, 31, 28, 24, 19];
+  var G = [
+    [0.904, 0.477, 7.10], [0.808, 0.355, 7.03], [0.769, 0.263, 7.12], [0.712, 0.159, 6.92], [0.654, 0.187, 6.69],
+    [0.635, 0.152, 7.30], [0.635, 0.239, 7.33], [0.615, 0.310, 7.27], [0.615, 0.133, 7.43], [0.615, 0.117, 6.69],
+    [0.596, 0.268, 7.07], [0.596, 0.309, 7.40], [0.538, 0.218, 7.52], [0.462, 0.194, 7.70], [0.365, 0.044, 7.50]
+  ];
+  var BR = 14;
+  var CRIT = ["C1 · Degree", "C2 · Eigenvector", "C3 · Avg. TRL"];
+  var SC = [
+    { id: "S1", name: "S1 · Equal", w: [1 / 3, 1 / 3, 1 / 3], txt: "No preference information: all criteria weigh the same." },
+    { id: "S2", name: "S2 · Entropy", w: [0.261, 0.338, 0.401], txt: "Objective weights: the criterion that best separates the countries weighs more." },
+    { id: "S3", name: "S3 · Network", w: [0.4, 0.4, 0.2], txt: "Network access matters most: the two centralities take 80% of the weight." },
+    { id: "S4", name: "S4 · Maturity", w: [0.2, 0.2, 0.6], txt: "Maturity matters most: TRL weighs more than both centralities combined." },
+    { id: "S5", name: "S5 · Influence", w: [0.2, 0.5, 0.3], txt: "Influence in the core: eigenvector centrality gets half of the weight." }
+  ];
+  var $ = function (id) { return document.getElementById(id); };
+  var NS = "http://www.w3.org/2000/svg";
+  var f = function (x, d) { return x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var ord = function (n) { var s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+  function el(tag, attrs, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // ---------- PROMETHEE II ----------
+  function promethee(w, usual, idx) {
+    var n = idx.length, s = w[0] + w[1] + w[2];
+    var ww = w.map(function (x) { return s > 0 ? x / s : 1 / 3; });
+    var rng = [0, 1, 2].map(function (j) {
+      var v = idx.map(function (i) { return G[i][j]; });
+      return Math.max.apply(null, v) - Math.min.apply(null, v);
+    });
+    function P(d, j) { if (d <= 0) return 0; return usual ? 1 : Math.min(1, d / rng[j]); }
+    var fp = [], fm = [];
+    idx.forEach(function () { fp.push(0); fm.push(0); });
+    for (var a = 0; a < n; a++) for (var b = 0; b < n; b++) {
+      if (a === b) continue;
+      var pi = 0;
+      for (var j = 0; j < 3; j++) pi += ww[j] * P(G[idx[a]][j] - G[idx[b]][j], j);
+      fp[a] += pi / (n - 1); fm[b] += pi / (n - 1);
+    }
+    var res = idx.map(function (i, k) { return { i: i, fp: fp[k], fm: fm[k], phi: fp[k] - fm[k] }; });
+    res.sort(function (x, y) { return y.phi - x.phi; });
+    res.forEach(function (r, k) { r.rank = k + 1; });
+    return res;
+  }
+  function rankMap(res) { var m = {}; res.forEach(function (r) { m[r.i] = r.rank; }); return m; }
+  var ALL = NAMES.map(function (_, i) { return i; });
+
+  // ---------- Data table ----------
+  $("dataBody").innerHTML = ALL.map(function (i) {
+    return '<tr' + (i === BR ? ' class="br"' : '') + '><td><b>' + NAMES[i] + '</b></td><td>' + DEG[i] + '</td><td>' + f(G[i][0], 3) + '</td><td>' + f(G[i][1], 3) + '</td><td>' + f(G[i][2], 2) + '</td></tr>';
+  }).join("");
+
+  // ---------- Rank table by scenario (computed) ----------
+  var RK = SC.map(function (s) { return rankMap(promethee(s.w, false, ALL)); });
+  var base = promethee(SC[0].w, false, ALL);
+  $("rankBody").innerHTML = base.map(function (r) {
+    return '<tr' + (r.i === BR ? ' class="br"' : '') + '><td><b>' + NAMES[r.i] + '</b></td>' + RK.map(function (m) {
+      return '<td' + (m[r.i] <= 5 ? ' class="top"' : '') + '>' + ord(m[r.i]) + '</td>';
+    }).join("") + '</tr>';
+  }).join("");
+
+  // ---------- Toy networks ----------
+  (function () {
+    var A = $("toyA"), B = $("toyB");
+    var cx = 150, cy = 100, k;
+    for (k = 0; k < 6; k++) {
+      var ang = -Math.PI / 2 + k * Math.PI / 3, x = cx + 72 * Math.cos(ang), y = cy + 72 * Math.sin(ang);
+      A.appendChild(el("line", { x1: cx, y1: cy, x2: x, y2: y, "class": "edge" }));
+      A.appendChild(el("circle", { cx: x, cy: y, r: 10, "class": "nd" }));
+    }
+    A.appendChild(el("circle", { cx: cx, cy: cy, r: 18, "class": "nd focus" }));
+    A.appendChild(el("text", { x: cx, y: cy + 4, "text-anchor": "middle", "class": "ndl" }, "A"));
+    var hubs = [[70, 100], [230, 100]], b = [150, 40];
+    hubs.forEach(function (h, s) {
+      for (k = 0; k < 5; k++) {
+        var ang = (s === 0 ? Math.PI * 0.55 : -Math.PI * 0.45) + k * Math.PI * 0.22, x = h[0] + 52 * Math.cos(ang), y = h[1] + 52 * Math.sin(ang);
+        B.appendChild(el("line", { x1: h[0], y1: h[1], x2: x, y2: y, "class": "edge" }));
+        B.appendChild(el("circle", { cx: x, cy: y, r: 8, "class": "nd" }));
+      }
+    });
+    B.appendChild(el("line", { x1: hubs[0][0], y1: hubs[0][1], x2: hubs[1][0], y2: hubs[1][1], "class": "edge" }));
+    hubs.forEach(function (h) {
+      B.appendChild(el("line", { x1: b[0], y1: b[1], x2: h[0], y2: h[1], "class": "edge" }));
+      B.appendChild(el("circle", { cx: h[0], cy: h[1], r: 15, "class": "nd hub" }));
+    });
+    B.appendChild(el("circle", { cx: b[0], cy: b[1], r: 18, "class": "nd focus2" }));
+    B.appendChild(el("text", { x: b[0], y: b[1] + 4, "text-anchor": "middle", "class": "ndl" }, "B"));
+  })();
+
+  // ---------- Scatter: TRL vs degree ----------
+  (function () {
+    var svg = $("scatter"), L = 58, R = 620, T = 16, Bm = 276;
+    var x = function (v) { return L + (v - 0.3) / 0.7 * (R - L); };
+    var y = function (v) { return Bm - (v - 6.6) / 1.2 * (Bm - T); };
+    var t;
+    for (t = 6.6; t <= 7.81; t += 0.2) {
+      svg.appendChild(el("line", { x1: L, x2: R, y1: y(t), y2: y(t), "class": "gr" }));
+      svg.appendChild(el("text", { x: L - 8, y: y(t) + 4, "text-anchor": "end", "class": "tick" }, f(t, 1)));
+    }
+    for (t = 0.3; t <= 1.001; t += 0.1) {
+      svg.appendChild(el("text", { x: x(t), y: Bm + 18, "text-anchor": "middle", "class": "tick" }, f(t, 1)));
+    }
+    svg.appendChild(el("line", { x1: L, x2: R, y1: Bm, y2: Bm, "class": "ax" }));
+    svg.appendChild(el("text", { x: (L + R) / 2, y: Bm + 42, "text-anchor": "middle", "class": "axt" }, "C1 · Degree centrality (breadth of access) →"));
+    svg.appendChild(el("text", { x: 14, y: (T + Bm) / 2, "text-anchor": "middle", "class": "axt", transform: "rotate(-90 14 " + (T + Bm) / 2 + ")" }, "C3 · Average TRL →"));
+    var LBL = { 0: ["middle", 0, -14], 1: ["start", 10, 16], 13: ["start", 10, 4], 14: ["start", 10, 4], 12: ["start", 10, -6], 9: ["end", -10, 4], 4: ["start", 10, 4], 11: ["end", -10, 4] };
+    ALL.forEach(function (i) {
+      var cx = x(G[i][0]), cy = y(G[i][2]);
+      var g = el("g", {});
+      g.appendChild(el("circle", { cx: cx, cy: cy, r: 12, "class": "hit" }));
+      g.appendChild(el("circle", { cx: cx, cy: cy, r: 6, "class": "dot" + (i === BR ? " br" : "") }));
+      g.appendChild(el("title", {}, NAMES[i] + ": degree " + f(G[i][0], 3) + ", TRL " + f(G[i][2], 2)));
+      svg.appendChild(g);
+      if (LBL[i]) svg.appendChild(el("text", { x: cx + LBL[i][1], y: cy + LBL[i][2], "text-anchor": LBL[i][0], "class": "lab" }, NAMES[i]));
+    });
+  })();
+
+  // ---------- Simulator ----------
+  var scen = 0;
+  $("presets").innerHTML = SC.map(function (s, k) { return '<button type="button" data-k="' + k + '" aria-pressed="' + (k === 0) + '">' + s.name + '</button>'; }).join("");
+  $("weights").innerHTML = CRIT.map(function (c, j) {
+    return '<label for="w' + j + '">' + c + ' <span id="wv' + j + '"></span></label><input type="range" id="w' + j + '" min="0" max="100" step="0.1" value="33.3">';
+  }).join("");
+  $("drop").innerHTML = '<option value="-1">None (15 countries)</option>' + ALL.map(function (i) { return '<option value="' + i + '">' + NAMES[i] + '</option>'; }).join("");
+
+  function setScenario(k) {
+    scen = k;
+    SC[k].w.forEach(function (v, j) { $("w" + j).value = Math.round(v * 1000) / 10; });
+    document.querySelectorAll("#presets button").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.k === k)); });
+    render();
+  }
+  function render() {
+    var raw = [0, 1, 2].map(function (j) { return +$("w" + j).value; });
+    var s = raw[0] + raw[1] + raw[2];
+    var w = raw.map(function (v) { return s > 0 ? v / s : 1 / 3; });
+    w.forEach(function (v, j) { $("wv" + j).textContent = f(v, 3); });
+    var match = scen >= 0 && SC[scen].w.every(function (v, j) { return Math.abs(v - w[j]) < 0.006; });
+    if (!match) { scen = -1; document.querySelectorAll("#presets button").forEach(function (b) { b.setAttribute("aria-pressed", "false"); }); }
+    $("scenarioText").textContent = match ? SC[scen].txt : "Custom weights.";
+    var usual = $("usual").checked, drop = +$("drop").value;
+    var idx = ALL.filter(function (i) { return i !== drop; });
+    var res = promethee(w, usual, idx);
+    var ref = rankMap(promethee(SC[0].w, false, idx));
+    drawBars(res, ref);
+  }
+  function drawBars(res, ref) {
+    var svg = $("bars");
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var rowH = 27, top = 8, labW = 140, X0 = 240, X1 = 600;
+    var H = top + res.length * rowH + 24;
+    svg.setAttribute("viewBox", "0 0 660 " + H);
+    var m = 0.45;
+    var zero = X0 + (X1 - X0) / 2, sc = (X1 - X0) / 2 / m;
+    [-0.4, -0.2, 0, 0.2, 0.4].forEach(function (t) {
+      var xx = zero + t * sc;
+      svg.appendChild(el("line", { x1: xx, x2: xx, y1: top - 2, y2: top + res.length * rowH, "class": t === 0 ? "ax" : "gr" }));
+      svg.appendChild(el("text", { x: xx, y: top + res.length * rowH + 16, "text-anchor": "middle", "class": "tick" }, (t > 0 ? "+" : "") + f(t, 1)));
+    });
+    res.forEach(function (r, k) {
+      var yy = top + k * rowH, g = el("g", { "class": "row" });
+      g.appendChild(el("rect", { x: 0, y: yy, width: 660, height: rowH, "class": "hit" }));
+      g.appendChild(el("text", { x: labW - 10, y: yy + 18, "text-anchor": "end", "class": "lab" }, NAMES[r.i]));
+      var dlt = ref[r.i] - r.rank;
+      var dtxt = dlt > 0 ? "▲" + dlt : dlt < 0 ? "▼" + (-dlt) : "=";
+      g.appendChild(el("text", { x: labW, y: yy + 18, "class": "val" }, "#" + r.rank + " " + dtxt));
+      var v = Math.max(-m, Math.min(m, r.phi)), w = Math.abs(v) * sc;
+      var bx = v >= 0 ? zero : zero - w;
+      if (w > 0.5) g.appendChild(el("rect", { x: bx, y: yy + 6, width: Math.max(w, 1), height: rowH - 12, rx: 3, "class": r.phi >= 0 ? "bar-pos" : "bar-neg" }));
+      var tx = r.phi >= 0 ? zero + w + 5 : zero - w - 5;
+      g.appendChild(el("text", { x: tx, y: yy + 18, "text-anchor": r.phi >= 0 ? "start" : "end", "class": "val" }, (r.phi > 0 ? "+" : "") + f(r.phi, 3)));
+      g.appendChild(el("title", {}, NAMES[r.i] + " · " + ord(r.rank) + " place\nφ⁺ = " + f(r.fp, 3) + "   φ⁻ = " + f(r.fm, 3) + "   φ = " + f(r.phi, 3)));
+      svg.appendChild(g);
+    });
+  }
+  document.querySelectorAll("#presets button").forEach(function (b) { b.addEventListener("click", function () { setScenario(+b.dataset.k); }); });
+  [0, 1, 2].forEach(function (j) { $("w" + j).addEventListener("input", function () { scen = -1; render(); }); });
+  $("usual").addEventListener("change", render);
+  $("drop").addEventListener("change", render);
+  setScenario(0);
+})();
+</script>
+</body>
+</html>

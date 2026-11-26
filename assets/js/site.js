@@ -42,8 +42,28 @@
 
   var filters = Array.prototype.slice.call(document.querySelectorAll(".filter"));
   var years = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+  var cats = Array.prototype.slice.call(document.querySelectorAll(".pub-cat"));
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".cat-tab"));
   var countEl = document.getElementById("pub-count-n");
   var activeType = "all";
+  var activeCat = "all";
+
+  // Categoria pela âncora do endereço: #indexadas, #nao-indexadas, #preprints
+  function catFromHash() {
+    var h = location.hash.replace("#", "");
+    var map = { "indexadas": "indexada", "nao-indexadas": "nao_indexada", "preprints": "preprint" };
+    activeCat = map[h] || "all";
+    tabs.forEach(function (t) { t.setAttribute("aria-current", String(t.getAttribute("data-cat") === activeCat)); });
+  }
+  window.addEventListener("hashchange", function () { catFromHash(); apply(); });
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      history.replaceState(null, "", t.getAttribute("href"));
+      catFromHash(); apply();
+    });
+  });
+  catFromHash();
 
   function normalize(s) {
     return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -59,8 +79,17 @@
       p.hidden = !ok;
       if (ok) shown++;
     });
+    cats.forEach(function (c) {
+      var off = activeCat !== "all" && c.getAttribute("data-cat") !== activeCat;
+      c.querySelectorAll(".pub").forEach(function (p) {
+        if (off && !p.hidden) { p.hidden = true; shown--; }
+      });
+    });
     years.forEach(function (sec) {
       sec.hidden = !sec.querySelector(".pub:not([hidden])");
+    });
+    cats.forEach(function (c) {
+      c.hidden = !c.querySelector(".pub:not([hidden])");
     });
     if (countEl) countEl.textContent = shown;
   }

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure of Preferences</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+<!--
+  Interactive companion to Chapter 2 ("Structure of Preferences") of the book
+  in docs/book_en (docs/livro in Portuguese). Self-contained: no external
+  files, works offline. Based on Costa (2016), J. Model. Manag. 11(1), 26-42.
+-->
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f4f6fb; --ink: #0b1f4d; --muted: #51607a; --line: #d9e0ec;
+    --accent: #1d5fbf;
+    --r1: #f3d9d4; --r2: #f8e9d2; --r3: #e9ecef; --r4: #dcefd9; --r5: #bfe3c0;
+    --conc: #0b6e63; --pref: #c2410c; --marker: #1f2328;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c; --panel: #1e232b; --ink: #e6e9ee; --muted: #9aa4b2; --line: #39424e;
+      --accent: #6aa9f0;
+      --r1: #4a2a26; --r2: #4a3a22; --r3: #2e343d; --r4: #24402a; --r5: #1f5a2c;
+      --conc: #4fd1c0; --pref: #fb923c; --marker: #e6e9ee;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171c; --panel: #1e232b; --ink: #e6e9ee; --muted: #9aa4b2; --line: #39424e;
+    --accent: #6aa9f0;
+    --r1: #4a2a26; --r2: #4a3a22; --r3: #2e343d; --r4: #24402a; --r5: #1f5a2c;
+    --conc: #4fd1c0; --pref: #fb923c; --marker: #e6e9ee;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.5; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
+  .lang button, .tabs button, .btn {
+    font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  .lang button[aria-pressed="true"], .tabs button[aria-pressed="true"] {
+    background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 14px; }
+  .panel { background: var(--panel); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+  .statements { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .statements .panel { margin: 0; border-left: 5px solid var(--conc); }
+  .statements .panel + .panel { border-left-color: var(--pref); }
+  .gtitle { font-weight: 700; margin: 0 0 6px; }
+  .gtitle.c { color: var(--conc); } .gtitle.p { color: var(--pref); }
+  .statements b { display: block; margin-bottom: 2px; }
+  svg { width: 100%; height: auto; display: block; touch-action: none; user-select: none; }
+  .axis { stroke: var(--ink); stroke-width: 1.4; fill: none; }
+  .tick { font-size: 12px; fill: var(--muted); text-anchor: middle; }
+  .rlabel { font-size: 14px; fill: var(--ink); text-anchor: middle; font-style: italic; }
+  .conc { stroke: var(--conc); stroke-width: 3.5; fill: none; }
+  .pref { stroke: var(--pref); stroke-width: 3.5; fill: none; stroke-dasharray: 9 6; }
+  .controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 22px; }
+  .controls label { display: flex; flex-direction: column; font-size: 0.92rem; }
+  .controls .row { display: flex; justify-content: space-between; }
+  .controls output { font-variant-numeric: tabular-nums; font-weight: 600; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .readout { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .card { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .card .k { font-size: 0.8rem; color: var(--muted); }
+  .card .v { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .card.c .v { color: var(--conc); } .card.p .v { color: var(--pref); }
+  .explain { font-size: 1.02rem; min-height: 4.5em; }
+  .explain .rel { font-weight: 700; font-size: 1.15rem; }
+  .eq { font-family: "Cambria Math", Cambria, Georgia, serif; font-size: 1.02rem; overflow-x: auto; }
+  .eq table { border-collapse: collapse; } .eq td { padding: 2px 10px 2px 0; white-space: nowrap; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.9rem; color: var(--muted); margin-top: 6px; }
+  .legend i { display: inline-block; width: 30px; height: 0; vertical-align: middle; margin-right: 6px; border-top: 3.5px solid var(--conc); }
+  .legend i.d { border-top: 3.5px dashed var(--pref); }
+  .legend label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--ink); }
+  .legend label i { margin-right: 0; }
+  .legend input { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+  .axis.c { stroke: var(--conc); stroke-width: 2; } .axis.p { stroke: var(--pref); stroke-width: 2; }
+  .tick.c, .atitle.c { fill: var(--conc); } .tick.p, .atitle.p { fill: var(--pref); }
+  .atitle { font-size: 14px; font-weight: 700; text-anchor: middle; }
+  .off { opacity: 0.28; }
+  footer { color: var(--muted); font-size: 0.85rem; margin-top: 18px; }
+  .hidden { display: none; }
+  #prom { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 18px; }
+  #prom h2 { font-size: 1.3rem; margin: 0 0 6px; }
+  .promgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .promcard { background: var(--panel); border-radius: 12px; padding: 12px 14px; }
+  .promcard h3 { font-size: 1rem; margin: 0; }
+  .promcard .par { font-size: 0.82rem; color: var(--muted); }
+  .promcard .f { font-family: "Cambria Math", Cambria, Georgia, serif; font-size: 0.93rem; margin-top: 4px; }
+  .promcard .val { font-weight: 700; color: var(--pref); font-variant-numeric: tabular-nums; }
+  .pcurve { stroke: var(--pref); stroke-width: 3; fill: none; stroke-linecap: round; }
+  @media (max-width: 640px) { .promgrid { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    .statements, .controls { grid-template-columns: 1fr; }
+    .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* ---- LabDEC identity: header and credits (after the LabDEC thesis simulator) ---- */
+  :root { --night: #071637; --navy: #0B1F4D; --gold: #FFD75A; --lab-blue: #1D5FBF; --lab-line: #D9E0EC; }
+  body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header.lab { background: var(--night); color: #fff; padding: 14px 16px; display: block; margin: 0; }
+  header.lab .lab-in { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between;
+                       align-items: center; gap: 12px 20px; flex-wrap: wrap; }
+  header.lab .brand { flex: 1; min-width: 240px; }
+  header.lab small { display: block; color: var(--gold); font-size: 11px; letter-spacing: .08em;
+                     text-transform: uppercase; font-weight: 700; }
+  header.lab h1 { font-family: "Sora", "Inter", sans-serif; font-size: 1.5rem; font-weight: 800; margin: 2px 0 6px; color: #fff; }
+  header.lab .cred { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .03em; font-style: normal;
+                     color: var(--night); background: var(--gold); border-radius: 999px; padding: 2px 10px; }
+  header.lab .lic { display: inline-block; margin-left: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .03em;
+                    color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 1px 10px; text-decoration: none; }
+  header.lab .lic:hover { background: var(--gold); color: var(--night); }
+  header.lab .lang button { background: transparent; color: #fff; border-color: rgba(255,255,255,.45); }
+  header.lab .lang button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--night); }
+  footer.credits { border-top: 1px solid var(--lab-line); background: #fff; color: #51607A; font-size: 13px;
+                   line-height: 1.5; padding: 16px; margin: 0; }
+  footer.credits .in { max-width: 1000px; margin: 0 auto; display: flex; gap: 14px 24px; flex-wrap: wrap; }
+  footer.credits .in > div { flex: 1 1 260px; }
+  footer.credits small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--lab-blue); }
+  footer.credits b { color: var(--navy); }
+  footer.credits a { color: var(--lab-blue); font-weight: 600; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) footer.credits { background: #14171c; border-color: #39424e; color: #9aa4b2; }
+    :root:not([data-theme="light"]) footer.credits b { color: #e6e9ee; }
+  }
+</style>
+</head>
+<body>
+<header class="lab"><div class="lab-in">
+  <div class="brand">
+    <small data-t="eyebrow"></small>
+    <h1 data-t="title"></h1>
+    <em class="cred" data-t="author"></em><a class="lic" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license" data-t="license"></a>
+  </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="pt" aria-pressed="false">PT</button>
+    </div>
+</div></header>
+<main>
+  <p class="sub" data-t="subtitle"></p>
+
+  <div class="statements">
+    <div class="panel"><b data-t="s1h"></b><span data-t="s1"></span></div>
+    <div class="panel"><b data-t="s2h"></b><span data-t="s2"></span></div>
+  </div>
+
+  <div class="tabs" role="group" aria-label="Criterion type" style="margin-top:14px">
+    <button type="button" data-type="true" aria-pressed="false" data-t="tTrue"></button>
+    <button type="button" data-type="semi" aria-pressed="false" data-t="tSemi"></button>
+    <button type="button" data-type="pseudo" aria-pressed="true" data-t="tPseudo"></button>
+  </div>
+
+  <div class="panel">
+    <b data-t="eqTitle"></b>
+    <div class="eq" id="eq" style="margin-top:8px"></div>
+  </div>
+
+  <div class="panel">
+    <p class="gtitle c" data-t="g1"></p>
+    <svg id="plotC" viewBox="0 0 820 372" role="img" aria-label="S1: concordance function"></svg>
+  </div>
+
+  <div class="panel">
+    <p class="gtitle p" data-t="g2"></p>
+    <svg id="plotP" viewBox="0 0 820 372" role="img" aria-label="S2: preference function"></svg>
+  </div>
+
+  <div class="panel">
+    <div class="readout">
+      <div class="card"><div class="k" data-t="kRel"></div><div class="v" id="vRel"></div></div>
+      <div class="card c"><div class="k">c<sub>j</sub>(a,b) &mdash; <span data-t="kC"></span></div><div class="v" id="vC"></div></div>
+      <div class="card p"><div class="k">p<sub>j</sub>(a,b) &mdash; <span data-t="kP"></span></div><div class="v" id="vP"></div></div>
+      <div class="card"><div class="k">1 &minus; p<sub>j</sub>(b,a)</div><div class="v" id="vCheck"></div></div>
+    </div>
+    <p class="explain" id="explain" style="margin:12px 0 0"></p>
+  </div>
+
+  <div class="panel">
+    <div class="controls">
+      <label><span class="row"><span>g<sub>j</sub>(a) &mdash; <span data-t="lGa"></span></span><output id="oGa"></output></span>
+        <input type="range" id="ga" min="0" max="100" step="1" value="38"></label>
+      <label><span class="row"><span>g<sub>j</sub>(b) &mdash; <span data-t="lGb"></span></span><output id="oGb"></output></span>
+        <input type="range" id="gb" min="0" max="100" step="1" value="50"></label>
+      <label id="wq"><span class="row"><span>q<sub>j</sub> &mdash; <span data-t="lQ"></span></span><output id="oQ"></output></span>
+        <input type="range" id="q" min="0" max="25" step="1" value="10"></label>
+      <label id="wp"><span class="row"><span>p<sub>j</sub> &mdash; <span data-t="lP"></span></span><output id="oP"></output></span>
+        <input type="range" id="p" min="0" max="30" step="1" value="24"></label>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="play"></button>
+      <button type="button" class="btn" id="reset" data-t="reset"></button>
+      <span class="sub" style="margin:0" data-t="playHint"></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="gtitle" data-t="g3"></p>
+    <svg id="plot" viewBox="0 0 820 372" role="img" aria-label="Regions of preference and the two functions"></svg>
+    <div class="legend">
+      <label><input type="checkbox" id="showC" checked><i></i><span data-t="legC"></span></label>
+      <label><input type="checkbox" id="showP" checked><i class="d"></i><span data-t="legP"></span></label>
+      <span data-t="legDrag"></span>
+    </div>
+  </div>
+
+  <footer data-t="footer"></footer>
+
+  <section id="prom">
+    <h2 data-t="promTitle"></h2>
+    <p class="sub" style="max-width:none" data-t="promIntro"></p>
+    <div class="panel">
+      <div class="controls">
+        <label><span class="row"><span>d &mdash; <span data-t="promD"></span></span><output id="oPd"></output></span>
+          <input type="range" id="pd" min="-10" max="50" step="1" value="16"></label>
+        <label><span class="row"><span>q &mdash; <span data-t="promQ"></span></span><output id="oPq"></output></span>
+          <input type="range" id="pq" min="0" max="25" step="1" value="10"></label>
+        <label><span class="row"><span>p &mdash; <span data-t="promP"></span></span><output id="oPp"></output></span>
+          <input type="range" id="pp" min="1" max="40" step="1" value="25"></label>
+        <label><span class="row"><span>s &mdash; <span data-t="promS"></span></span><output id="oPs"></output></span>
+          <input type="range" id="ps" min="1" max="30" step="1" value="12"></label>
+      </div>
+    </div>
+    <div class="promgrid" id="promGrid"></div>
+    <footer data-t="promSource"></footer>
+  </section>
+</main>
+<footer class="credits"><div class="in"><div><small data-t="credAuthorH"></small><span data-t="credAuthor"></span></div><div><small data-t="credDevH"></small><span data-t="credDev"></span></div><div><small data-t="credLicH"></small><span data-t="credLic"></span></div></div></footer>
+
+
+<script>
+(function () {
+  "use strict";
+  // ---------------------------------------------------------------- texts
+  var T = {
+    en: {
+      title: "Structure of Preferences",
+      eyebrow: 'LabDEC · Visual OutDecK · Teaching material',
+      author: 'Prof. Helder Gomes Costa · UFF',
+      license: 'Creative Commons 4.0 license',
+      credAuthorH: 'Author',
+      credAuthor: '<b>Helder Gomes Costa</b> – Universidade Federal Fluminense (UFF), Brazil.',
+      credDevH: 'Development',
+      credDev: '<b>LabDEC</b> – Data Analysis and Decision Laboratory, <b>Universidade Federal Fluminense (UFF)</b>.',
+      credLicH: 'License',
+      credLic: '<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Creative Commons 4.0 (CC BY 4.0)</a> license: sharing, use and adaptation are allowed, <b>provided the source is cited</b>.',
+      subtitle: "Move alternative a along the performance axis of one criterion and see how the two readings of the same comparison respond: preference (“a is better than b”) and concordance, or non-dominance (“a is not worse than b”).",
+      s1h: "S1 — Non-dominance", s1: "a is non-dominated by b if, and only if, a is not worse than b. Measured by the concordance function c_j(a,b). Basis of ELECTRE.",
+      s2h: "S2 — Preference", s2: "The decision maker prefers a to b if, and only if, a is better than b. Measured by the preference function p_j(a,b). Basis of PROMETHEE.",
+      g1: "S1 — Non-dominance: c_j(a,b), the concordance with “a is not worse than b”",
+      g2: "S2 — Preference: p_j(a,b), the preference for a over b",
+      g3: "S1 and S2 together",
+      tTrue: "True-criterion", tSemi: "Semi-criterion", tPseudo: "Pseudo-criterion",
+      legC: "c_j(a,b) — concordance (left axis)", legP: "p_j(a,b) — preference (right axis)", legDrag: "Tick a box to light its line up. Drag the marker, or use the sliders below.",
+      kRel: "Relation", kP: "a is better than b", kC: "a is not worse than b",
+      lGa: "performance of a", lGb: "performance of b", lQ: "indifference threshold", lP: "preference threshold",
+      play: "▶ Play", pause: "❚❚ Pause", reset: "Reset", playHint: "Play sweeps a from the worst to the best performance.",
+      eqTitle: "Functions of this type of criterion",
+      footer: "Companion to Chapter 2 of the article. Source: Helder Gomes Costa, Graphical interpretation of outranking principles, <i>Journal of Modelling in Management</i>, Volume 11, Issue 1, 2016, Pages 26-42, ISSN 1746-5664, <a href=\"https://doi.org/10.1108/JM2-08-2013-0037\">https://doi.org/10.1108/JM2-08-2013-0037</a>. (<a href=\"https://www.sciencedirect.com/science/article/pii/S1746566416000287\">https://www.sciencedirect.com/science/article/pii/S1746566416000287</a>)",
+      otherwise: "otherwise", check: "equals c_j(a,b)",
+      promTitle: "The six PROMETHEE preference functions",
+      promIntro: "PROMETHEE lets each criterion have its own preference function P(d), where d = g_j(a) − g_j(b) is the advantage of a over b. Types 1, 2 and 5 are the preference functions p_j(a,b) of the true-criterion, the semi-criterion and the pseudo-criterion shown above; types 3, 4 and 6 are other shapes for the transition from no preference to strict preference. Move d and the parameters to compare the six.",
+      promD: "advantage of a over b", promQ: "indifference threshold", promP: "preference threshold", promS: "inflection point of the Gaussian",
+      promNames: ["Type 1 — Usual", "Type 2 — U-shape (quasi-criterion)", "Type 3 — V-shape (linear preference)",
+                  "Type 4 — Level", "Type 5 — Linear (with indifference area)", "Type 6 — Gaussian"],
+      promIf: "if", promParams: ["no parameter", "parameter: q", "parameter: p", "parameters: q, p", "parameters: q, p", "parameter: s"],
+      promSource: "Source: Brans, J.P., Vincke, P. (1985). A preference ranking organisation method: the PROMETHEE method for multiple criteria decision-making. Management Science, 31(6), 647–656.",
+      eqNote: "— note the order: p_j(b,a) is the preference for b over a, not p_j(a,b). Example: when g_j(a) > g_j(b) + p_j, b is not preferred to a, so p_j(b,a) = 0 and c_j(a,b) = 1 − 0 = 1.",
+      rel: { bPa: "b P_j a — strict preference for b", bQa: "b Q_j a — weak preference for b", aIb: "a I_j b — indifference",
+             aQb: "a Q_j b — weak preference for a", aPb: "a P_j b — strict preference for a" },
+      ex: {
+        bPa: "a is clearly worse than b. There is no preference for a (p = 0) and no agreement with “a is not worse than b” (c = 0): a is dominated by b.",
+        bQa: "b is only weakly preferred: the decision maker hesitates. a is slightly dominated, so the concordance with “a is not worse than b” is partial (0 < c < 1). The preference for a is still null.",
+        aIbLow: "The performance of a is LOWER than that of b, but the difference does not exceed q_j. So a is considered not worse than b (c = 1) although it is not preferred (p = 0). This is the essence of the outranking approach.",
+        aIbEq: "Same performance: a is not worse than b (c = 1), and it is not better either (p = 0). For a true-criterion this single point is the only place where the two functions differ.",
+        aIbHigh: "a performs better, but the difference does not exceed q_j: it is not enough to state a preference (p = 0). Concordance is total (c = 1).",
+        aQb: "a is weakly preferred: the preference for a grows with the difference (0 < p < 1). Concordance has been total since g_j(b) − q_j.",
+        aPb: "a is clearly better than b: strict preference (p = 1) and, of course, a is not worse than b (c = 1)."
+      }
+    },
+    pt: {
+      title: "Estrutura de preferências",
+      eyebrow: 'LabDEC · Visual OutDecK · Material didático',
+      author: 'Prof. Helder Gomes Costa · UFF',
+      license: 'Licença Creative Commons 4.0',
+      credAuthorH: 'Autoria',
+      credAuthor: '<b>Helder Gomes Costa</b> – Universidade Federal Fluminense (UFF).',
+      credDevH: 'Desenvolvimento',
+      credDev: '<b>LabDEC</b> – Laboratório de Análise de Dados e Decisão, vinculado à <b>Universidade Federal Fluminense (UFF)</b>.',
+      credLicH: 'Licença de uso',
+      credLic: 'Licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Creative Commons 4.0 (CC BY 4.0)</a>, que autoriza o compartilhamento, o uso e a adaptação, <b>desde que citada a fonte</b>.',
+      subtitle: "Mova a alternativa a ao longo do eixo de desempenho de um critério e veja como respondem as duas leituras da mesma comparação: preferência (“a é melhor que b”) e concordância, ou não dominância (“a não é pior que b”).",
+      s1h: "E1 — Não dominância", s1: "a não é dominada por b se, e somente se, a não é pior que b. Medida pela função de concordância c_j(a,b). Base do ELECTRE.",
+      s2h: "E2 — Preferência", s2: "O decisor prefere a a b se, e somente se, a é melhor que b. Medida pela função de preferência p_j(a,b). Base do PROMETHEE.",
+      g1: "E1 — Não dominância: c_j(a,b), a concordância com “a não é pior que b”",
+      g2: "E2 — Preferência: p_j(a,b), a preferência de a sobre b",
+      g3: "E1 e E2 juntos",
+      tTrue: "Critério verdadeiro", tSemi: "Semicritério", tPseudo: "Pseudocritério",
+      legC: "c_j(a,b) — concordância (eixo esquerdo)", legP: "p_j(a,b) — preferência (eixo direito)", legDrag: "Marque uma caixa para acender a linha. Arraste o marcador ou use os controles abaixo.",
+      kRel: "Relação", kP: "a é melhor que b", kC: "a não é pior que b",
+      lGa: "desempenho de a", lGb: "desempenho de b", lQ: "limiar de indiferença", lP: "limiar de preferência",
+      play: "▶ Animar", pause: "❚❚ Pausar", reset: "Reiniciar", playHint: "A animação leva a do pior ao melhor desempenho.",
+      eqTitle: "Funções deste tipo de critério",
+      footer: "Material de apoio ao Capítulo 2 do artigo. Fonte: Helder Gomes Costa, Graphical interpretation of outranking principles, <i>Journal of Modelling in Management</i>, Volume 11, Issue 1, 2016, Pages 26-42, ISSN 1746-5664, <a href=\"https://doi.org/10.1108/JM2-08-2013-0037\">https://doi.org/10.1108/JM2-08-2013-0037</a>. (<a href=\"https://www.sciencedirect.com/science/article/pii/S1746566416000287\">https://www.sciencedirect.com/science/article/pii/S1746566416000287</a>)",
+      otherwise: "caso contrário", check: "igual a c_j(a,b)",
+      promTitle: "As seis funções de preferência do PROMETHEE",
+      promIntro: "O PROMETHEE permite que cada critério tenha a sua própria função de preferência P(d), em que d = g_j(a) − g_j(b) é a vantagem de a sobre b. Os tipos 1, 2 e 5 são as funções de preferência p_j(a,b) do critério verdadeiro, do semicritério e do pseudocritério mostradas acima; os tipos 3, 4 e 6 são outras formas para a passagem da ausência de preferência à preferência estrita. Mova d e os parâmetros para comparar as seis.",
+      promD: "vantagem de a sobre b", promQ: "limiar de indiferença", promP: "limiar de preferência", promS: "ponto de inflexão da gaussiana",
+      promNames: ["Tipo 1 — Usual", "Tipo 2 — Forma em U (quase-critério)", "Tipo 3 — Forma em V (preferência linear)",
+                  "Tipo 4 — Nível", "Tipo 5 — Linear (com zona de indiferença)", "Tipo 6 — Gaussiana"],
+      promIf: "se", promParams: ["sem parâmetro", "parâmetro: q", "parâmetro: p", "parâmetros: q, p", "parâmetros: q, p", "parâmetro: s"],
+      promSource: "Fonte: Brans, J.P., Vincke, P. (1985). A preference ranking organisation method: the PROMETHEE method for multiple criteria decision-making. Management Science, 31(6), 647–656.",
+      eqNote: "— atenção à ordem: p_j(b,a) é a preferência de b sobre a, e não p_j(a,b). Exemplo: quando g_j(a) > g_j(b) + p_j, b não é preferida a a; logo p_j(b,a) = 0 e c_j(a,b) = 1 − 0 = 1.",
+      rel: { bPa: "b P_j a — preferência estrita por b", bQa: "b Q_j a — preferência fraca por b", aIb: "a I_j b — indiferença",
+             aQb: "a Q_j b — preferência fraca por a", aPb: "a P_j b — preferência estrita por a" },
+      ex: {
+        bPa: "a é claramente pior que b. Não há preferência por a (p = 0) nem concordância com “a não é pior que b” (c = 0): a é dominada por b.",
+        bQa: "b é apenas fracamente preferida: o decisor hesita. a é levemente dominada, e a concordância com “a não é pior que b” é parcial (0 < c < 1). A preferência por a continua nula.",
+        aIbLow: "O desempenho de a é INFERIOR ao de b, mas a diferença não excede q_j. Por isso a é considerada não pior que b (c = 1), embora não seja preferida (p = 0). Essa é a essência da abordagem de sobreclassificação.",
+        aIbEq: "Mesmo desempenho: a não é pior que b (c = 1) e também não é melhor (p = 0). No critério verdadeiro, este único ponto é o único lugar em que as duas funções diferem.",
+        aIbHigh: "a tem desempenho melhor, mas a diferença não excede q_j: não basta para afirmar preferência (p = 0). A concordância é total (c = 1).",
+        aQb: "a é fracamente preferida: a preferência por a cresce com a diferença (0 < p < 1). A concordância já é total desde g_j(b) − q_j.",
+        aPb: "a é claramente melhor que b: preferência estrita (p = 1) e, naturalmente, a não é pior que b (c = 1)."
+      }
+    }
+  };
+
+  // ---------------------------------------------------------------- state
+  var S = { lang: "en", type: "pseudo", ga: 38, gb: 50, q: 10, p: 24, playing: false,
+            showC: true, showP: true };
+  var $ = function (id) { return document.getElementById(id); };
+  var NS = "http://www.w3.org/2000/svg";
+  // plot geometry: x from 0 to 100, y from 0 to 1
+  var X0 = 62, X1 = 758, Y1 = 62, Y0 = 268;
+  var px = function (g) { return X0 + (X1 - X0) * g / 100; };
+  var py = function (v) { return Y0 - (Y0 - Y1) * v; };
+
+  // q and p as the chosen type of criterion sees them
+  function thresholds() {
+    if (S.type === "true") return { q: 0, p: 0 };
+    if (S.type === "semi") return { q: S.q, p: S.q };
+    return { q: S.q, p: Math.max(S.p, S.q) };
+  }
+  // preference of x over y for a difference d = g(x) - g(y)   (Eqs. 2.3, 2.7, 2.12)
+  function pref(d) {
+    var t = thresholds();
+    if (d <= t.q) return 0;
+    if (d >= t.p) return 1;
+    return (d - t.q) / (t.p - t.q);
+  }
+  // concordance with "x is not worse than y"                  (Eqs. 2.4, 2.8, 2.13)
+  function conc(d) {
+    var t = thresholds();
+    if (d >= -t.q) return 1;
+    if (d <= -t.p) return 0;
+    return (d + t.p) / (t.p - t.q);
+  }
+  function relation(d) {
+    var t = thresholds();
+    if (Math.abs(d) <= t.q) return "aIb";
+    if (d > 0) return d >= t.p ? "aPb" : "aQb";
+    return -d >= t.p ? "bPa" : "bQa";
+  }
+  // plain "x_j" -> subscript markup
+  function sub(s) { return s.replace(/([a-zA-Z])_j/g, "$1<sub>j</sub>"); }
+  function fmt(v) { return v.toFixed(2).replace(".", S.lang === "pt" ? "," : "."); }
+
+  function el(name, attrs, text) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function label(x, y, cls, parts) {            // parts: [text, isSubscript]
+    var t = el("text", { x: x, y: y, class: cls });
+    parts.forEach(function (pt) {
+      var s = el("tspan", pt[1] ? { "baseline-shift": "sub", "font-size": "72%" } : {}, pt[0]);
+      t.appendChild(s);
+    });
+    return t;
+  }
+  var gj = function (who, tail) { return [["g", 0], ["j", 1], ["(" + who + ")" + (tail || ""), 0]]; };
+
+  // ---------------------------------------------------------------- drawing
+  // One graph. twoAxes: c_j(a,b) on the left and p_j(a,b) on the right (the
+  // combined graph); otherwise a single axis, on the left, for the one
+  // function the graph shows.
+  function draw(id, showC, showP, twoAxes) {
+    var svg = $(id), t = thresholds(), gb = S.gb;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var clamp = function (g) { return Math.max(0, Math.min(100, g)); };
+
+    // regions
+    var cuts = [0, clamp(gb - t.p), clamp(gb - t.q), clamp(gb + t.q), clamp(gb + t.p), 100];
+    var names = [["b", "P", "a"], ["b", "Q", "a"], ["a", "I", "b"], ["a", "Q", "b"], ["a", "P", "b"]];
+    for (var i = 0; i < 5; i++) {
+      var a = cuts[i], b = cuts[i + 1];
+      if (b - a <= 0) continue;
+      svg.appendChild(el("rect", { x: px(a), y: Y1, width: px(b) - px(a), height: Y0 - Y1,
+                                   fill: "var(--r" + (i + 1) + ")" }));
+      if (px(b) - px(a) > 46) {
+        svg.appendChild(label((px(a) + px(b)) / 2, Y1 - 8, "rlabel",
+          [[names[i][0] + " " + names[i][1], 0], ["j", 1], [" " + names[i][2], 0]]));
+      }
+    }
+    // the point of indifference of a true-criterion
+    if (S.type === "true") {
+      svg.appendChild(label(px(gb), Y1 - 30, "rlabel", [["a I", 0], ["j", 1], [" b", 0]]));
+      svg.appendChild(el("line", { x1: px(gb), y1: Y1 - 24, x2: px(gb), y2: Y1 - 4, class: "axis" }));
+    }
+
+    // axes
+    // horizontal axis, then one vertical axis per function, both from 0 to 1:
+    // c_j(a,b) on the left and p_j(a,b) on the right, each in the colour of
+    // its curve and dimmed while the curve is switched off
+    svg.appendChild(el("path", { d: "M" + X0 + " " + Y0 + " H" + X1, class: "axis" }));
+    function vaxis(x, side, cls, on, name) {
+      var g = el("g", on ? {} : { class: "off" });
+      g.appendChild(el("path", { d: "M" + x + " " + (Y1 - 20) + " V" + Y0, class: "axis " + cls }));
+      [0, 0.5, 1].forEach(function (v) {
+        g.appendChild(el("line", { x1: x, y1: py(v), x2: x + 6 * side, y2: py(v), class: "axis " + cls }));
+        g.appendChild(el("text", { x: x + 11 * side, y: py(v) + 4, class: "tick " + cls,
+                                   "text-anchor": side < 0 ? "end" : "start" },
+                         v === 0.5 ? (S.lang === "pt" ? "0,5" : "0.5") : String(v)));
+      });
+      g.appendChild(label(x, Y1 - 30, "atitle " + cls, [[name, 0], ["j", 1], ["(a,b)", 0]]));
+      svg.appendChild(g);
+    }
+    if (twoAxes) {
+      vaxis(X0, -1, "c", showC, "c");
+      vaxis(X1, 1, "p", showP, "p");
+    } else {
+      vaxis(X0, -1, showC ? "c" : "p", true, showC ? "c" : "p");
+    }
+    svg.appendChild(label(X1 - 6, Y0 + 66, "tick", gj("a")));
+
+    // ticks: thresholds around g_j(b)
+    var ticks = [[gb, gj("b")]];
+    if (t.q > 0) { ticks.push([gb - t.q, gj("b", " − q").concat([["j", 1]])]); ticks.push([gb + t.q, gj("b", " + q").concat([["j", 1]])]); }
+    if (t.p > t.q) { ticks.push([gb - t.p, gj("b", " − p").concat([["j", 1]])]); ticks.push([gb + t.p, gj("b", " + p").concat([["j", 1]])]); }
+    ticks.sort(function (u, v) { return u[0] - v[0]; });
+    var lastX = -1e9, row = 0;
+    ticks.forEach(function (tk) {
+      if (tk[0] < 0 || tk[0] > 100) return;
+      var x = px(tk[0]);
+      row = (x - lastX < 84) ? 1 - row : 0;      // stagger labels that would collide
+      lastX = x;
+      svg.appendChild(el("line", { x1: x, y1: Y0, x2: x, y2: Y0 + 6 + 16 * row, class: "axis" }));
+      svg.appendChild(label(x, Y0 + 21 + 16 * row, "tick", tk[1]));
+    });
+
+    // the two functions, as polylines over g_j(a)
+    function curve(fn, cls) {
+      var pts = [], brk = [0, gb - t.p, gb - t.q, gb, gb + t.q, gb + t.p, 100], e = 1e-6;
+      brk.forEach(function (g) {
+        [g - e, g + e].forEach(function (x) {
+          if (x >= 0 && x <= 100) pts.push([x, fn(x - gb)]);
+        });
+      });
+      pts.sort(function (u, v) { return u[0] - v[0]; });
+      svg.appendChild(el("polyline", { class: cls,
+        points: pts.map(function (q) { return px(q[0]).toFixed(1) + "," + py(q[1]).toFixed(1); }).join(" ") }));
+    }
+    // concordance slightly above, preference slightly below, so that both
+    // stay visible where they coincide
+    var gC = el("g", { transform: "translate(0,-2.2)" }), gP = el("g", { transform: "translate(0,2.2)" });
+    svg.appendChild(gC); svg.appendChild(gP);
+    var keep = svg;
+    if (showC) { svg = gC; curve(conc, "conc"); }
+    if (showP) { svg = gP; curve(pref, "pref"); }
+    svg = keep;
+
+    // marker of alternative a
+    var d = S.ga - gb, x = px(S.ga);
+    svg.appendChild(el("line", { x1: x, y1: Y1 - 4, x2: x, y2: Y0 + 4, stroke: "var(--marker)",
+                                 "stroke-width": 1.6, "stroke-dasharray": "3 4" }));
+    if (showC) svg.appendChild(el("circle", { cx: x, cy: py(conc(d)) - 2.2, r: 7, fill: "var(--conc)", stroke: "var(--bg)", "stroke-width": 2 }));
+    if (showP) svg.appendChild(el("circle", { cx: x, cy: py(pref(d)) + 2.2, r: 7, fill: "var(--pref)", stroke: "var(--bg)", "stroke-width": 2 }));
+    svg.appendChild(el("path", { d: "M" + (x - 9) + " " + (Y0 + 44) + " L" + (x + 9) + " " + (Y0 + 44) + " L" + x + " " + (Y0 + 30) + " Z",
+                                 fill: "var(--marker)" }));
+    svg.appendChild(el("text", { x: x, y: Y0 + 62, class: "tick", "font-weight": 700, fill: "var(--ink)" }, "a"));
+    // Black dots at the jump of each step function shown (none for the
+    // pseudo-criterion, whose functions have no jump):
+    //   concordance  -> (g_j(b) - q_j, 1)   [true-criterion: (g_j(b), 1)]
+    //   preference   -> (g_j(b) + q_j, 1) for the semi-criterion;
+    //                   (g_j(b), 0) for the true-criterion
+    var dots = [];
+    if (S.type !== "pseudo") {
+      if (showC) dots.push([gb - t.q, py(1) - 2.2]);
+      if (showP) dots.push(S.type === "semi" ? [gb + t.q, py(1) + 2.2] : [gb, py(0) + 2.2]);
+    }
+    dots.forEach(function (pt) {
+      if (pt[0] < 0 || pt[0] > 100) return;
+      svg.appendChild(el("line", { x1: px(pt[0]), y1: Y0, x2: px(pt[0]), y2: pt[1], stroke: "var(--marker)",
+                                   "stroke-width": 1.2, "stroke-dasharray": "2 4" }));
+      svg.appendChild(el("circle", { cx: px(pt[0]), cy: pt[1], r: 5.5, fill: "var(--marker)",
+                                     stroke: "var(--bg)", "stroke-width": 1.5, class: "bdot" }));
+    });
+  }
+
+  function equations() {
+    var o = T[S.lang].otherwise, g = "g<sub>j</sub>", r = "";
+    function sys(name, rows) {
+      return "<table><tr><td rowspan='" + rows.length + "'>" + name + " = </td>" +
+        rows.map(function (x, i) { return (i ? "<tr>" : "") + "<td>" + x[0] + ",</td><td>" + x[1] + "</td></tr>"; }).join("") + "</table>";
+    }
+    var A = g + "(a)", B = g + "(b)", q = "q<sub>j</sub>", p = "p<sub>j</sub>";
+    if (S.type === "true") {
+      r = sys(p + "(a,b)", [["1", A + " &gt; " + B], ["0", o]]) + sys("c<sub>j</sub>(a,b)", [["1", A + " &ge; " + B], ["0", o]]);
+    } else if (S.type === "semi") {
+      r = sys(p + "(a,b)", [["1", A + " &gt; " + B + " + " + q], ["0", o]]) +
+          sys("c<sub>j</sub>(a,b)", [["1", A + " &ge; " + B + " &minus; " + q], ["0", o]]);
+    } else {
+      r = sys(p + "(a,b)", [["0", A + " &le; " + B + " + " + q],
+            ["(" + A + " &minus; " + B + " &minus; " + q + ") / (" + p + " &minus; " + q + ")", B + " + " + q + " &lt; " + A + " &lt; " + B + " + " + p],
+            ["1", A + " &ge; " + B + " + " + p]]) +
+          sys("c<sub>j</sub>(a,b)", [["0", A + " &le; " + B + " &minus; " + p],
+            ["(" + A + " &minus; " + B + " + " + p + ") / (" + p + " &minus; " + q + ")", B + " &minus; " + p + " &lt; " + A + " &lt; " + B + " &minus; " + q],
+            ["1", A + " &ge; " + B + " &minus; " + q]]);
+    }
+    $("eq").innerHTML = r + "<p style='margin:8px 0 0'>c<sub>j</sub>(a,b) = 1 &minus; p<sub>j</sub>(<b>b,a</b>)" +
+      " &nbsp;<span style='font-family:system-ui,sans-serif;font-size:0.88rem;color:var(--muted)'>" + sub(T[S.lang].eqNote) + "</span></p>";
+  }
+
+  function update() {
+    var L = T[S.lang], d = S.ga - S.gb, rel = relation(d);
+    if (S.p < S.q) { S.p = S.q; $("p").value = S.p; }
+    $("oGa").textContent = S.ga; $("oGb").textContent = S.gb; $("oQ").textContent = S.q; $("oP").textContent = S.p;
+    $("wq").classList.toggle("hidden", S.type === "true");
+    $("wp").classList.toggle("hidden", S.type !== "pseudo");
+    $("vRel").innerHTML = sub(L.rel[rel].split(" — ")[0]);
+    $("vP").textContent = fmt(pref(d));
+    $("vC").textContent = fmt(conc(d));
+    $("vCheck").textContent = fmt(1 - pref(-d));
+    var key = rel === "aIb" ? (d < 0 ? "aIbLow" : (d === 0 ? "aIbEq" : "aIbHigh")) : rel;
+    $("explain").innerHTML = "<span class='rel'>" + sub(L.rel[rel]) + ".</span> " + sub(L.ex[key]);
+    $("play").textContent = S.playing ? L.pause : L.play;
+    draw("plotC", true, false, false);        // S1: non-dominance
+    draw("plotP", false, true, false);        // S2: preference
+    draw("plot", S.showC, S.showP, true);     // both, switched by the legend
+  }
+
+  function texts() {
+    var L = T[S.lang];
+    document.documentElement.lang = S.lang;
+    document.title = L.title;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-t]"), function (n) {
+      n.innerHTML = sub(L[n.getAttribute("data-t")]);
+    });
+    equations();
+    update();
+    drawProm();
+  }
+
+  // ---------------------------------------------------------------- events
+  [["ga", "ga"], ["gb", "gb"], ["q", "q"], ["p", "p"]].forEach(function (pair) {
+    $(pair[0]).addEventListener("input", function (e) {
+      S[pair[1]] = +e.target.value; stop(); update();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-type]"), function (b) {
+    b.addEventListener("click", function () {
+      S.type = b.getAttribute("data-type");
+      Array.prototype.forEach.call(document.querySelectorAll("[data-type]"), function (o) {
+        o.setAttribute("aria-pressed", o === b ? "true" : "false");
+      });
+      equations(); update();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-lang]"), function (b) {
+    b.addEventListener("click", function () {
+      S.lang = b.getAttribute("data-lang");
+      Array.prototype.forEach.call(document.querySelectorAll("[data-lang]"), function (o) {
+        o.setAttribute("aria-pressed", o === b ? "true" : "false");
+      });
+      texts();
+    });
+  });
+
+  // legend checkboxes: light each curve up or switch it off
+  [["showC", "showC"], ["showP", "showP"]].forEach(function (pair) {
+    $(pair[0]).addEventListener("change", function (e) { S[pair[1]] = e.target.checked; update(); });
+  });
+
+  // dragging the marker, on any of the three graphs
+  ["plotC", "plotP", "plot"].forEach(function (id) {
+    var svg = $(id), dragging = false;
+    function fromPointer(e) {
+      var r = svg.getBoundingClientRect();
+      var x = (e.clientX - r.left) * 820 / r.width;
+      S.ga = Math.round(Math.max(0, Math.min(100, (x - X0) * 100 / (X1 - X0))));
+      $("ga").value = S.ga; update();
+    }
+    svg.addEventListener("pointerdown", function (e) { dragging = true; stop(); svg.setPointerCapture(e.pointerId); fromPointer(e); });
+    svg.addEventListener("pointermove", function (e) { if (dragging) fromPointer(e); });
+    svg.addEventListener("pointerup", function () { dragging = false; });
+    svg.addEventListener("pointercancel", function () { dragging = false; });
+  });
+
+  // animation: a goes from the worst to the best performance
+  var raf = null, t0 = 0, DURATION = 9000;
+  function frame(now) {
+    if (!S.playing) return;
+    var k = Math.min((now - t0) / DURATION, 1);
+    S.ga = Math.round(100 * k); $("ga").value = S.ga; update();
+    if (k < 1) raf = requestAnimationFrame(frame); else stop();
+  }
+  function stop() { S.playing = false; if (raf) cancelAnimationFrame(raf); raf = null; $("play").textContent = T[S.lang].play; }
+  $("play").addEventListener("click", function () {
+    if (S.playing) { stop(); return; }
+    S.playing = true;
+    var start = S.ga >= 100 ? 0 : S.ga;       // resume from where a is
+    t0 = performance.now() - DURATION * start / 100;
+    raf = requestAnimationFrame(frame); update();
+  });
+  $("reset").addEventListener("click", function () {
+    stop(); S.ga = 38; S.gb = 50; S.q = 10; S.p = 24;
+    $("ga").value = 38; $("gb").value = 50; $("q").value = 10; $("p").value = 24; update();
+  });
+
+  // ------------------------------------------- the six PROMETHEE functions
+  var PR = { d: 16, q: 10, p: 25, s: 12 };
+  var DMIN = -10, DMAX = 50, PX0 = 44, PX1 = 346, PY1 = 26, PY0 = 150;
+  var qx = function (d) { return PX0 + (PX1 - PX0) * (d - DMIN) / (DMAX - DMIN); };
+  var qy = function (v) { return PY0 - (PY0 - PY1) * v; };
+  // each type: its function, its pieces [d1, v1, d2, v2] (jumps are left
+  // open, as discontinuities), the thresholds marked on the axis, its formula
+  function promTypes() {
+    var q = PR.q, p = Math.max(PR.p, PR.q + 1), s = PR.s, I = T[S.lang].promIf, dec = S.lang === "pt" ? "0,5" : "0.5";
+    var row = function (v, c) { return v + " " + I + " " + c; };
+    return [
+      { f: function (d) { return d > 0 ? 1 : 0; },
+        seg: [[DMIN, 0, 0, 0], [0, 1, DMAX, 1]], jump: [[0, 0, 1]], marks: [],
+        eq: [row("0", "d &le; 0"), row("1", "d &gt; 0")] },
+      { f: function (d) { return d > q ? 1 : 0; },
+        seg: [[DMIN, 0, q, 0], [q, 1, DMAX, 1]], jump: [[q, 0, 1]], marks: [[q, "q"]],
+        eq: [row("0", "d &le; q"), row("1", "d &gt; q")] },
+      { f: function (d) { return d <= 0 ? 0 : (d >= p ? 1 : d / p); },
+        seg: [[DMIN, 0, 0, 0], [0, 0, p, 1], [p, 1, DMAX, 1]], jump: [], marks: [[p, "p"]],
+        eq: [row("0", "d &le; 0"), row("d / p", "0 &lt; d &lt; p"), row("1", "d &ge; p")] },
+      { f: function (d) { return d <= q ? 0 : (d <= p ? 0.5 : 1); },
+        seg: [[DMIN, 0, q, 0], [q, 0.5, p, 0.5], [p, 1, DMAX, 1]], jump: [[q, 0, 0.5], [p, 0.5, 1]],
+        marks: [[q, "q"], [p, "p"]],
+        eq: [row("0", "d &le; q"), row(dec, "q &lt; d &le; p"), row("1", "d &gt; p")] },
+      { f: function (d) { return d <= q ? 0 : (d >= p ? 1 : (d - q) / (p - q)); },
+        seg: [[DMIN, 0, q, 0], [q, 0, p, 1], [p, 1, DMAX, 1]], jump: [], marks: [[q, "q"], [p, "p"]],
+        eq: [row("0", "d &le; q"), row("(d &minus; q) / (p &minus; q)", "q &lt; d &lt; p"), row("1", "d &ge; p")] },
+      { f: function (d) { return d <= 0 ? 0 : 1 - Math.exp(-d * d / (2 * s * s)); },
+        seg: null, jump: [], marks: [[s, "s"]],
+        eq: [row("0", "d &le; 0"), row("1 &minus; exp(&minus;d&sup2; / 2s&sup2;)", "d &gt; 0")] }
+    ];
+  }
+  function drawProm() {
+    var L = T[S.lang], grid = $("promGrid"), types = promTypes();
+    if (PR.p <= PR.q) { PR.p = PR.q + 1; $("pp").value = PR.p; }
+    $("oPd").textContent = PR.d; $("oPq").textContent = PR.q; $("oPp").textContent = PR.p; $("oPs").textContent = PR.s;
+    grid.innerHTML = "";
+    types.forEach(function (ty, i) {
+      var card = document.createElement("div"); card.className = "promcard";
+      var v = ty.f(PR.d);
+      card.innerHTML = "<h3>" + L.promNames[i] + "</h3><div class='par'>" + L.promParams[i] + "</div>";
+      var svg = el("svg", { viewBox: "0 0 360 196", role: "img", "aria-label": L.promNames[i] });
+      card.appendChild(svg);
+      // axes: P(d) from 0 to 1, d from DMIN to DMAX, a light line at d = 0
+      svg.appendChild(el("path", { d: "M" + PX0 + " " + (PY1 - 12) + " V" + PY0 + " H" + (PX1 + 8), class: "axis" }));
+      svg.appendChild(el("line", { x1: qx(0), y1: PY1, x2: qx(0), y2: PY0, stroke: "var(--line)", "stroke-width": 1 }));
+      [[0, "0"], [0.5, S.lang === "pt" ? "0,5" : "0.5"], [1, "1"]].forEach(function (tk) {
+        svg.appendChild(el("line", { x1: PX0 - 4, y1: qy(tk[0]), x2: PX0, y2: qy(tk[0]), class: "axis" }));
+        svg.appendChild(el("text", { x: PX0 - 8, y: qy(tk[0]) + 4, class: "tick", "text-anchor": "end" }, tk[1]));
+      });
+      svg.appendChild(el("text", { x: PX0, y: PY1 - 16, class: "tick" }, "P(d)"));
+      svg.appendChild(el("text", { x: PX1 + 4, y: PY0 + 34, class: "tick", "text-anchor": "end" }, "d"));
+      [[0, "0"]].concat(ty.marks).forEach(function (m) {
+        if (m[0] > DMAX) return;
+        svg.appendChild(el("line", { x1: qx(m[0]), y1: PY0, x2: qx(m[0]), y2: PY0 + 5, class: "axis" }));
+        svg.appendChild(el("text", { x: qx(m[0]), y: PY0 + 19, class: "tick", "font-style": m[0] ? "italic" : "normal" }, m[1]));
+        if (m[0]) svg.appendChild(el("line", { x1: qx(m[0]), y1: PY0, x2: qx(m[0]), y2: qy(ty.f(m[0] + 1e-6)),
+                                               stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 4" }));
+      });
+      // the curve
+      if (ty.seg) {
+        ty.seg.forEach(function (g) {
+          var a = Math.min(g[0], DMAX), b = Math.min(g[2], DMAX);
+          if (b <= a) return;
+          var vb = g[1] + (g[3] - g[1]) * (b - g[0]) / (g[2] - g[0]);
+          svg.appendChild(el("line", { x1: qx(a), y1: qy(g[1]), x2: qx(b), y2: qy(vb), class: "pcurve" }));
+        });
+      } else {
+        var pts = [];
+        for (var d = DMIN; d <= DMAX; d += 0.5) pts.push(qx(d).toFixed(1) + "," + qy(ty.f(d)).toFixed(1));
+        svg.appendChild(el("polyline", { points: pts.join(" "), class: "pcurve" }));
+      }
+      // jumps: closed dot at the value taken, open dot at the other end
+      ty.jump.forEach(function (j) {
+        if (j[0] > DMAX) return;
+        svg.appendChild(el("circle", { cx: qx(j[0]), cy: qy(j[1]), r: 4, fill: "var(--pref)" }));
+        svg.appendChild(el("circle", { cx: qx(j[0]), cy: qy(j[2]), r: 4, fill: "var(--panel)", stroke: "var(--pref)", "stroke-width": 2 }));
+      });
+      // marker at the current d
+      svg.appendChild(el("line", { x1: qx(PR.d), y1: PY1 - 4, x2: qx(PR.d), y2: PY0, stroke: "var(--marker)",
+                                   "stroke-width": 1.4, "stroke-dasharray": "3 4" }));
+      svg.appendChild(el("circle", { cx: qx(PR.d), cy: qy(v), r: 6, fill: "var(--marker)", stroke: "var(--panel)", "stroke-width": 2 }));
+      var f = document.createElement("div"); f.className = "f";
+      f.innerHTML = "P(d) = " + ty.eq.join("; &nbsp;") + "<br>P(" + PR.d + ") = <span class='val'>" + fmt(v) + "</span>";
+      card.appendChild(f);
+      grid.appendChild(card);
+    });
+  }
+  [["pd", "d"], ["pq", "q"], ["pp", "p"], ["ps", "s"]].forEach(function (pair) {
+    $(pair[0]).addEventListener("input", function (e) { PR[pair[1]] = +e.target.value; drawProm(); });
+  });
+
+  // The language of the file: preference_structures.html is English,
+  // preference_structures_pt.html is Portuguese (the buttons switch both ways).
+  if (document.documentElement.lang === "pt") {
+    S.lang = "pt";
+    Array.prototype.forEach.call(document.querySelectorAll("[data-lang]"), function (o) {
+      o.setAttribute("aria-pressed", o.getAttribute("data-lang") === "pt" ? "true" : "false");
+    });
+  }
+  texts();
+})();
+</script>
+</body>
+</html>

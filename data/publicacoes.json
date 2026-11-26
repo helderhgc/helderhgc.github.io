@@ -10,7 +10,59 @@
    "Leonardo de Farias Linhares",
    "Helder Gomes Costa",
    "Edilvando Pereira Eufrazio"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
+ },
+ {
+  "title": "Toward Intelligent Decision-Making: A systematic review of hybrid frameworks combining multi-criteria analysis and generative AI",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026,
+  "type": "conference-paper",
+  "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": [
+   "Brunno e Souza Rodrigues",
+   "Carla Martins Floriano",
+   "Diogo Ferreira de Lima Silva",
+   "Helder Gomes Costa"
+  ],
+  "cat": "nao_indexada",
+  "indexers": []
+ },
+ {
+  "title": "Ranked-Clustering of Countries on SDG9 Indicators with a No-Code Visual Clustering Web Application",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026,
+  "type": "conference-paper",
+  "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": [
+   "Helder Gomes Costa",
+   "Leonardo Fernandes Costa",
+   "Fábio Aquino da Silva"
+  ],
+  "cat": "nao_indexada",
+  "indexers": []
+ },
+ {
+  "title": "Military Intelligence in the Analysis of Military Equipment Tenders: Modeling Using a Multicriteria Ranking Problem Structure",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026,
+  "type": "conference-paper",
+  "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": [
+   "Leonardo Antonio Monteiro Pessôa",
+   "Rodrigo José Pires Ferreira",
+   "Marcelo Hazin Alencar",
+   "Helder Gomes Costa"
+  ],
+  "cat": "nao_indexada",
+  "indexers": []
  },
  {
   "title": "Marketing, profit strategies and sustainability: a challenge for companies in different sectors",
@@ -25,7 +77,27 @@
    "Helder Gomes Costa",
    "Thamires Eis Duarte",
    "Paulo Roberto Borges Amaral"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
+ },
+ {
+  "title": "Machine Learning applied to eco-innovation assessment",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026,
+  "type": "conference-paper",
+  "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": [
+   "Isadora Valentim Vieira da Motta",
+   "Edilvando Pereira Eufrazio",
+   "Helder Gomes Costa"
+  ],
+  "cat": "nao_indexada",
+  "indexers": []
  },
  {
   "title": "Inequalities matter when prioritizing sustainable goals: Insights from applying a novel multi-criteria-clustering modeling to SDG Index Scores",
@@ -37,7 +109,28 @@
   "authors": [
    "Helder Gomes Costa",
    "Diogo Lima"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
+ },
+ {
+  "title": "Hierarchical Sorting under Parameter Uncertainty: An Experimental Study Using MCHP, ELECTRE TRI-B, and SMAA-TRI for Freedom and Prosperity Indicators",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026,
+  "type": "conference-paper",
+  "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": [
+   "Diogo Lima",
+   "Brunno Rodrigues",
+   "Helder Gomes Costa"
+  ],
+  "cat": "nao_indexada",
+  "indexers": []
  },
  {
   "title": "Genetic K-Means for Missing-Value Imputation",
@@ -51,7 +144,11 @@
    "Carla Martins Floriano",
    "Diogo Lima",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "preprint"
  },
  {
   "title": "Discovering the critical number of respondents to validate an item in a questionnaire: the binomial cut-level content validity proposal",
@@ -66,7 +163,13 @@
    "Edilvando Pereira Eufrazio",
    "Eduardo Shimoda",
    "Aldo Shimoya"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Applying an Outranking Approach to Sort E-Learning Services",
@@ -77,7 +180,12 @@
   "url": "https://doi.org/10.1007/978-3-032-13153-9_12",
   "authors": [
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "A TOTALLY NON-COMPENSATORY SORTING METHOD FOR HETEROGENEOUS EVALUATORS: APPLICATION TO IMPROVE AIRPORT SERVICE QUALITY",
@@ -90,7 +198,13 @@
    "Phelipe M. da Rocha",
    "Leonardo Antônio M. Pessoa",
    "Helder G. Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A Methodological Integration of MCDA and Visual Governance Tools: Evidence-Weighted Value–Viability Assessment",
@@ -104,7 +218,11 @@
    "Floriano Dutra Neto",
    "Marcia Sarpa",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "preprint"
  },
  {
   "title": "Microfinance Performance Indicators Under Sustainability Perspective",
@@ -118,7 +236,12 @@
    "Elaine Aparecida Araújo",
    "Hélder Gomes Costa",
    "Luciano Azevedo de Souza"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "INTEGRATING PITCH, AHP, AND K-MEANS FOR PROJECT MANAGEMENT STRATEGIES",
@@ -131,7 +254,13 @@
    "Luciano Azevedo de Souza",
    "Renan Carriço Payer",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Genetic K-Means: An Algorithm to Elicitate Missing Values in K-Means Clustering",
@@ -145,7 +274,13 @@
    "Carla Martins Floriano",
    "Diogo Ferreira De Lima Silva",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "IEEE"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Evidence-based project prioritization for cancer prevention in Brazil: merging expert consensus with multi-criteria decision analysis",
@@ -160,7 +295,11 @@
    "Marcia Sarpa de Campos Mello",
    "Helder Gomes Costa",
    "Vinicius Araujo Pimenta"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "EVALUATING COUNTRIES’ PROSPERITY USING A HYBRID APPROACH WITH ELECTRE III AND K-MEANS: A COMPARISON OF PRE AND POST-COVID-19 PANDEMIC SCENARIOS",
@@ -173,7 +312,13 @@
    "Igor Danilo Costa Matos",
    "Helder Gomes Costa",
    "Diogo Lima"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Comprehensive dataset of global innovation index panel data (2013–2022): Clustering with K-means and principal component analysis",
@@ -185,7 +330,13 @@
   "authors": [
    "Edilvando Eufrazio",
    "Helder Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Analysing Metadata of Articles Connecting IOT to Agriculture and Climate Change",
@@ -200,7 +351,12 @@
    "Flávio Silva Machado",
    "Robisom Damasceno Calado",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "A Hybrid Model with K-Means and ELECTRE-III to Analyze Countries Considering Prosperity Indicators",
@@ -213,7 +369,12 @@
    "Diogo Lima",
    "Igor Danilo Costa Matos",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "Visual OutDecK: A Web APP for Supporting Multicriteria Decision Modelling of Outranking Choice Problems",
@@ -224,7 +385,12 @@
   "url": "https://doi.org/10.1007/978-3-031-27409-1_83",
   "authors": [
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "The usage of lean tools in healthcare environment",
@@ -238,7 +404,11 @@
    "Helder Gomes Costa",
    "Ovidio Orlando Filho",
    "Robisom Damasceno Calado"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Prioritizing Management Action of Stricto Sensu Course: Data Analysis Supported by the k-means Algorithm",
@@ -254,7 +424,12 @@
    "Hudson Hübner de Souza",
    "João Carlos Correia Baptista Soares de Mello",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "Prioritizing Educational Website Resource Adaptations: Data Analysis Supported by the k-Means Algorithm",
@@ -267,7 +442,12 @@
    "Luciano Azevedo de Souza",
    "Michelle Merlino Lins Campos Ramos",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "CLUSTERING MEMBERS OF PROJECT TEAMS ACCORDING THEIR PERCEPTIONS ABOUT THE IMPACT OF REMOTE WORK ON PROJECT SUCCESS: A COMPARATIVE ANALYSIS",
@@ -279,7 +459,13 @@
   "authors": [
    "Luciano Azevedo de Souza",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "CATEGORIZAÇÃO DE PAÍSES EM FUNÇÃO DAS VARIÁVEIS QUE COMPÕEM O BETTER LIFE INDEX",
@@ -293,7 +479,11 @@
    "Glaucia Da Costa Azevedo",
    "Luciano Azevedo De Souza",
    "Edilvando Pereira Eufrazio"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Applying ELECTRE TRI to Sort States According the Performance of Their Alumni in Brazilian National High School Exam (ENEM)",
@@ -306,7 +496,12 @@
    "Helder Gomes Costa",
    "Luciano Azevedo de Souza",
    "Marcos Costa Roboredo"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "AN OUTRANKING ELECTRE-BASED MODELING FOR SETTING THE NAVAL CORE COMPONENTS OF AN AMPHIBIOUS TASK FORCE",
@@ -319,7 +514,13 @@
    "Helder Gomes Costa",
    "Raphael Corrêa Silva",
    "Leonardo Antonio Monteiro Pessôa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Weight Assignment for Resource Sharing in the Context of a Project and Operation Portfolio",
@@ -334,7 +535,12 @@
    "Mirian Picinini Méxas",
    "Cláudio Benevenuto de Campos Lima",
    "Wagner Rodrigues Ribeiro"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "PRIORITIZING CRITERIA TO EVALUATE PROJECT SUCCESS: MODELING WITH THE ANALYTIC HIERARCHY PROCESS (AHP)",
@@ -347,7 +553,11 @@
    "Luciano Azevedo de Souza",
    "Helder Gomes Costa",
    "Fernando Oliveira de Araujo"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Performance Evaluation of Integrated Public Security Areas: Application of the PROMETHEE II Method in the Brazilian Context",
@@ -360,7 +570,11 @@
    "Marcio Basilio",
    "Vladecy Pereira",
    "Helder Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "preprint"
  },
  {
   "title": "Managing the Conditions for Project Success: An Approach Using k-means Clustering",
@@ -372,7 +586,13 @@
   "authors": [
    "Luciano Azevedo de Souza",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Gaps, Trends and Challenges in Assessing Quality of Service at Airport Terminals: A Systematic Review and Bibliometric Analysis",
@@ -385,7 +605,13 @@
    "Phelipe Medeiros da Rocha",
    "Helder Gomes Costa",
    "Glauco Barbosa da Silva"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "DMAIC Application in an Emergency Care Unit",
@@ -400,7 +626,12 @@
    "Olavo de Oliveira Braga Neto",
    "Helder Gomes Costa",
    "Luis Enrique Valdiviezo Viera"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "Clustering Brazilian Public Emergency Healthcare Units",
@@ -415,7 +646,13 @@
    "Santos, Gabriel Nascimento",
    "Bonamigo, Andrei",
    "Callado, Robisom Damasceno"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Applying non-compensatory multicriteria methods to build Better Life Index countries ranking",
@@ -427,7 +664,14 @@
   "authors": [
    "Azevedo, Glaucia Da Costa",
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science",
+   "IEEE"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A Systematic Review of the Applications of Multi-Criteria Decision Aid Methods (1977–2022)",
@@ -442,7 +686,13 @@
    "Helder Gomes Costa",
    "Marcos Santos",
    "Amartya Ghosh"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "The influence of factors on project management: a qualitative approach",
@@ -457,7 +707,13 @@
    "Mirian Picinini Méxas",
    "Claudio Benevenuto de Campos Lima",
    "Wagner Rodrigues Ribeiro"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Multicriteria Model for Sorting the Quality of Services Provided by Airports",
@@ -469,7 +725,12 @@
   "authors": [
    "Phelipe Medeiros da Rocha",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "Kaizen and Healthcare: A Bibliometric Analysis",
@@ -485,7 +746,13 @@
    "Helder Gomes Costa",
    "Christiane Lima Barbosa",
    "Robisom Damasceno Calado"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "K-Means and Multicriteria Decision Aid Applied to Sustainability Evaluation",
@@ -497,7 +764,12 @@
   "authors": [
    "Rafaela Lima Santos de Souza",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "Information and Communication Technologies in the Educational Process",
@@ -510,7 +782,13 @@
    "Michelle Merlino Lins Campos Ramos",
    "Helder Gomes Costa",
    "Glaucia da Costa Azevedo"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Influence of Game-Based Methods in Developing Engineering Competences",
@@ -523,7 +801,13 @@
    "Helder Gomes Costa",
    "Frederico Henrichs Sheremetieff",
    "Elaine Aparecida Araújo"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "ELICITATION OF CRITERIA WEIGHTS FOR MULTICRITERIA MODELS: BIBLIOMETRICS, TYPOLOGIES, CHARACTERISTICS AND APPLICATIONS",
@@ -539,7 +823,13 @@
    "Helder Gomes Costa",
    "Henrique Rego Monteiro Da Hora",
    "Milton Erthal Junior"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Avaliação da sustentabilidade ambiental no contexto de instituições de ensino superior: mapeamento de modelos",
@@ -551,7 +841,11 @@
   "authors": [
    "Élida De Paula Pedro",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "A Non-compensatory Multicriteria Model for Sorting the Influence of PBL Over Professional Skills",
@@ -563,7 +857,12 @@
   "authors": [
    "Helder Gomes Costa",
    "Anabela Carvalho Alves"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "Systematic review and meta-analysis of the use of lean methods and tools in healthcare services: an alternative to improve care during the pandemic",
@@ -579,7 +878,11 @@
    "Maria Helena Teixeira da Silva",
    "Saulo Cabral Bourguignon",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "preprint"
  },
  {
   "title": "Multicriteria decision choices for investment in innovative upper-middle income countries",
@@ -592,7 +895,13 @@
    "Silva, Marcela do Carmo",
    "Costa, Helder Gomes",
    "Simoes Gomes, Carlos Francisco"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Dependence Analysis Between Childhood Social Indicators and Human Development Index Through Canonical Correlation Analysis",
@@ -605,7 +914,14 @@
    "do Carvalhal Monteiro, R.L.",
    "Pereira, V.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Criteria for assessing a sustainable hotel business",
@@ -620,7 +936,14 @@
    "Meiriño, M.J.",
    "Sampaio, M.C.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A Proposed Synthetic Index of Quality Life for OECD Countries",
@@ -632,7 +955,12 @@
   "authors": [
    "Edilvando Pereira Eufrazio",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "indexada",
+  "forced": true
  },
  {
   "title": "A Proposal for Avoiding Compensatory Effects While Using ELECTRE TRI with Multiple Evaluators",
@@ -645,7 +973,13 @@
    "Helder Gomes Costa",
    "Livia Dias de Oliveira Nepomuceno",
    "Valdecy Pereira"
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Stimulating and inhibiting factors of patent filing with Brazilian universities",
@@ -658,7 +992,13 @@
    "De Carvalho Pereira, F.",
    "Costa, H.G.",
    "Pereira, V."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "INTERDISCIPLINARITY IN HIGHER EDUCATION: A CROSS-SECTIONAL ANALYSIS OF THE LITERATURE IN THE PERIOD 2014-2018",
@@ -673,7 +1013,13 @@
    "Ferreira, Geraldo de Souza",
    "Reis Costa, Stella Regina",
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Influencing factors in a portfolio of projects and operations: A systematic review",
@@ -688,7 +1034,13 @@
    "Méxas, M.P.",
    "De Campos Lima, C.B.",
    "Caiado, R.G.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Classifying the integrated public safety areas (IPSAs): a multi-criteria based approach",
@@ -701,7 +1053,14 @@
    "Basilio, M.P.",
    "Pereira, V.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Applying electre tri me for evaluating the quality of services provided by a library",
@@ -713,7 +1072,14 @@
   "authors": [
    "Costa, H.G.",
    "Duarte, M.B.T."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "ACM"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Analysis of the Better Life Index Trough a Cluster Algorithm",
@@ -726,7 +1092,14 @@
    "do Carvalhal Monteiro, R.L.",
    "Pereira, V.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A scientometric review of global research on sustainability and project management dataset",
@@ -740,7 +1113,14 @@
    "Miranda Junior, H.L.",
    "Farias Filho, J.R.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "The Choosing of Teaching Methods According to Entrepreneurial Profiles: A Multicriteria Approach",
@@ -755,7 +1135,14 @@
    "Costa, Helder Gomes",
    "Gutierrez, Ruben Huamanchumo",
    "De Souza, Cristina Gomes"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Reduction of rework in complex projects - A Preventive Planning Tool (PPT)",
@@ -776,7 +1163,13 @@
    "Da Paz Campagnac, L.A.",
    "Tavares, L.A.C.",
    "Nogueira, S.M.S."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Prospective scenarios: A literature review on the Scopus database",
@@ -791,7 +1184,14 @@
    "Fernanda de Carvalho Pereira",
    "Carlos Francisco Simões Gomes",
    "Helder Gomes da Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "ELECTRE ME: A PROPOSAL OF AN OUTRANKING MODELING IN SITUATIONS WITH SEVERAL EVALUATORS",
@@ -804,7 +1204,13 @@
    "Costa, Helder Gomes",
    "de Oliveira Nepomuceno, Livia Dias",
    "Pereira, Valdecy"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Assessing the quality of information technology infrastructure services",
@@ -817,7 +1223,14 @@
    "Freitas, A.L.P.",
    "Monteiro, G.A.P.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Sensibility analysis of MCDA using prospective in Brazilian energy sector",
@@ -832,7 +1245,14 @@
    "Alexandre P de Barros",
    "Zhimin Huang",
    "Xunpeng Shi"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Patent filings versus articles published: A review of the literature in the context of Multicriteria Decision Aid",
@@ -845,7 +1265,14 @@
    "Fernanda de Carvalho Pereira",
    "Helder Gomes Costa",
    "Valdecy Pereira"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Modelo para mapeamento das percepções dos usuários a respeito dos serviços prestados por uma biblioteca especializada",
@@ -857,7 +1284,15 @@
   "authors": [
    "Maria Bernarda Teixeira Duarte",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Impacts of Lean Six Sigma over organizational sustainability: A survey study",
@@ -870,7 +1305,14 @@
    "Jéssica Galdino de Freitas",
    "Helder Gomes Costa",
    "Fernando Toledo Ferraz"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Impacts of Lean Six Sigma over organizational sustainability",
@@ -882,7 +1324,14 @@
   "authors": [
    "Jéssica Galdino de Freitas",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Análise multicritério em dados sobre empreendedorismo:  um estudo bibliométrico",
@@ -897,7 +1346,11 @@
    "Glauco Barbosa da Silva",
    "Mara Regina dos Santos Barcelos",
    "Altina Silva Oliveira"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "AHP-De Borda: a hybrid multicriteria ranking method",
@@ -908,7 +1361,13 @@
   "url": "https://doi.org/10.14488/BJOPM.2017.v14.n3.a1",
   "authors": [
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A multiproduct economic order quantity model with simulated annealing application",
@@ -920,7 +1379,14 @@
   "authors": [
    "Valdecy Pereira",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A Multicriteria Approach to the Human Development Index Classification",
@@ -933,7 +1399,14 @@
    "Raquel Lourenço do Carvalhal Monteiro",
    "Valdecy Pereira",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Modeling selection criteria of R&amp;D projects for awarding direct subsidies to the private sector",
@@ -946,7 +1419,14 @@
    "Victório, C.J.",
    "Costa, H.G.",
    "de Souza, C.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Linear integer model for the course timetabling problem of a faculty in rio de janeiro",
@@ -958,7 +1438,14 @@
   "authors": [
    "Pereira, V.",
    "Gomes Costa, H."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Graphical interpretation of outranking principles: Avoiding misinterpretation results from ELECTRE I",
@@ -969,7 +1456,14 @@
   "url": "http://www.scopus.com/inward/record.url?eid=2-s2.0-84959489630&partnerID=MN8TOARS",
   "authors": [
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Analysis of the operational performance of brazilian airport terminals: A multicriteria approach with De Borda-AHP integration",
@@ -983,7 +1477,14 @@
    "Barros, A.P.D.",
    "Silva, G.B.D.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A probabilistic approach applied to the classification of courses by multiple evaluators",
@@ -997,7 +1498,14 @@
    "Costa, H.G.",
    "Nepomuceno, L.D.O.",
    "Pereira, V."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "STRATEGIC MULTICRITERIA ANALYSIS: SOCIAL, ECONOMIC AND ENVIRONMENTAL TO SUPPORT THE DECISION IN AN ENERGY DISTRIBUTION COMPANY",
@@ -1010,7 +1518,13 @@
    "Martins, Eduardo Ferraz",
    "Alves Lima, Gilson Brito",
    "Gomes, Helder Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "RIOT - a tool for estimating the reliability of surveys",
@@ -1024,7 +1538,13 @@
    "Henrique Rego Monteiro Da Hora",
    "Dalessandro Soares Vianna",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Proposta de um método multicritério para escolha múltipla",
@@ -1036,7 +1556,14 @@
   "authors": [
    "Henrique Rego Monteiro da Hora",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Mapping of the scientific production on the ITIL application published in the national and international literature",
@@ -1051,7 +1578,14 @@
    "Gomes, C.F.S.",
    "Da Silva, R.A.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Mapeamento de um núcleo de partida de referências em Data Mining a partir de periódicos publicados no Brasil",
@@ -1063,7 +1597,14 @@
   "authors": [
    "Glauco Barbosa da Silva",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Interfaces between production engineering and the public affairs: evidences from bibliometric analysis",
@@ -1075,7 +1616,14 @@
   "authors": [
    "de Jesus, I.R.D.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Entrepreneurship in engineering education: A literature review",
@@ -1088,7 +1636,14 @@
    "Da Silva, G.B.",
    "Costa, H.G.",
    "De Barros, M.D."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "DEMAND FORECASTING PROCESS OF INNOVATION USING THE METHOD ANALYTIC HIERARCHY PROCESS",
@@ -1103,7 +1658,13 @@
    "Reis, Augusto da Cunha",
    "Severo, Eliana Andrea",
    "Ferro de Guimaraes, Julio Cesar"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Criteria selection for evaluation of ERP systems implementation in large Brazilian companies",
@@ -1117,7 +1678,14 @@
    "Costa, H.G.",
    "Pereira, V.",
    "Shimoda, E."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "CPP-TRI: A sorting method based on the probabilistic composition of preferences",
@@ -1130,7 +1698,13 @@
    "Sant'Anna, A.P.",
    "Costa, H.G.",
    "Pereira, V."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Bibliometric analysis of information systems related to innovation",
@@ -1145,7 +1719,14 @@
    "Cordeiro, V.R.",
    "Gomes, C.F.S.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Auxílio multicritério à decisão aplicado ao planejamento e gestão na indústria de petróleo e gás",
@@ -1158,7 +1739,14 @@
    "Roberta Braga Neves",
    "Valdecy Pereira",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "ANALYZING PERCEPTIONS ABOUT THE INFLUENCE OF A MASTER COURSE OVER THE PROFESSIONAL SKILLS OF ITS ALUMNI: A MULTICRITERIA APPROACH",
@@ -1170,7 +1758,15 @@
   "authors": [
    "Lívia Dias de Oliveira Nepomuceno",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A literature review on lot size with quantity discounts: 1995-2013",
@@ -1182,7 +1778,14 @@
   "authors": [
    "Pereira, V.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Qualidade de vida no trabalho no setor petrolífero: uma comparação entre os colaboradores onshore e offshore",
@@ -1196,7 +1799,11 @@
    "Henrique Rego Monteiro Da Hora",
    "Helder Gomes Costa",
    "Gina Torres Rego Monteiro"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Nonlinear programming applied to the reduction of inconsistency in the AHP method",
@@ -1208,7 +1815,14 @@
   "authors": [
    "Valdecy Pereira",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "MULTIPLEX ELECTIONIS METHODUS (MEM) APLICADO A UM PROBLEMA DE SELEÇÃO DUPLA",
@@ -1220,7 +1834,11 @@
   "authors": [
    "Henrique Rego Monteiro da Hora",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Multi-criteria indicator for sustainability rating in suppliers of the oil and gas industries in Brazil",
@@ -1236,7 +1854,14 @@
    "Gutierrez, R.H.",
    "Lameira, V.J.",
    "Meiriño, M.J."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Modelo multicritério para avaliação e classificação da gestão organizacional: proposta e caso de uso",
@@ -1250,7 +1875,15 @@
    "Boas, Gisele Alvim de Rezende Vilas",
    "Freitas, André Luís Policani",
    "Gomes, Carlos Francisco Simões"
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "COMPARAÇÃO ENTRE MÉTODOS FUZZY NA LOCALIZAÇÃO DE UMA BASE NAVAL HIPOTÉTICA",
@@ -1264,7 +1897,11 @@
    "Marcos Pereira Estellita Lins",
    "Carlos Alberto Nunes Cosenza",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Classificação multicritério dos portos de contêineres no Brasil",
@@ -1280,7 +1917,11 @@
    "Rafaela Landim Gomes Siqueira",
    "Henrique Rego Monteiro Da Hora",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "UMA AVALIAÇÃO INTEGRADA COM O CEQ, ISHIKAWA E AHP EM UMA EMPRESA DE CONCRETAGEM",
@@ -1295,7 +1936,11 @@
    "Raphael Carvalho Rangel",
    "Henrique Rego Monteiro da Hora",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "TEORIA DAS RESTRIÇÕES (TOC): CASO DE APLICAÇÃO EM UMA EMPRESA DE CONFECÇÃO",
@@ -1307,7 +1952,11 @@
   "authors": [
    "Fabio Gonçalves Torres",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Students' and Alumni's profiles analysis through the data mining technique: A case study in the Federal Institute in Rio de Janeiro State interior",
@@ -1322,7 +1971,13 @@
    "Hora, H.R.M.",
    "Costa, H.G.",
    "Hora, A.L.B."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Role of production engineers in the public sector",
@@ -1334,7 +1989,13 @@
   "authors": [
    "De Jesus, I.R.D.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "OPERATIONAL EFFICIENCY OF BRAZILIAN PORTS: RELEVANT FACTORS - CASE STUDY",
@@ -1347,7 +2008,13 @@
    "Simoes Gomes, Carlos Francisco",
    "Carneiro Dos Santos, Julia Pereira",
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Meg - Double selection multicriteria method proposal",
@@ -1359,7 +2026,13 @@
   "authors": [
    "Da Hora, H.R.M.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "FertBrasil: An innovative network for the development of tropical soils fertilizers",
@@ -1376,7 +2049,13 @@
    "Laforet, C.",
    "De Paiva, D.W.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Evaluation of the importance of criteria for the selection of Integrated Management Systems (ERP) for use in civil construction companies,Avaliação da importância relativa dos critérios para a seleção de Sistemas Integrados de Gestão (ERP) para uso em empresas da construção civil",
@@ -1389,7 +2068,13 @@
    "Méxas, M.P.P.",
    "Costa, H.G.",
    "Quelhas, O.L.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Evaluation of the importance of criteria for the selection of Integrated Management Systems (ERP) for use in civil construction companies | Avalia?ao da importancia relativa dos critérios para a sele?ao de Sistemas Integrados de Gestao (ERP) para uso em empresas da constru?ao civil",
@@ -1402,7 +2087,13 @@
    "Méxas, M.P.P.",
    "Costa, H.G.",
    "Quelhas, O.L.G."
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Eficiência Operacional dos Portos Brasileiros: Fatores Relevantes",
@@ -1411,7 +2102,11 @@
   "type": "journal-article",
   "doi": "10.7177/sg.2012.v8.n2.a2",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Aplicação de métodos multicritério ao problema de escolha de modelos de pagamento eletrônico por cartão de crédito",
@@ -1420,7 +2115,14 @@
   "type": "journal-article",
   "doi": "10.1590/s0103-65132013005000068",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "APLICAÇÃO DA COMPOSIÇÃO PROBABILÍSTICA E DO MÉTODO DAS K-MÉDIAS À CLASSIFICAÇÃO DE MUNICÍPIOS QUANTO À OFERTA DE CRECHES",
@@ -1433,7 +2135,11 @@
    "Annibal Parracho Sant’Anna",
    "Flavia Faria",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "An EOQ binary model with all units discounts for multiproducts",
@@ -1445,7 +2151,13 @@
   "authors": [
    "Pereira, V.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Abordagem estratégica para a seleção de sistemas erp utilizando apoio multicritério à decisão",
@@ -1458,7 +2170,11 @@
    "Carlos Francisco Simões Gomes",
    "Helder Gomes Costa",
    "Gabriel Gonzaga De Souza"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "A set of criteria for selection of enterprise resource planning (ERP)",
@@ -1472,7 +2188,14 @@
    "Quelhas, O.L.G.",
    "Costa, H.G.",
    "De Jesus Lameira, V."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "A Nova Gestão Pública como indutora das atividades de Engenharia de Produção nos órgãos públicos",
@@ -1484,7 +2207,14 @@
   "authors": [
    "Igor Rosa Dias de Jesus",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Multiple criteria model for the management of complex engineering network of projects",
@@ -1499,7 +2229,13 @@
    "Lordelo, S.",
    "Farias Filho, J.R.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Multiple criteria model for evaluating a master course influence over professional skills of alumni",
@@ -1511,7 +2247,13 @@
   "authors": [
    "De Oliveira Nepomuceno, L.D.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Mapping perceptions about the impact of e-procurement solutions over organizations performance,Mapeamento de lacunas de percepções no negócio de e-procurement sobre o desempenho organizacional",
@@ -1525,7 +2267,13 @@
    "Da Costa, E.C.",
    "De Carvalho, R.A.",
    "Gutierrez, R.H."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Mapping perceptions about the impact of e-procurement solutions over organizations performance | Mapeamento de lacunas de percep?ões no negocio de e-procurement sobre o desempenho organizacional",
@@ -1539,7 +2287,14 @@
    "Da Costa, E.C.",
    "De Carvalho, R.A.",
    "Gutierrez, R.H."
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Mapping perceptions about the impact of e-procurement solutions over organizations performance",
@@ -1553,7 +2308,13 @@
    "da Costa, Ernani Carvalho",
    "de Carvalho, Rogerio Atem",
    "Gutierrez, Ruben Huamanchumo"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Industrial location in Northern Fluminense: An analysis in terms of supply and demand for locational factors | Localiza?ão industrial na região Norte Fluminense: Uma análise em termos de oferta e demanda por fatores locacionais",
@@ -1567,7 +2328,13 @@
    "Campanhão, A.F.",
    "da Hora, H.R.M.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Editorial",
@@ -1576,7 +2343,13 @@
   "type": "journal-article",
   "doi": "10.4322/bjopm.2013.007",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Study on the most appropriate scale for use in questionnaires: an experiment with Kano's model",
@@ -1591,7 +2364,11 @@
    "Luana Maravilha de Almeida",
    "Henrique Rego Monteiro da Hora",
    "Helder Gomes Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Multicritério Aplicado à Seleção de Sistemas de Informação: Uma Revisão Bibliográfica",
@@ -1604,7 +2381,11 @@
    "Mirian Méxas",
    "Osvaldo Quelhas",
    "Helder Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Mapeamento da Produção Científica no Escopo da Ontologia",
@@ -1616,7 +2397,11 @@
   "authors": [
    "Elizabeth Dias",
    "Helder Costa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Instructions for formatting articles for Revista Eletronica Sistemas & Gestao",
@@ -1628,7 +2413,13 @@
   "authors": [
    "de Oliveira Nepomuceno, Livia Dias",
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Editorial Introduction",
@@ -1639,7 +2430,13 @@
   "url": "https://publons.com/wos-op/publon/23648306/",
   "authors": [
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Impact of professional master's programs on graduate students: Intercomparison of perceptions of students, faculty members, coordinators, and companies involved,Impacto do mestrado profissional no desempenho dos seus egressos: Intercomparação entre as percepções de discentes, docentes, coordenadores e empresa",
@@ -1652,7 +2449,13 @@
    "De Oliveira Nepomuceno, L.D.",
    "Costa, H.G.",
    "Shimoda, E."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "CONSTRUCTION OF AN AHP-BASED MODEL TO CATCH CRITERIA WEIGHTS IN POST-OCCUPANCY EVALUATION",
@@ -1664,7 +2467,11 @@
   "authors": [
    "Helder Gomes Costa",
    "Pedro de Seixas Correa"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Using a multicriteria approach for classifying universities' performance,Emprego de uma abordagem multicritério para classificação do desempenho de instituições de ensino superior",
@@ -1677,7 +2484,13 @@
    "Freitas, A.L.P.",
    "Rodrigues, S.G.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "MUNICIPAL DISTRICT POTENTIAL FOR CONSUME: AN MULTICRITERIA APPROACH",
@@ -1688,7 +2501,13 @@
   "url": "https://publons.com/wos-op/publon/35905966/",
   "authors": [
    "Gomes, Andre Raeli"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "ELECTRE TRI applied to costumers satisfaction evaluation | ELECTRE TRI aplicado a avalia?ão da satisfa?ão de consumidores",
@@ -1702,21 +2521,33 @@
    "Mansur, A.F.U.",
    "Freitas, A.L.P.",
    "de Carvalho, R.A."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "ELECTRE TRI applied to costumers satisfaction evaluation",
   "venue": "Produção",
   "year": 2007,
   "type": "journal-article",
-  "doi": "S0103-65132007000200002",
+  "doi": "10.1590/S0103-65132007000200002",
   "url": "http://www.scopus.com/inward/record.url?eid=2-s2.0-35348933841&partnerID=40&md5=9fdca7598cff3c4836a0b7fb9249eacf",
   "authors": [
    "Costa, H. G.",
    "Mansur, A. F. U.",
    "Freitas, A. L. P.",
    "de Carvalho, R. A."
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Application of an integrated decision support process for supplier selection",
@@ -1728,7 +2559,14 @@
   "authors": [
    "de Carvalho, R.A.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Post graduate programs evaluation: an integrated approach based on ELECTRE TRI, SWOT and CAPES evaluation system",
@@ -1740,7 +2578,13 @@
   "authors": [
    "Neves, Roberta Braga",
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Avaliação de programas de pós-graduação: proposta baseada na integração ELECTRE TRI, SWOT e sistema CAPES",
@@ -1752,7 +2596,11 @@
   "authors": [
    "Neves, Roberta Braga",
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "A Web based contract selection tool",
@@ -1764,7 +2612,13 @@
   "authors": [
    "De Carvalho, R.A.",
    "Costa, H.G."
-  ]
+  ],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Contribuições da análise multicritério à determinação do grau de proximidade em arranjos físicos",
@@ -1776,7 +2630,11 @@
   "authors": [
    "Costa, Helder Gomes",
    "Herrera, William David Morán"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Métodos para avaliação da postura estratégica",
@@ -1788,7 +2646,11 @@
   "authors": [
    "Azevedo, Marilena Coelho de",
    "Costa, Helder Gomes"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "UMA MODELAGEM HÍBRIDA COM K-MÉDIAS E ELECTRE-III PARA ANALISAR PAÍSES CONSIDERANDO DIFERENTES CONJUNTOS DE DADOS SOCIOECONÔMICOS",
@@ -1802,7 +2664,11 @@
    "IGOR DANILO COSTA MATOS",
    "Helder Gomes Costa",
    "Marcos Roboredo"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "SELEÇÃO DE PARÂMETROS PARA USINA MECÂNICA: UMA ABORDAGEM MULTI-CRITÉRIO",
@@ -1813,34 +2679,58 @@
   "url": null,
   "authors": [
    "HELDER GOMES COSTA"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "PROGRAMAÇÃO LINEAR INTEIRA PARA O PROBLEMA DE CORTE UNIDIMENSIONAL DE ESTOQUE COM REAPROVEITAMENTO DOS RESÍDUOS",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.7198/s2237-07222011000200001",
+  "doi": "10.7198/s2237-07222011000200001",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Prioritization of enterprise resource planning systems criteria: Focusing on construction industry",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1016/j.ijpe.2012.05.025",
+  "doi": "10.1016/j.ijpe.2012.05.025",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Prioritization criteria for enterprise resource planning systems selection for civil construction companies: a multicriteria approach",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1139/l2012-071",
+  "doi": "10.1139/l2012-071",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "PRESENÇA DE PARTÍCULAS ESFÉRICAS E CILÍNDRICAS NO ESCOAMENTO DE FLUIDOS NEWTONIANOS E NÃO NEWTONIANOS",
@@ -1851,132 +2741,225 @@
   "url": null,
   "authors": [
    "HELDER GOMES COSTA"
-  ]
+  ],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Métodos de auxílio multicritério à decisão aplicados a problemas de PCP: mapeamento da produção em periódicos publicados no Brasil",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0104-530x2013000100010",
+  "doi": "10.1590/s0104-530x2013000100010",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Modelo de autoavaliação para suporte à gestão organizacional: experimentação em indústria do segmento de malharia",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0103-65132012005000070",
+  "doi": "10.1590/s0103-65132012005000070",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Metabolism of the Antituberculosis Drug Ethionamide",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.2174/1389200211309010151",
+  "doi": "10.2174/1389200211309010151",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Melhores práticas em implantação de escritório de gerenciamento de projeto: desenvolvimento de referenciais de sucesso",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0103-65132012005000094",
+  "doi": "10.1590/s0103-65132012005000094",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": true,
+  "wos": true,
+  "indexers": [
+   "Scopus",
+   "Web of Science",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Mapeamento de percepções na avaliação dos impactos do mestrado profissional no perfil do seu egresso",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0103-65132012005000058",
+  "doi": "10.1590/s0103-65132012005000058",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": true,
+  "wos": false,
+  "indexers": [
+   "Scopus",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Influência da graduação em engenharia de produção no perfil dos seus egressos: percepções discentes",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s1414-40772010000100006",
+  "doi": "10.1590/s1414-40772010000100006",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Impacto do mestrado profissional no desempenho dos seus egressos: intercomparação entre as percepções de discentes, docentes, coordenadores e empresa",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0104-530x2010000400014",
+  "doi": "10.1590/s0104-530x2010000400014",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "ESTUDO DE PERCEPÇÕES QUANTO ÀS MELHORIAS ORIUNDAS DA IMPLANTAÇÃO E PRÁTICA DO GERENCIAMENTO DA ROTINA",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.3895/s1808-04482009000400001",
+  "doi": "10.3895/s1808-04482009000400001",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [],
+  "cat": "nao_indexada"
  },
  {
   "title": "Emprego do método de análise hierárquica (AHP) na seleção de variedades para o plantio de cana-de-açúcar",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0104-530x1999000300009",
+  "doi": "10.1590/s0104-530x1999000300009",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Emprego de uma abordagem multicritério para classificação do desempenho de instituições de ensino superior",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0104-40362009000400006",
+  "doi": "10.1590/s0104-40362009000400006",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science",
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "ELECTRE TRI aplicado a avaliação da satisfação de consumidores",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0103-65132007000200002",
+  "doi": "10.1590/s0103-65132007000200002",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Avaliação e classificação da qualidade de serviços utilizando uma abordagem multicritério",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0104-530x1998000300008",
+  "doi": "10.1590/s0104-530x1998000300008",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Avaliação de transportadoras de materiais perigosos utilizando o método electre tri",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0104-530x2004000200008",
+  "doi": "10.1590/s0104-530x2004000200008",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": false,
+  "indexers": [
+   "SciELO"
+  ],
+  "cat": "indexada"
  },
  {
   "title": "Avaliação da importância relativa dos critérios para a seleção de Sistemas Integrados de Gestão (ERP) para uso em empresas da construção civil",
   "venue": null,
   "year": null,
   "type": "journal-article",
-  "doi": "http://dx.doi.org/10.1590/s0104-530x2013000200007",
+  "doi": "10.1590/s0104-530x2013000200007",
   "url": null,
-  "authors": []
+  "authors": [],
+  "scopus": false,
+  "wos": true,
+  "indexers": [
+   "Web of Science",
+   "SciELO"
+  ],
+  "cat": "indexada"
  }
 ]

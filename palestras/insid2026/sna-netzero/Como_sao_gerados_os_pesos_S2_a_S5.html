@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pesos dos Cenários S1–S5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<!--
+  Nota complementar ao tutorial SNA + PROMETHEE II (Linhares, Costa & Eufrazio, INSID 2026):
+  como são gerados os pesos dos cenários S2 (entropia) e S3–S5 (perfis de política). LabDEC.
+-->
+<style>
+  /* Layout: faixa navy de abertura, coluna de leitura ~70ch, simulador e gráficos na largura da coluna */
+  :root {
+    --bg: #F6F8FC; --surface: #FFFFFF; --ink: #101B33; --muted: #516079; --line: #D5DDEA; --grid: #E6EBF3;
+    --heading: #0B1F4D; --blue: #1D5FBF; --green: #13865A; --orange: #C9641A; --magenta: #B0286C;
+    --pos: #1D5FBF; --neg: #C9641A;
+    --blue-soft: #E4EDFB; --green-soft: #DDF2E8; --orange-soft: #FBEADB; --magenta-soft: #F8E1EC;
+    --band: #0B1F4D; --band-muted: #B8C7E6;
+    --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A1226; --surface: #111C36; --ink: #E5EBF6; --muted: #9DAAC2; --line: #263453; --grid: #1C2944;
+      --heading: #DCE6FA; --blue: #5C98F2; --green: #3FC98F; --orange: #F09A4D; --magenta: #E2609F;
+      --pos: #3F80E0; --neg: #CC6E22;
+      --blue-soft: #172B52; --green-soft: #12382B; --orange-soft: #3A2716; --magenta-soft: #3A1729;
+      --band: #071431; --band-muted: #9FB2D8;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0A1226; --surface: #111C36; --ink: #E5EBF6; --muted: #9DAAC2; --line: #263453; --grid: #1C2944;
+    --heading: #DCE6FA; --blue: #5C98F2; --green: #3FC98F; --orange: #F09A4D; --magenta: #E2609F;
+    --pos: #3F80E0; --neg: #CC6E22;
+    --blue-soft: #172B52; --green-soft: #12382B; --orange-soft: #3A2716; --magenta-soft: #3A1729;
+    --band: #071431; --band-muted: #9FB2D8;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16.5px; line-height: 1.62; }
+  .wrap { max-width: 880px; margin: 0 auto;
+          padding-left: max(16px, env(safe-area-inset-left, 0px));
+          padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+  .band { background: var(--band); color: #FFFFFF; }
+  .band .wrap { padding-block: 40px 34px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--band-muted); font-weight: 600; margin: 0 0 14px; }
+  .eyebrow b { color: #7FB2FF; }
+  h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 4.6vw, 2.75rem); line-height: 1.12; margin: 0 0 14px; text-wrap: balance; letter-spacing: -.01em; }
+  .lede { font-size: 1.12rem; color: #DCE5F7; max-width: 62ch; margin: 0 0 16px; }
+  .cite { font-size: .88rem; color: var(--band-muted); margin: 0; max-width: 80ch; }
+
+  main .wrap { padding-block: 8px 56px; }
+  section { padding-top: 34px; }
+  h2 { font-family: var(--font-display); color: var(--heading); font-size: 1.5rem; line-height: 1.25; margin: 0 0 12px; text-wrap: balance; }
+  h2 .n { color: var(--blue); margin-right: .35em; }
+  h3 { font-family: var(--font-display); color: var(--heading); font-size: 1.08rem; margin: 22px 0 8px; }
+  p { margin: 0 0 12px; max-width: 70ch; }
+  ul, ol { margin: 0 0 12px; padding-left: 1.3em; max-width: 68ch; }
+  li { margin-bottom: 6px; }
+  strong { color: var(--heading); }
+  a { color: var(--blue); }
+  .muted { color: var(--muted); font-size: .9rem; }
+
+  .tldr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .tldr > div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  .tldr .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+  .tldr > div:nth-child(1) .k { color: var(--blue); }
+  .tldr > div:nth-child(2) .k { color: var(--orange); }
+  .tldr > div:nth-child(3) .k { color: var(--green); }
+  .tldr p { margin: 0; font-size: .97rem; }
+
+  .stages { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: stretch; margin: 12px 0; }
+  .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+  .stage .k { font-family: var(--font-display); font-weight: 700; color: var(--heading); }
+  .stage p { margin: 4px 0 0; font-size: .93rem; }
+  .arrow { align-self: center; font-size: 1.6rem; color: var(--blue); font-weight: 700; }
+
+  .callout { border-radius: 10px; padding: 14px 16px; margin: 14px 0; background: var(--blue-soft); max-width: 74ch; }
+  .callout.warn { background: var(--orange-soft); }
+  .callout.ok { background: var(--green-soft); }
+  .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
+  .callout .t { font-weight: 700; color: var(--heading); display: block; margin-bottom: 4px; }
+
+  .figure { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 12px 0; }
+  .figure svg { display: block; width: 100%; height: auto; }
+  .figcap { font-size: .85rem; color: var(--muted); margin: 8px 2px 0; }
+  .twocol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .twocol > div { min-width: 0; }
+
+  svg .ax { stroke: var(--line); stroke-width: 1; fill: none; }
+  svg .gr { stroke: var(--grid); stroke-width: 1; fill: none; }
+  svg .tick { fill: var(--muted); font: 500 11px var(--font-body); }
+  svg .axt { fill: var(--muted); font: 600 12px var(--font-body); }
+  svg .lab { fill: var(--ink); font: 600 12px var(--font-body); }
+  svg .val { fill: var(--muted); font: 500 11px var(--font-body); font-variant-numeric: tabular-nums; }
+  svg .dot { fill: var(--pos); stroke: var(--surface); stroke-width: 2; }
+  svg .dot.br { fill: var(--neg); }
+  svg .edge { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+  svg .nd { fill: var(--surface); stroke: var(--muted); stroke-width: 1.5; }
+  svg .nd.hub { fill: var(--blue-soft); stroke: var(--blue); }
+  svg .nd.focus { fill: var(--pos); stroke: var(--pos); }
+  svg .nd.focus2 { fill: var(--neg); stroke: var(--neg); }
+  svg .ndl { fill: #FFFFFF; font: 700 12px var(--font-body); }
+  #bars .lab { font-size: 14px; }
+  #bars .val, #bars .tick { font-size: 13px; }
+  svg .bar-pos { fill: var(--pos); }
+  svg .bar-neg { fill: var(--neg); }
+  svg .hit { fill: transparent; }
+  svg .row:hover .hit { fill: var(--grid); }
+
+  .trl { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 3px; margin: 10px 0 4px; max-width: 640px; }
+  .trl div { text-align: center; font-weight: 700; font-size: .85rem; padding: 6px 0; border-radius: 4px; color: var(--heading); }
+  .trl .a { background: var(--grid); } .trl .b { background: var(--blue-soft); } .trl .c { background: var(--green-soft); }
+  .trl-leg { display: grid; grid-template-columns: 3fr 3fr 3fr; gap: 3px; max-width: 640px; font-size: .78rem; color: var(--muted); text-align: center; }
+
+  .tbl { overflow-x: auto; margin: 10px 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .92rem; }
+  th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { font-weight: 700; color: var(--heading); background: var(--blue-soft); font-size: .84rem; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.wrapc { white-space: normal; text-align: left; }
+  td.top { font-weight: 700; color: var(--blue); }
+  tr.br td { background: var(--orange-soft); }
+
+  .steps { list-style: none; padding: 0; counter-reset: s; max-width: none; }
+  .steps > li { counter-increment: s; position: relative; padding: 2px 0 12px 46px; margin: 0; }
+  .steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%;
+     background: var(--blue); color: #FFFFFF; font-family: var(--font-display); font-weight: 700; display: grid; place-items: center; font-size: .95rem; }
+  .steps ul { margin-top: 6px; }
+  .steps ul li { margin-bottom: 4px; }
+  .formula { font-family: var(--font-display); background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; padding: 9px 14px; margin: 6px 0; display: inline-block; max-width: 100%; }
+
+  .sim { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-top: 12px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .presets button { font: inherit; font-size: .85rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .presets button[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #FFFFFF; }
+  .presets button:focus-visible, .ctrl input:focus-visible, .ctrl select:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .sim-grid { display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 20px; }
+  .ctrl label { display: flex; justify-content: space-between; gap: 8px; font-size: .88rem; font-weight: 600; margin-top: 10px; }
+  .ctrl label span { color: var(--blue); font-variant-numeric: tabular-nums; }
+  .ctrl input[type=range] { width: 100%; accent-color: var(--blue); }
+  .ctrl .sub { font-size: .76rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; margin: 16px 0 0; }
+  .ctrl .chk { justify-content: flex-start; align-items: flex-start; font-weight: 500; color: var(--muted); }
+  .ctrl .chk span { color: var(--muted); }
+  .ctrl .chk input { margin-top: 4px; accent-color: var(--blue); }
+  .ctrl select { width: 100%; font: inherit; font-size: .9rem; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); margin-top: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .82rem; color: var(--muted); margin: 0 0 6px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .note { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+
+  dl.gloss { display: grid; grid-template-columns: minmax(0, 14em) minmax(0, 1fr); gap: 8px 16px; margin: 8px 0; }
+  dl.gloss dt { font-weight: 700; color: var(--heading); }
+  dl.gloss dd { margin: 0; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin: 8px 0; max-width: 74ch; }
+  summary { cursor: pointer; font-weight: 600; color: var(--heading); }
+  details p { margin: 8px 0 2px; }
+  footer { border-top: 1px solid var(--line); margin-top: 40px; padding-top: 16px; font-size: .85rem; color: var(--muted); }
+
+  @media (max-width: 720px) {
+    .tldr, .twocol, .sim-grid { grid-template-columns: minmax(0, 1fr); }
+    .stages { grid-template-columns: minmax(0, 1fr); }
+    .arrow { transform: rotate(90deg); justify-self: center; }
+    dl.gloss { grid-template-columns: minmax(0, 1fr); }
+    dl.gloss dd { margin-bottom: 8px; }
+  }
+</style>
+<style>
+  .wbar { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr); gap: 10px; align-items: center; margin: 8px 0; }
+  .wbar .lab { font-weight: 700; color: var(--heading); font-size: .95rem; }
+  .wbar .lab small { display: block; font-weight: 500; color: var(--muted); font-size: .8rem; }
+  .stack { display: flex; height: 30px; border-radius: 6px; overflow: hidden; gap: 2px; background: var(--surface); }
+  .stack div { display: grid; place-items: center; color: #FFFFFF; font-weight: 700; font-size: .85rem; font-variant-numeric: tabular-nums; min-width: 0; }
+  .c1 { background: var(--pos); } .c2 { background: #1BA3C6; } .c3 { background: var(--green); }
+  .wleg { display: flex; flex-wrap: wrap; gap: 14px; font-size: .85rem; color: var(--muted); margin-top: 6px; }
+  .wleg i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+</style>
+</head>
+<body>
+
+<div class="band">
+  <div class="wrap">
+    <p class="eyebrow"><b>LabDEC</b> · INSID 2026 · Material didático</p>
+    <h1>Como são gerados os pesos dos cenários S2 a S5</h1>
+    <p class="lede">Nota complementar ao tutorial do artigo de Linhares, Costa &amp; Eufrazio (INSID 2026). Os pesos de S2 são <b>calculados a partir dos dados</b>, pelo método da entropia. Os de S3, S4 e S5 <b>não são calculados</b>: os autores os escolheram como perfis estilizados de política.</p>
+    <p class="cite">Critérios: C1 · centralidade de grau, C2 · centralidade de autovetor, C3 · TRL médio. Dados: Tabela 1 do artigo; IEA, <a href="https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide" target="_blank" rel="noopener" style="color:#9CC3FF">ETP Clean Energy Technology Guide</a>.</p>
+  </div>
+</div>
+
+<main>
+<div class="wrap">
+
+<section id="visao">
+  <h2>Os cinco conjuntos de pesos</h2>
+  <div class="figure">
+    <div class="wbar"><div class="lab">S1 · Iguais<small>base</small></div><div class="stack"><div class="c1" style="flex:0.333">0,333</div><div class="c2" style="flex:0.333">0,333</div><div class="c3" style="flex:0.333">0,333</div></div></div>
+    <div class="wbar"><div class="lab">S2 · Entropia<small>calculado dos dados</small></div><div class="stack"><div class="c1" style="flex:0.261">0,261</div><div class="c2" style="flex:0.338">0,338</div><div class="c3" style="flex:0.401">0,401</div></div></div>
+    <div class="wbar"><div class="lab">S3 · Rede<small>definido pelos autores</small></div><div class="stack"><div class="c1" style="flex:0.4">0,4</div><div class="c2" style="flex:0.4">0,4</div><div class="c3" style="flex:0.2">0,2</div></div></div>
+    <div class="wbar"><div class="lab">S4 · Maturidade<small>definido pelos autores</small></div><div class="stack"><div class="c1" style="flex:0.2">0,2</div><div class="c2" style="flex:0.2">0,2</div><div class="c3" style="flex:0.6">0,6</div></div></div>
+    <div class="wbar"><div class="lab">S5 · Influência<small>definido pelos autores</small></div><div class="stack"><div class="c1" style="flex:0.2">0,2</div><div class="c2" style="flex:0.5">0,5</div><div class="c3" style="flex:0.3">0,3</div></div></div>
+    <div class="wleg"><span><i class="c1"></i>C1 · Grau</span><span><i class="c2"></i>C2 · Autovetor</span><span><i class="c3"></i>C3 · TRL médio</span></div>
+    <p class="figcap">Largura de cada segmento proporcional ao peso; cada linha soma 1. Fonte: Tabela 2 do artigo.</p>
+  </div>
+  <p>O <b>S1</b> (1/3 para cada critério) é a referência: representa a ausência de qualquer informação de preferência.</p>
+</section>
+
+<section id="entropia">
+  <h2><span class="n">1</span>S2 · Entropia: pesos tirados dos próprios dados</h2>
+  <p>A ideia: um critério em que os 15 países têm valores parecidos não ajuda a diferenciá-los e deve pesar pouco. Um critério em que os valores se espalham de forma desigual diferencia mais e deve pesar mais. A <b>entropia</b>, conceito da teoria da informação de Shannon (1948), mede justamente o quanto a distribuição é uniforme. O uso da entropia para obter pesos de critérios é um método clássico da decisão multicritério (Zeleny, 1982; Hwang &amp; Yoon, 1981); no artigo, ele é aplicado à matriz normalizada min–máx (Seção 3.4).</p>
+
+  <h3>Passo a passo, para cada critério j</h3>
+  <ol class="steps">
+    <li><b>Normalizar min–máx.</b>
+      <div class="formula">x<sub>ij</sub> = (g<sub>ij</sub> − mín<sub>j</sub>) ÷ (máx<sub>j</sub> − mín<sub>j</sub>)</div><br>O pior país fica com 0 e o melhor com 1.</li>
+    <li><b>Transformar em proporções.</b>
+      <div class="formula">p<sub>ij</sub> = x<sub>ij</sub> ÷ Σ<sub>i</sub> x<sub>ij</sub></div></li>
+    <li><b>Calcular a entropia</b> (com 0 · ln 0 = 0).
+      <div class="formula">E<sub>j</sub> = −(1 / ln 15) · Σ<sub>i</sub> p<sub>ij</sub> · ln p<sub>ij</sub></div><br>Vai de 0 a 1; E<sub>j</sub> = 1 significa valores perfeitamente iguais.</li>
+    <li><b>Grau de diversificação.</b>
+      <div class="formula">d<sub>j</sub> = 1 − E<sub>j</sub></div><br>É o quanto o critério diferencia os países.</li>
+    <li><b>Normalizar.</b>
+      <div class="formula">w<sub>j</sub> = d<sub>j</sub> ÷ (d<sub>1</sub> + d<sub>2</sub> + d<sub>3</sub>)</div></li>
+  </ol>
+
+  <h3>Resultado com os dados da Tabela 1</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Critério</th><th>Entropia E</th><th>Diversificação d = 1 − E</th><th>Peso w</th></tr></thead>
+    <tbody>
+      <tr><td>C1 · Grau</td><td>0,9487</td><td>0,0513</td><td class="top">0,261</td></tr>
+      <tr><td>C2 · Autovetor</td><td>0,9336</td><td>0,0664</td><td class="top">0,338</td></tr>
+      <tr><td>C3 · TRL médio</td><td>0,9214</td><td>0,0786</td><td class="top">0,401</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Recalculado a partir da Tabela 1; bate com a Tabela 2 do artigo. O cálculo direto dá 0,400 para C3; o artigo arredonda para 0,401 para que os três pesos somem 1.</p>
+  <p>O TRL recebe o maior peso porque, depois da normalização, seus valores são os mais desiguais entre os países: é o critério que mais separa os candidatos nos dados.</p>
+  <div class="callout warn">
+    <span class="t">S2 não expressa a preferência de ninguém</span>
+    <p>Os pesos de entropia refletem só o poder de discriminação de cada critério naquele conjunto de 15 países. Se a lista de países mudar, os pesos mudam.</p>
+  </div>
+</section>
+
+<section id="perfis">
+  <h2><span class="n">2</span>S3, S4 e S5: perfis de política definidos pelos autores</h2>
+  <p>Como nenhum decisor real foi consultado, os autores criaram três perfis “arquetípicos” com duas regras simples:</p>
+  <ul>
+    <li>a dimensão priorizada recebe a <b>maior parte</b> do peso;</li>
+    <li>todo critério mantém <b>pelo menos 0,2</b>, para nenhum ser ignorado.</li>
+  </ul>
+  <div class="tbl"><table>
+    <thead><tr><th>Cenário</th><th>C1 Grau</th><th>C2 Autovetor</th><th>C3 TRL</th><th style="text-align:left">Quem pensaria assim</th></tr></thead>
+    <tbody>
+      <tr><td><b>S3 · Foco na rede</b></td><td>0,4</td><td>0,4</td><td>0,2</td><td class="wrapc">País periférico que quer ampliar contatos: as duas centralidades somam 80% do peso.</td></tr>
+      <tr><td><b>S4 · Foco na maturidade</b></td><td>0,2</td><td>0,2</td><td>0,6</td><td class="wrapc">Agência que financia demonstração e implantação: o TRL pesa mais que as duas centralidades juntas (0,6 &gt; 0,4). É o oposto de S3.</td></tr>
+      <tr><td><b>S5 · Foco na influência</b></td><td>0,2</td><td>0,5</td><td>0,3</td><td class="wrapc">Quem quer entrar nos consórcios que definem agendas e padrões: o autovetor sozinho leva metade do peso.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout">
+    <span class="t">Cenários, ao invés de preferências elicitadas</span>
+    <p>Os autores deixam claro que esses números não foram obtidos de um decisor. Eles servem para delimitar o espaço de orientações plausíveis, e cada ranking vale para o seu perfil. Numa aplicação real, os pesos viriam do próprio decisor (por pontuação direta, <i>swing weighting</i> ou as ferramentas interativas do PROMETHEE), depois de uma etapa participativa de estruturação do problema.</p>
+  </div>
+</section>
+
+<section id="referencias">
+  <h2>Referências</h2>
+  <ul>
+    <li>Shannon, C. E. (1948). A mathematical theory of communication. <i>Bell System Technical Journal</i>, 27(3), 379–423. Citada no artigo como referência do método da entropia [17].</li>
+    <li>Zeleny, M. (1982). <i>Multiple Criteria Decision Making</i>. McGraw-Hill, New York.</li>
+    <li>Hwang, C. L.; Yoon, K. (1981). <i>Multiple Attribute Decision Making: Methods and Applications</i>. Lecture Notes in Economics and Mathematical Systems, vol. 186. Springer, Berlin. Citada no artigo [8].</li>
+    <li>Linhares, L. F.; Costa, H. G.; Eufrazio, E. P. (2026). <i>Integrating Social Network Analysis and PROMETHEE II for Prioritizing International Cooperation Partners in Net-Zero Technology Projects</i>. INSID 2026. Seção 3.4 e Tabela 2.</li>
+  </ul>
+</section>
+
+<footer>
+  LabDEC · Laboratório de Decisão · Universidade Federal Fluminense. Nota complementar ao tutorial <a href="Tutorial_para_leigos_SNA_PROMETHEE_NetZero.html">Tutorial_para_leigos_SNA_PROMETHEE_NetZero.html</a>, baseada em Linhares, Costa &amp; Eufrazio (INSID 2026), Seção 3.4 e Tabela 2. Dados: Agência Internacional de Energia (IEA), ETP Clean Energy Technology Guide, <a href="https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide" target="_blank" rel="noopener" style="overflow-wrap:anywhere">https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide</a>.
+</footer>
+
+</div>
+</main>
+</body>
+</html>

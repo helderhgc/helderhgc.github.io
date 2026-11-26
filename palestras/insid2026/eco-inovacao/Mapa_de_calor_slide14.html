@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de Calor dos Clusters</title>
+<!-- Nota complementar ao slide 14 de KMeans_EcoInovacao_INSID2026_PT.pptx (Motta, Eufrazio & Costa, INSID 2026).
+     Gerado por build/build_explainer_slide14.py a partir de build/results.json. LabDEC · UFF -->
+<style>
+:root{--bg:#F6F8FC;--surface:#FFFFFF;--ink:#101B33;--muted:#516079;--line:#D5DDEA;--grid:#E6EBF3;--heading:#0B1F4D;
+--blue:#1D5FBF;--green:#2E7D12;--orange:#B4600A;--magenta:#B0286C;--blue-soft:#E4EDFB;--green-soft:#E3F2DA;--orange-soft:#FBEADB;
+--magenta-soft:#F8E1EC;--yellow-soft:#FFF3C4;--yellow-ink:#7A5C00;--band:#0B1F4D;--band-muted:#B8C7E6;
+--dot-blue:#1D5FBF;--dot-orange:#F28C1C;--dot-green:#5DB52E;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A1226;--surface:#111C36;--ink:#E5EBF6;--muted:#9DAAC2;--line:#263453;
+--grid:#1C2944;--heading:#DCE6FA;--blue:#5C98F2;--green:#6FCF4A;--orange:#F09A4D;--magenta:#E2609F;--blue-soft:#172B52;--green-soft:#173A1E;
+--orange-soft:#3A2716;--magenta-soft:#3A1729;--yellow-soft:#3A3212;--yellow-ink:#F2D36B;--band:#071431;--band-muted:#9FB2D8;
+--dot-blue:#5C98F2;--dot-orange:#F09A4D;--dot-green:#6FCF4A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0A1226;--surface:#111C36;--ink:#E5EBF6;--muted:#9DAAC2;--line:#263453;--grid:#1C2944;--heading:#DCE6FA;
+--blue:#5C98F2;--green:#6FCF4A;--orange:#F09A4D;--magenta:#E2609F;--blue-soft:#172B52;--green-soft:#173A1E;--orange-soft:#3A2716;
+--magenta-soft:#3A1729;--yellow-soft:#3A3212;--yellow-ink:#F2D36B;--band:#071431;--band-muted:#9FB2D8;--dot-blue:#5C98F2;
+--dot-orange:#F09A4D;--dot-green:#6FCF4A;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Arial,system-ui,sans-serif;font-size:16.5px;line-height:1.6}
+.wrap{max-width:900px;margin:0 auto;padding-left:16px;padding-right:16px}
+.band{background:var(--band);color:#fff}.band .wrap{padding-block:40px 34px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--band-muted);font-weight:600;margin:0 0 12px}
+h1{font-size:clamp(1.8rem,4.4vw,2.6rem);line-height:1.12;margin:0 0 14px;text-wrap:balance}
+.lede{font-size:1.1rem;color:#DCE5F7;max-width:64ch;margin:0 0 14px}.cite{font-size:.88rem;color:var(--band-muted);margin:0}
+main .wrap{padding-block:8px 56px}
+h2{color:var(--heading);font-size:1.5rem;margin:44px 0 10px;line-height:1.2}
+h3{color:var(--heading);font-size:1.3rem;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+h4{margin:0;font-size:1.05rem;color:var(--heading)}
+p{margin:0 0 12px}.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;position:relative;padding:0 0 12px 46px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;
+font-weight:700;display:grid;place-items:center}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:8px 0 0;font-size:.95rem}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.ldot{width:14px;height:14px;border-radius:50%;display:inline-block}
+table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--surface)}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:.85rem}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.85rem;font-weight:600;white-space:nowrap}
+.t-bottom{background:var(--magenta-soft);color:var(--magenta)}.t-middle{background:var(--yellow-soft);color:var(--yellow-ink)}
+.t-top{background:var(--green-soft);color:var(--green)}.tag.pr{outline:2px solid var(--ink);outline-offset:1px}
+.cl{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin:22px 0}
+.cl-blue{border-top:0}.members{color:var(--muted);margin:0 0 8px}
+.num-badge{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-weight:700;font-size:1rem;flex:none}
+.num-badge.blue{background:var(--dot-blue)}.num-badge.orange{background:var(--dot-orange)}.num-badge.green{background:var(--dot-green)}
+figure.chart{margin:10px 0 16px}figure.chart svg{width:100%;height:auto;display:block}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:4px}
+.z-bot{fill:var(--magenta-soft)}.z-mid{fill:var(--yellow-soft)}.z-top{fill:var(--green-soft)}
+.qline{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 3}.rline{stroke:var(--grid);stroke-width:1}
+.qlab{font-size:12px;fill:var(--muted);text-anchor:middle;font-weight:600}.zlab{font-size:12px;fill:var(--muted);text-anchor:middle}
+.ilab{font-size:13px;fill:var(--muted);text-anchor:end;dominant-baseline:central}.ilab.ipr{fill:var(--ink);font-weight:700}
+.vlab{font-size:12px;fill:var(--ink);dominant-baseline:central;font-variant-numeric:tabular-nums}
+.dot.blue{fill:var(--dot-blue)}.dot.orange{fill:var(--dot-orange)}.dot.green{fill:var(--dot-green)}
+.ring{fill:none;stroke:var(--ink);stroke-width:2}
+.ind{border-top:1px solid var(--line);padding:14px 0 6px}
+.ind header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.facts{font-size:.93rem;color:var(--muted)}.ind ul{margin:0 0 10px;padding-left:20px}
+.ods{display:flex;flex-wrap:wrap;gap:6px}.chip{background:var(--blue-soft);color:var(--blue);border-radius:999px;padding:2px 10px;font-size:.82rem;font-weight:600}
+details{margin:8px 0 4px}summary{cursor:pointer;color:var(--blue);font-size:.92rem}
+table.mini{max-width:460px;margin-top:6px;border:1px solid var(--line);border-radius:10px}
+.note{background:var(--blue-soft);border-radius:12px;padding:14px 16px;margin:14px 0}
+.warn{background:var(--orange-soft);border-radius:12px;padding:14px 16px;margin:14px 0}
+.script{border-left:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-style:italic}
+a{color:var(--blue)}a:visited{color:var(--blue)}
+.cs{border-left:2px solid var(--line)}.pc{font-size:.8rem;white-space:nowrap;vertical-align:middle}
+.pchip{display:inline-block;padding:1px 8px;border-radius:6px;font-weight:700;font-size:.78rem}
+.p-cor{background:var(--magenta);color:#fff}.p-dev{background:#E8C33A;color:#3A2E00}.p-none{color:var(--muted);font-size:.78rem}
+th.grp{text-align:center;border-left:2px solid var(--line)}
+.legbox{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;background:var(--surface);border:1px solid var(--line);
+border-radius:12px;padding:14px 16px;margin:10px 0;font-size:.9rem}
+.legbox div{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:10px}
+.legbox .sw{display:flex;gap:4px;flex-wrap:wrap}
+table.prio td,table.prio th{vertical-align:middle}table.prio{min-width:760px}td.ind-n{white-space:nowrap;font-weight:600}
+@media (max-width:760px){.legbox{grid-template-columns:1fr}.legbox div{grid-template-columns:150px 1fr}}
+table.just td{font-size:.9rem}.ok{color:var(--green);font-weight:700}.ko{color:var(--magenta);font-weight:700}
+blockquote{margin:10px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 10px 10px 0;font-size:.95rem}
+footer{color:var(--muted);font-size:.85rem;padding:24px 0 40px;border-top:1px solid var(--line);margin-top:40px}
+@media (max-width:600px){body{font-size:15.5px}.cl{padding:14px}h2{font-size:1.3rem}}
+
+.hm td,.hm th{vertical-align:middle}.hm small{display:block;font-size:.74rem;color:var(--muted);line-height:1.3;margin-top:2px}
+.hm small.th{margin-top:0}.hc{text-align:center;min-width:110px;border-left:3px solid var(--surface)}
+.h-bottom{background:var(--magenta-soft);color:var(--magenta)}.h-middle{background:var(--yellow-soft);color:var(--yellow-ink)}
+.h-top{background:var(--green-soft);color:var(--green)}.hc small{color:inherit;opacity:.85}
+figure.sm{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
+figure.sm h4{font-size:.98rem;margin:0 0 4px}.cbar{stroke:var(--ink);stroke-width:3;stroke-linecap:round}.pt{opacity:.9}
+.calc{font-variant-numeric:tabular-nums;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}
+.calc code{font-size:.95rem}.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+.kv div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kv b{display:block;font-size:1.6rem;line-height:1.1}
+@media (max-width:640px){.kv{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+<p class="eyebrow">INSID 2026 · Sessão técnica · Nota ao slide 14</p>
+<h1>O perfil de cada grupo, indicador por indicador</h1>
+<p class="lede">Como se lê o mapa de calor dos centróides: de onde vem cada número, de onde vem cada cor, o que a média de cada célula esconde
+e como o artigo interpreta os três perfis.</p>
+<p class="cite">Base: Motta, Eufrazio &amp; Costa, “Machine Learning applied to eco-innovation assessment: applying K-means to Eco-Innovation Index data”,
+Tabelas 7, 10, 11 e 12, seção 5.5 e Apêndice B (Dataset C). Números recalculados a partir da Tabela B.4.</p>
+</div></header>
+<main><div class="wrap">
+
+<h2>1. O que o slide mostra</h2>
+<p>Uma tabela com os 12 indicadores do Eco-Innovation Index 2024 nas linhas e os três clusters nas colunas. Cada célula traz o <b>centróide</b>
+do grupo naquele indicador, e a cor diz em que faixa esse valor cai em relação aos 27 países:
+<span class="tag t-top">Superior</span> acima do 3º quartil, <span class="tag t-middle">Intermediário</span> entre os quartis e
+<span class="tag t-bottom">Inferior</span> abaixo do 1º quartil. À direita, o slide resume o resultado:</p>
+<div class="kv">
+<div class="cl-green"><span class="muted">Cluster 3 · superior</span><b>8 · 4 · 0</b>superior · intermediário · inferior</div>
+<div><span class="muted">Cluster 1 · intermediário</span><b>2 · 9 · 1</b>superior · intermediário · inferior</div>
+<div><span class="muted">Cluster 2 · inferior</span><b>0 · 10 · 2</b>superior · intermediário · inferior</div>
+</div>
+<p>É a partir desta tabela que os grupos ganham nome (seção 6) e que se escolhem os indicadores prioritários do slide 17.</p>
+
+<h2>2. De onde vem cada número: o centróide</h2>
+<p>O centróide de um grupo, num indicador, é a <b>média simples</b> dos valores dos países do grupo nesse indicador, na escala original do EII
+(UE27 em 2014 = 100). Exemplo: cluster 1, exportações de bens e serviços ambientais.</p>
+<div class="calc"><code>(112,6 + 70,3 + 62,5 + 61,4 + 55,0 + 37,2) / 6 = <b>66,5</b></code>
+<p class="muted" style="margin:8px 0 0">Espanha 112,6, Países Baixos 70,3, Itália 62,5, Bélgica 61,4, Malta 55,0, Irlanda 37,2.</p></div>
+<div class="note"><p><b>E a normalização?</b> O K-means agrupou os países com os indicadores em escala 0–1 (min-max), para que nenhum indicador
+domine a distância. Como a min-max é uma transformação linear de cada indicador, a média dos valores normalizados corresponde exatamente à
+média dos valores originais. Por isso o slide pode mostrar os centróides na escala do EII, que é mais fácil de ler, sem mudar nenhuma categoria:
+os quartis também se transformam da mesma forma.</p></div>
+
+<h2>3. De onde vem cada cor: os quartis dos 27 países</h2>
+<p>Para cada indicador, ordenam-se os 27 valores. O 1º quartil (Q1) deixa um quarto dos países abaixo dele; o 3º quartil (Q3), três quartos.
+Com interpolação linear, o Q1 fica na posição 6,5 da lista ordenada (contando a partir de 0), entre o 7º e o 8º valor;
+o Q3, na posição 19,5, entre o 20º e o 21º. No exemplo das exportações:</p>
+<div class="calc"><code>valores ordenados: 12,5, 37,2, 55,0, 61,4, 62,5, 67,2, 70,3, 72,1, 72,8, …<br>
+Q1 = 70,3 + 0,5 × (72,1 − 70,3) = <b>71,2</b> &nbsp;·&nbsp; Q3 = <b>127,8</b><br>
+centróide do cluster 1 = 66,5 &lt; Q1 → <span class="tag t-bottom">Inferior</span></code></div>
+<p>A regra é a mesma nas 36 células. Importante: <b>a régua é relativa aos 27 países da UE</b>, não um padrão absoluto. “Intermediário” significa
+estar na metade central da UE, o que muitas vezes já é bem acima de 100, o nível da UE em 2014.</p>
+<p class="muted">Quartis com interpolação linear; podem diferir em 0,1 da Tabela 11 do artigo, conforme o método de cálculo.</p>
+
+<h2>4. O mapa de calor completo</h2>
+<p>A mesma tabela do slide, com dois dados a mais em cada célula: a <b>posição</b> do centróide na régua dos quartis (0 = Q1, 1 = Q3) e
+quantos países do grupo estão, individualmente, na faixa inferior · intermediária · superior.</p>
+<div class="scroll"><table class="hm">
+<thead><tr><th>Indicador</th><th class="num">Q1</th><th class="num">Q3</th><th>Cluster 1 · interm.</th><th>Cluster 2 · inferior</th><th>Cluster 3 · superior</th></tr></thead>
+<tbody><tr><td>P&amp;D governamental ambiental e energético<small class="th">Insumos</small></td><td class="num">23,9</td><td class="num">90,0</td><td class="hc h-middle"><b>54,8</b><small>posição 0,47<br>2·3·1 países</small></td><td class="hc h-middle"><b>29,8</b><small>posição 0,09<br>5·8·0 países</small></td><td class="hc h-top"><b>117,0</b><small>posição 1,41<br>0·2·6 países</small></td></tr><tr><td>Pessoal de P&amp;D e pesquisadores<small class="th">Insumos</small></td><td class="num">78,5</td><td class="num">163,7</td><td class="hc h-middle"><b>133,3</b><small>posição 0,64<br>1·3·2 países</small></td><td class="hc h-middle"><b>83,6</b><small>posição 0,06<br>6·7·0 países</small></td><td class="hc h-top"><b>183,5</b><small>posição 1,23<br>0·3·5 países</small></td></tr><tr><td>Certificados ISO 14001<small class="th">Atividades</small></td><td class="num">75,8</td><td class="num">177,3</td><td class="hc h-middle"><b>108,3</b><small>posição 0,32<br>2·3·1 países</small></td><td class="hc h-middle"><b>154,0</b><small>posição 0,77<br>2·5·6 países</small></td><td class="hc h-middle"><b>101,6</b><small>posição 0,25<br>2·6·0 países</small></td></tr><tr><td>Patentes de eco-inovação<small class="th">Produtos</small></td><td class="num">27,0</td><td class="num">79,1</td><td class="hc h-middle"><b>53,8</b><small>posição 0,51<br>0·5·1 países</small></td><td class="hc h-bottom"><b>25,7</b><small>posição -0,03<br>7·6·0 países</small></td><td class="hc h-top"><b>97,2</b><small>posição 1,35<br>0·2·6 países</small></td></tr><tr><td>Publicações acadêmicas em eco-inovação<small class="th">Produtos</small></td><td class="num">234,4</td><td class="num">447,0</td><td class="hc h-middle"><b>328,1</b><small>posição 0,44<br>0·6·0 países</small></td><td class="hc h-middle"><b>335,1</b><small>posição 0,47<br>5·5·3 países</small></td><td class="hc h-top"><b>447,2</b><small>posição 1,00<br>2·2·4 países</small></td></tr><tr><td>Produtividade de materiais<small class="th">Eficiência de recursos</small></td><td class="num">86,8</td><td class="num">218,4</td><td class="hc h-top"><b>239,5</b><small>posição 1,16<br>0·1·5 países</small></td><td class="hc h-middle"><b>88,9</b><small>posição 0,02<br>6·7·0 países</small></td><td class="hc h-middle"><b>151,1</b><small>posição 0,49<br>1·5·2 países</small></td></tr><tr><td>Produtividade da água<small class="th">Eficiência de recursos</small></td><td class="num">103,5</td><td class="num">205,5</td><td class="hc h-middle"><b>163,2</b><small>posição 0,59<br>1·4·1 países</small></td><td class="hc h-middle"><b>136,2</b><small>posição 0,32<br>5·4·4 países</small></td><td class="hc h-middle"><b>198,7</b><small>posição 0,93<br>1·5·2 países</small></td></tr><tr><td>Produtividade energética<small class="th">Eficiência de recursos</small></td><td class="num">65,5</td><td class="num">158,4</td><td class="hc h-middle"><b>141,8</b><small>posição 0,82<br>1·3·2 países</small></td><td class="hc h-middle"><b>75,0</b><small>posição 0,10<br>6·7·0 países</small></td><td class="hc h-top"><b>164,5</b><small>posição 1,07<br>0·3·5 países</small></td></tr><tr><td>Produtividade de GEE<small class="th">Eficiência de recursos</small></td><td class="num">149,1</td><td class="num">233,2</td><td class="hc h-top"><b>241,8</b><small>posição 1,10<br>0·3·3 países</small></td><td class="hc h-bottom"><b>144,5</b><small>posição -0,06<br>6·7·0 países</small></td><td class="hc h-middle"><b>225,6</b><small>posição 0,91<br>1·3·4 países</small></td></tr><tr><td>Exportações de bens e serviços ambientais<small class="th">Socioeconômicos</small></td><td class="num">71,2</td><td class="num">127,8</td><td class="hc h-bottom"><b>66,5</b><small>posição -0,08<br>5·1·0 países</small></td><td class="hc h-middle"><b>101,6</b><small>posição 0,54<br>2·7·4 países</small></td><td class="hc h-top"><b>134,7</b><small>posição 1,12<br>0·5·3 países</small></td></tr><tr><td>Emprego em proteção ambiental<small class="th">Socioeconômicos</small></td><td class="num">63,9</td><td class="num">180,1</td><td class="hc h-middle"><b>90,6</b><small>posição 0,23<br>3·2·1 países</small></td><td class="hc h-middle"><b>113,4</b><small>posição 0,43<br>3·8·2 países</small></td><td class="hc h-top"><b>191,0</b><small>posição 1,09<br>1·3·4 países</small></td></tr><tr><td>Valor adicionado em proteção ambiental<small class="th">Socioeconômicos</small></td><td class="num">80,8</td><td class="num">162,9</td><td class="hc h-middle"><b>96,8</b><small>posição 0,19<br>3·2·1 países</small></td><td class="hc h-middle"><b>116,2</b><small>posição 0,43<br>3·8·2 países</small></td><td class="hc h-top"><b>169,4</b><small>posição 1,08<br>1·3·4 países</small></td></tr></tbody></table></div>
+
+<h2>5. O que a média esconde: os 27 países em cada indicador</h2>
+<p>Cada painel mostra os 27 países (pontos) na escala do indicador, separados por cluster, com as faixas de quartil ao fundo.
+O traço vertical é o centróide do grupo, o valor que aparece no slide. Passe o mouse sobre um ponto para ver o país.</p>
+<figure class="chart sm"><h4>P&amp;D governamental ambiental e energético <span class="muted">· Insumos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="P&amp;D governamental ambiental e energético: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="102.6" height="84" class="z-bot"/>
+<rect x="222.6" y="20" width="247.9" height="84" class="z-mid"/>
+<rect x="470.5" y="20" width="269.5" height="84" class="z-top"/>
+<line x1="222.6" x2="222.6" y1="20" y2="104" class="qline"/>
+<text x="222.6" y="15" class="qlab">Q1 23,9</text>
+<line x1="470.5" x2="470.5" y1="20" y2="104" class="qline"/>
+<text x="470.5" y="15" class="qlab">Q3 90,0</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="480.6" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 92,7</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 155,8</title></circle>
+<circle cx="541.7" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 109,0</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 155,8</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>França: 155,8</title></circle>
+<circle cx="244.5" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 29,7</title></circle>
+<circle cx="439.4" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 81,7</title></circle>
+<circle cx="714.4" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 155,1</title></circle>
+<line x1="571.6" x2="571.6" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="256.9" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 33,0</title></circle>
+<circle cx="415.0" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 75,2</title></circle>
+<circle cx="203.7" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 18,8</title></circle>
+<circle cx="432.6" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 79,9</title></circle>
+<circle cx="184.6" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 13,7</title></circle>
+<circle cx="539.0" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 108,3</title></circle>
+<line x1="338.6" x2="338.6" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="158.3" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 6,7</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 2,6</title></circle>
+<circle cx="376.8" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 65,0</title></circle>
+<circle cx="241.5" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 28,9</title></circle>
+<circle cx="236.3" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 27,5</title></circle>
+<circle cx="173.3" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 10,7</title></circle>
+<circle cx="231.4" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 26,2</title></circle>
+<circle cx="238.9" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 28,2</title></circle>
+<circle cx="460.4" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 87,3</title></circle>
+<circle cx="161.3" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 7,5</title></circle>
+<circle cx="293.2" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 42,7</title></circle>
+<circle cx="213.8" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 21,5</title></circle>
+<circle cx="254.3" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 32,3</title></circle>
+<line x1="244.9" x2="244.9" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">2,6</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">155,8</text>
+</svg></figure><figure class="chart sm"><h4>Pessoal de P&amp;D e pesquisadores <span class="muted">· Insumos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Pessoal de P&amp;D e pesquisadores: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="206.0" height="84" class="z-bot"/>
+<rect x="326.0" y="20" width="241.0" height="84" class="z-mid"/>
+<rect x="566.9" y="20" width="173.1" height="84" class="z-top"/>
+<line x1="326.0" x2="326.0" y1="20" y2="104" class="qline"/>
+<text x="326.0" y="15" class="qlab">Q1 78,5</text>
+<line x1="566.9" x2="566.9" y1="20" y2="104" class="qline"/>
+<text x="566.9" y="15" class="qlab">Q3 163,7</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="639.9" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 189,5</title></circle>
+<circle cx="574.3" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 166,3</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 216,8</title></circle>
+<circle cx="678.6" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 203,2</title></circle>
+<circle cx="556.5" cy="39.0" r="5.5" class="dot green pt"><title>França: 160,0</title></circle>
+<circle cx="559.6" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 161,1</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 216,8</title></circle>
+<circle cx="541.5" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 154,7</title></circle>
+<line x1="622.9" x2="622.9" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 216,8</title></circle>
+<circle cx="395.9" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 103,2</title></circle>
+<circle cx="494.0" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 137,9</title></circle>
+<circle cx="434.4" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 116,8</title></circle>
+<circle cx="238.2" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 47,4</title></circle>
+<circle cx="607.1" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 177,9</title></circle>
+<line x1="481.0" x2="481.0" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="270.7" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 58,9</title></circle>
+<circle cx="163.9" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 21,1</title></circle>
+<circle cx="514.9" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 145,3</title></circle>
+<circle cx="395.9" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 103,2</title></circle>
+<circle cx="505.9" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 142,1</title></circle>
+<circle cx="312.6" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 73,7</title></circle>
+<circle cx="413.7" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 109,5</title></circle>
+<circle cx="339.4" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 83,2</title></circle>
+<circle cx="250.1" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 51,6</title></circle>
+<circle cx="363.2" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 91,6</title></circle>
+<circle cx="476.2" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 131,6</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 13,7</title></circle>
+<circle cx="276.9" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 61,1</title></circle>
+<line x1="340.5" x2="340.5" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">13,7</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">216,8</text>
+</svg></figure><figure class="chart sm"><h4>Certificados ISO 14001 <span class="muted">· Atividades</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Certificados ISO 14001: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="147.3" height="84" class="z-bot"/>
+<rect x="267.3" y="20" width="243.7" height="84" class="z-mid"/>
+<rect x="511.0" y="20" width="229.0" height="84" class="z-top"/>
+<line x1="267.3" x2="267.3" y1="20" y2="104" class="qline"/>
+<text x="267.3" y="15" class="qlab">Q1 75,8</text>
+<line x1="511.0" x2="511.0" y1="20" y2="104" class="qline"/>
+<text x="511.0" y="15" class="qlab">Q3 177,3</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="282.4" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 82,1</title></circle>
+<circle cx="267.3" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 75,8</title></circle>
+<circle cx="316.0" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 96,1</title></circle>
+<circle cx="492.2" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 169,5</title></circle>
+<circle cx="170.6" cy="39.0" r="5.5" class="dot green pt"><title>França: 35,5</title></circle>
+<circle cx="210.9" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 52,3</title></circle>
+<circle cx="422.6" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 140,5</title></circle>
+<circle cx="470.8" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 160,6</title></circle>
+<line x1="329.2" x2="329.2" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="186.6" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 42,2</title></circle>
+<circle cx="495.0" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 170,7</title></circle>
+<circle cx="355.4" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 112,5</title></circle>
+<circle cx="536.6" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 188,0</title></circle>
+<circle cx="231.3" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 60,8</title></circle>
+<circle cx="267.3" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 75,8</title></circle>
+<line x1="345.3" x2="345.3" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="599.4" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 214,2</title></circle>
+<circle cx="479.7" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 164,3</title></circle>
+<circle cx="717.0" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 263,2</title></circle>
+<circle cx="665.0" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 241,5</title></circle>
+<circle cx="287.7" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 84,3</title></circle>
+<circle cx="555.3" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 195,8</title></circle>
+<circle cx="451.4" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 152,5</title></circle>
+<circle cx="555.8" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 196,0</title></circle>
+<circle cx="298.2" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 88,7</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 24,0</title></circle>
+<circle cx="161.2" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 31,6</title></circle>
+<circle cx="474.2" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 162,0</title></circle>
+<circle cx="527.0" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 184,0</title></circle>
+<line x1="455.0" x2="455.0" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">24,0</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">263,2</text>
+</svg></figure><figure class="chart sm"><h4>Patentes de eco-inovação <span class="muted">· Produtos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Patentes de eco-inovação: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="105.6" height="84" class="z-bot"/>
+<rect x="225.6" y="20" width="205.2" height="84" class="z-mid"/>
+<rect x="430.8" y="20" width="309.2" height="84" class="z-top"/>
+<line x1="225.6" x2="225.6" y1="20" y2="104" class="qline"/>
+<text x="225.6" y="15" class="qlab">Q1 27,0</text>
+<line x1="430.8" x2="430.8" y1="20" y2="104" class="qline"/>
+<text x="430.8" y="15" class="qlab">Q3 79,1</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="477.7" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 91,0</title></circle>
+<circle cx="516.0" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 100,7</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 151,7</title></circle>
+<circle cx="547.5" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 108,7</title></circle>
+<circle cx="384.3" cy="39.0" r="5.5" class="dot green pt"><title>França: 67,3</title></circle>
+<circle cx="492.7" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 94,8</title></circle>
+<circle cx="592.8" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 120,2</title></circle>
+<circle cx="290.4" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 43,5</title></circle>
+<line x1="502.2" x2="502.2" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="412.3" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 74,4</title></circle>
+<circle cx="279.4" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 40,7</title></circle>
+<circle cx="324.3" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 52,1</title></circle>
+<circle cx="294.4" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 44,5</title></circle>
+<circle cx="226.2" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 27,2</title></circle>
+<circle cx="449.3" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 83,8</title></circle>
+<line x1="331.0" x2="331.0" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 6,1</title></circle>
+<circle cx="225.0" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 26,9</title></circle>
+<circle cx="292.4" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 44,0</title></circle>
+<circle cx="232.9" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 28,9</title></circle>
+<circle cx="226.9" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 27,4</title></circle>
+<circle cx="204.5" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 21,7</title></circle>
+<circle cx="185.9" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 17,0</title></circle>
+<circle cx="171.0" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 13,2</title></circle>
+<circle cx="260.1" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 35,8</title></circle>
+<circle cx="272.3" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 38,9</title></circle>
+<circle cx="188.7" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 17,7</title></circle>
+<circle cx="218.7" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 25,3</title></circle>
+<circle cx="240.7" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 30,9</title></circle>
+<line x1="220.2" x2="220.2" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">6,1</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">151,7</text>
+</svg></figure><figure class="chart sm"><h4>Publicações acadêmicas em eco-inovação <span class="muted">· Produtos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Publicações acadêmicas em eco-inovação: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="165.7" height="84" class="z-bot"/>
+<rect x="285.7" y="20" width="203.9" height="84" class="z-mid"/>
+<rect x="489.5" y="20" width="250.5" height="84" class="z-top"/>
+<line x1="285.7" x2="285.7" y1="20" y2="104" class="qline"/>
+<text x="285.7" y="15" class="qlab">Q1 234,4</text>
+<line x1="489.5" x2="489.5" y1="20" y2="104" class="qline"/>
+<text x="489.5" y="15" class="qlab">Q3 447,0</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="369.0" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 321,3</title></circle>
+<circle cx="224.3" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 170,3</title></circle>
+<circle cx="704.3" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 671,0</title></circle>
+<circle cx="680.8" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 646,5</title></circle>
+<circle cx="180.1" cy="39.0" r="5.5" class="dot green pt"><title>França: 124,2</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 684,3</title></circle>
+<circle cx="633.5" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 597,2</title></circle>
+<circle cx="408.5" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 362,5</title></circle>
+<line x1="489.7" x2="489.7" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="352.7" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 304,3</title></circle>
+<circle cx="313.9" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 263,8</title></circle>
+<circle cx="466.6" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 423,1</title></circle>
+<circle cx="314.3" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 264,2</title></circle>
+<circle cx="442.8" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 398,2</title></circle>
+<circle cx="363.1" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 315,1</title></circle>
+<line x1="375.5" x2="375.5" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 85,5</title></circle>
+<circle cx="717.0" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 684,3</title></circle>
+<circle cx="233.0" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 179,4</title></circle>
+<circle cx="498.6" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 456,5</title></circle>
+<circle cx="480.4" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 437,5</title></circle>
+<circle cx="377.5" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 330,1</title></circle>
+<circle cx="235.9" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 182,4</title></circle>
+<circle cx="471.3" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 428,0</title></circle>
+<circle cx="573.8" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 534,9</title></circle>
+<circle cx="294.3" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 243,4</title></circle>
+<circle cx="476.4" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 433,3</title></circle>
+<circle cx="191.3" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 135,9</title></circle>
+<circle cx="277.0" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 225,3</title></circle>
+<line x1="382.3" x2="382.3" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">85,5</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">684,3</text>
+</svg></figure><figure class="chart sm"><h4>Produtividade de materiais <span class="muted">· Eficiência de recursos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Produtividade de materiais: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="183.2" height="84" class="z-bot"/>
+<rect x="303.2" y="20" width="337.4" height="84" class="z-mid"/>
+<rect x="640.6" y="20" width="99.4" height="84" class="z-top"/>
+<line x1="303.2" x2="303.2" y1="20" y2="104" class="qline"/>
+<text x="303.2" y="15" class="qlab">Q1 86,8</text>
+<line x1="640.6" x2="640.6" y1="20" y2="104" class="qline"/>
+<text x="640.6" y="15" class="qlab">Q3 218,4</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="523.7" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 172,8</title></circle>
+<circle cx="636.8" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 216,9</title></circle>
+<circle cx="367.8" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 112,0</title></circle>
+<circle cx="147.8" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 26,2</title></circle>
+<circle cx="644.5" cy="39.0" r="5.5" class="dot green pt"><title>França: 219,9</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 248,2</title></circle>
+<circle cx="341.2" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 101,6</title></circle>
+<circle cx="366.8" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 111,6</title></circle>
+<line x1="468.1" x2="468.1" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="582.9" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 195,9</title></circle>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 248,2</title></circle>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 248,2</title></circle>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 248,2</title></circle>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 248,2</title></circle>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 248,2</title></circle>
+<line x1="694.7" x2="694.7" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="170.4" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 35,0</title></circle>
+<circle cx="306.8" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 88,2</title></circle>
+<circle cx="421.9" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 133,1</title></circle>
+<circle cx="170.9" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 35,2</title></circle>
+<circle cx="425.3" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 134,4</title></circle>
+<circle cx="416.3" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 130,9</title></circle>
+<circle cx="330.6" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 97,5</title></circle>
+<circle cx="270.6" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 74,1</title></circle>
+<circle cx="268.6" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 73,3</title></circle>
+<circle cx="299.6" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 85,4</title></circle>
+<circle cx="340.1" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 101,2</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 24,3</title></circle>
+<circle cx="448.6" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 143,5</title></circle>
+<line x1="308.6" x2="308.6" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">24,3</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">248,2</text>
+</svg></figure><figure class="chart sm"><h4>Produtividade da água <span class="muted">· Eficiência de recursos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Produtividade da água: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="166.8" height="84" class="z-bot"/>
+<rect x="286.8" y="20" width="177.6" height="84" class="z-mid"/>
+<rect x="464.4" y="20" width="275.6" height="84" class="z-top"/>
+<line x1="286.8" x2="286.8" y1="20" y2="104" class="qline"/>
+<text x="286.8" y="15" class="qlab">Q1 103,5</text>
+<line x1="464.4" x2="464.4" y1="20" y2="104" class="qline"/>
+<text x="464.4" y="15" class="qlab">Q3 205,5</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="452.5" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 198,7</title></circle>
+<circle cx="432.0" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 186,9</title></circle>
+<circle cx="555.6" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 257,9</title></circle>
+<circle cx="452.5" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 198,7</title></circle>
+<circle cx="321.4" cy="39.0" r="5.5" class="dot green pt"><title>França: 123,4</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 350,6</title></circle>
+<circle cx="433.7" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 187,9</title></circle>
+<circle cx="255.6" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 85,6</title></circle>
+<line x1="452.5" x2="452.5" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="348.8" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 139,1</title></circle>
+<circle cx="212.4" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 60,8</title></circle>
+<circle cx="390.7" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 163,2</title></circle>
+<circle cx="390.7" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 163,2</title></circle>
+<circle cx="685.5" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 332,5</title></circle>
+<circle cx="316.2" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 120,4</title></circle>
+<line x1="390.7" x2="390.7" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="154.1" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 27,3</title></circle>
+<circle cx="356.6" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 143,6</title></circle>
+<circle cx="529.2" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 242,7</title></circle>
+<circle cx="212.6" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 60,9</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 20,9</title></circle>
+<circle cx="382.7" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 158,6</title></circle>
+<circle cx="228.5" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 70,0</title></circle>
+<circle cx="476.2" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 212,3</title></circle>
+<circle cx="531.1" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 243,8</title></circle>
+<circle cx="339.4" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 133,7</title></circle>
+<circle cx="343.7" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 136,2</title></circle>
+<circle cx="257.4" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 86,6</title></circle>
+<circle cx="514.0" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 234,0</title></circle>
+<line x1="343.7" x2="343.7" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">20,9</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">350,6</text>
+</svg></figure><figure class="chart sm"><h4>Produtividade energética <span class="muted">· Eficiência de recursos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Produtividade energética: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="165.0" height="84" class="z-bot"/>
+<rect x="285.0" y="20" width="229.2" height="84" class="z-mid"/>
+<rect x="514.2" y="20" width="225.8" height="84" class="z-top"/>
+<line x1="285.0" x2="285.0" y1="20" y2="104" class="qline"/>
+<text x="285.0" y="15" class="qlab">Q1 65,5</text>
+<line x1="514.2" x2="514.2" y1="20" y2="104" class="qline"/>
+<text x="514.2" y="15" class="qlab">Q3 158,4</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="535.3" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 167,0</title></circle>
+<circle cx="535.8" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 167,2</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 240,7</title></circle>
+<circle cx="328.4" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 83,1</title></circle>
+<circle cx="518.3" cy="39.0" r="5.5" class="dot green pt"><title>França: 160,1</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 240,7</title></circle>
+<circle cx="510.1" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 156,8</title></circle>
+<circle cx="371.1" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 100,4</title></circle>
+<line x1="529.1" x2="529.1" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="370.1" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 100,0</title></circle>
+<circle cx="469.0" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 140,1</title></circle>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 240,7</title></circle>
+<circle cx="557.0" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 175,8</title></circle>
+<circle cx="228.5" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 42,6</title></circle>
+<circle cx="497.6" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 151,7</title></circle>
+<line x1="473.2" x2="473.2" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 7,9</title></circle>
+<circle cx="445.3" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 130,5</title></circle>
+<circle cx="248.5" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 50,7</title></circle>
+<circle cx="223.4" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 40,5</title></circle>
+<circle cx="423.3" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 121,6</title></circle>
+<circle cx="347.9" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 91,0</title></circle>
+<circle cx="281.3" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 64,0</title></circle>
+<circle cx="304.7" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 73,5</title></circle>
+<circle cx="288.2" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 66,8</title></circle>
+<circle cx="276.6" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 62,1</title></circle>
+<circle cx="433.9" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 125,9</title></circle>
+<circle cx="312.4" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 76,6</title></circle>
+<circle cx="281.8" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 64,2</title></circle>
+<line x1="308.4" x2="308.4" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">7,9</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">240,7</text>
+</svg></figure><figure class="chart sm"><h4>Produtividade de GEE <span class="muted">· Eficiência de recursos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Produtividade de GEE: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="248.9" height="84" class="z-bot"/>
+<rect x="368.9" y="20" width="229.4" height="84" class="z-mid"/>
+<rect x="598.3" y="20" width="141.7" height="84" class="z-top"/>
+<line x1="368.9" x2="368.9" y1="20" y2="104" class="qline"/>
+<text x="368.9" y="15" class="qlab">Q1 149,1</text>
+<line x1="598.3" x2="598.3" y1="20" y2="104" class="qline"/>
+<text x="598.3" y="15" class="qlab">Q3 233,2</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 276,8</title></circle>
+<circle cx="511.4" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 201,4</title></circle>
+<circle cx="306.3" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 126,2</title></circle>
+<circle cx="440.8" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 175,5</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>França: 276,8</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 276,8</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 276,8</title></circle>
+<circle cx="491.8" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 194,2</title></circle>
+<line x1="577.4" x2="577.4" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="587.5" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 229,3</title></circle>
+<circle cx="578.0" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 225,8</title></circle>
+<circle cx="696.6" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 269,3</title></circle>
+<circle cx="609.0" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 237,2</title></circle>
+<circle cx="717.0" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 276,8</title></circle>
+<circle cx="540.6" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 212,1</title></circle>
+<line x1="621.6" x2="621.6" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 66,3</title></circle>
+<circle cx="360.6" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 146,1</title></circle>
+<circle cx="284.0" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 118,0</title></circle>
+<circle cx="181.1" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 80,3</title></circle>
+<circle cx="220.1" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 94,6</title></circle>
+<circle cx="525.9" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 206,7</title></circle>
+<circle cx="475.4" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 188,2</title></circle>
+<circle cx="382.1" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 154,0</title></circle>
+<circle cx="458.2" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 181,9</title></circle>
+<circle cx="195.3" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 85,5</title></circle>
+<circle cx="519.0" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 204,2</title></circle>
+<circle cx="510.6" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 201,1</title></circle>
+<circle cx="377.2" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 152,2</title></circle>
+<line x1="356.2" x2="356.2" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">66,3</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">276,8</text>
+</svg></figure><figure class="chart sm"><h4>Exportações de bens e serviços ambientais <span class="muted">· Socioeconômicos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Exportações de bens e serviços ambientais: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="204.7" height="84" class="z-bot"/>
+<rect x="324.7" y="20" width="175.4" height="84" class="z-mid"/>
+<rect x="500.1" y="20" width="239.9" height="84" class="z-top"/>
+<line x1="324.7" x2="324.7" y1="20" y2="104" class="qline"/>
+<text x="324.7" y="15" class="qlab">Q1 71,2</text>
+<line x1="500.1" x2="500.1" y1="20" y2="104" class="qline"/>
+<text x="500.1" y="15" class="qlab">Q3 127,8</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="696.6" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 191,3</title></circle>
+<circle cx="489.1" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 124,3</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 197,9</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 197,9</title></circle>
+<circle cx="414.2" cy="39.0" r="5.5" class="dot green pt"><title>França: 100,1</title></circle>
+<circle cx="373.3" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 86,9</title></circle>
+<circle cx="425.7" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 103,8</title></circle>
+<circle cx="337.7" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 75,4</title></circle>
+<line x1="521.3" x2="521.3" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="294.4" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 61,4</title></circle>
+<circle cx="452.9" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 112,6</title></circle>
+<circle cx="219.4" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 37,2</title></circle>
+<circle cx="297.8" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 62,5</title></circle>
+<circle cx="274.6" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 55,0</title></circle>
+<circle cx="321.9" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 70,3</title></circle>
+<line x1="310.2" x2="310.2" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="347.6" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 78,6</title></circle>
+<circle cx="329.7" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 72,8</title></circle>
+<circle cx="541.8" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 141,3</title></circle>
+<circle cx="495.0" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 126,2</title></circle>
+<circle cx="376.7" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 88,0</title></circle>
+<circle cx="327.5" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 72,1</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 12,5</title></circle>
+<circle cx="425.4" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 103,7</title></circle>
+<circle cx="505.2" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 129,5</title></circle>
+<circle cx="312.3" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 67,2</title></circle>
+<circle cx="598.8" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 159,7</title></circle>
+<circle cx="568.1" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 149,8</title></circle>
+<circle cx="474.0" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 119,4</title></circle>
+<line x1="418.9" x2="418.9" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">12,5</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">197,9</text>
+</svg></figure><figure class="chart sm"><h4>Emprego em proteção ambiental <span class="muted">· Socioeconômicos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Emprego em proteção ambiental: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="153.7" height="84" class="z-bot"/>
+<rect x="273.7" y="20" width="237.8" height="84" class="z-mid"/>
+<rect x="511.5" y="20" width="228.5" height="84" class="z-top"/>
+<line x1="273.7" x2="273.7" y1="20" y2="104" class="qline"/>
+<text x="273.7" y="15" class="qlab">Q1 63,9</text>
+<line x1="511.5" x2="511.5" y1="20" y2="104" class="qline"/>
+<text x="511.5" y="15" class="qlab">Q3 180,1</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="681.4" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 263,2</title></circle>
+<circle cx="256.1" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 55,3</title></circle>
+<circle cx="434.3" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 142,4</title></circle>
+<circle cx="709.5" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 276,9</title></circle>
+<circle cx="553.4" cy="39.0" r="5.5" class="dot green pt"><title>França: 200,6</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 280,6</title></circle>
+<circle cx="469.7" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 159,7</title></circle>
+<circle cx="448.6" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 149,4</title></circle>
+<line x1="533.7" x2="533.7" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="235.8" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 45,4</title></circle>
+<circle cx="367.8" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 109,9</title></circle>
+<circle cx="250.8" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 52,7</title></circle>
+<circle cx="592.4" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 219,7</title></circle>
+<circle cx="221.9" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 38,6</title></circle>
+<circle cx="301.3" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 77,4</title></circle>
+<line x1="328.3" x2="328.3" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="326.1" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 89,5</title></circle>
+<circle cx="407.9" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 129,5</title></circle>
+<circle cx="421.8" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 136,3</title></circle>
+<circle cx="717.0" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 280,6</title></circle>
+<circle cx="312.8" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 83,0</title></circle>
+<circle cx="360.2" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 106,2</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 0,0</title></circle>
+<circle cx="564.6" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 206,1</title></circle>
+<circle cx="414.5" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 132,7</title></circle>
+<circle cx="265.3" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 59,8</title></circle>
+<circle cx="401.8" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 126,5</title></circle>
+<circle cx="258.8" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 56,6</title></circle>
+<circle cx="282.1" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 68,0</title></circle>
+<line x1="375.0" x2="375.0" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">0,0</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">280,6</text>
+</svg></figure><figure class="chart sm"><h4>Valor adicionado em proteção ambiental <span class="muted">· Socioeconômicos</span></h4><svg viewBox="0 0 760 130" role="img" aria-label="Valor adicionado em proteção ambiental: valores dos 27 países por cluster">
+<rect x="120.0" y="20" width="210.0" height="84" class="z-bot"/>
+<rect x="330.0" y="20" width="190.0" height="84" class="z-mid"/>
+<rect x="520.0" y="20" width="220.0" height="84" class="z-top"/>
+<line x1="330.0" x2="330.0" y1="20" y2="104" class="qline"/>
+<text x="330.0" y="15" class="qlab">Q1 80,8</text>
+<line x1="520.0" x2="520.0" y1="20" y2="104" class="qline"/>
+<text x="520.0" y="15" class="qlab">Q3 162,9</text>
+<text x="110" y="39.0" class="ilab">Cluster 3</text>
+<line x1="120" x2="740" y1="39.0" y2="39.0" class="rline"/>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Áustria: 248,1</title></circle>
+<circle cx="395.9" cy="39.0" r="5.5" class="dot green pt"><title>Alemanha: 109,3</title></circle>
+<circle cx="550.0" cy="39.0" r="5.5" class="dot green pt"><title>Dinamarca: 175,9</title></circle>
+<circle cx="717.0" cy="39.0" r="5.5" class="dot green pt"><title>Finlândia: 248,1</title></circle>
+<circle cx="490.0" cy="39.0" r="5.5" class="dot green pt"><title>França: 150,0</title></circle>
+<circle cx="482.9" cy="39.0" r="5.5" class="dot green pt"><title>Luxemburgo: 146,9</title></circle>
+<circle cx="647.2" cy="39.0" r="5.5" class="dot green pt"><title>Suécia: 217,9</title></circle>
+<circle cx="278.6" cy="39.0" r="5.5" class="dot green pt"><title>Eslovênia: 58,6</title></circle>
+<line x1="534.9" x2="534.9" y1="29.0" y2="49.0" class="cbar"/>
+<text x="110" y="65.0" class="ilab">Cluster 1</text>
+<line x1="120" x2="740" y1="65.0" y2="65.0" class="rline"/>
+<circle cx="297.3" cy="65.0" r="5.5" class="dot blue pt"><title>Bélgica: 66,7</title></circle>
+<circle cx="481.5" cy="65.0" r="5.5" class="dot blue pt"><title>Espanha: 146,3</title></circle>
+<circle cx="190.2" cy="65.0" r="5.5" class="dot blue pt"><title>Irlanda: 20,4</title></circle>
+<circle cx="585.8" cy="65.0" r="5.5" class="dot blue pt"><title>Itália: 191,4</title></circle>
+<circle cx="223.0" cy="65.0" r="5.5" class="dot blue pt"><title>Malta: 34,6</title></circle>
+<circle cx="424.3" cy="65.0" r="5.5" class="dot blue pt"><title>Países Baixos: 121,6</title></circle>
+<line x1="366.9" x2="366.9" y1="55.0" y2="75.0" class="cbar"/>
+<text x="110" y="91.0" class="ilab">Cluster 2</text>
+<line x1="120" x2="740" y1="91.0" y2="91.0" class="rline"/>
+<circle cx="400.0" cy="91.0" r="5.5" class="dot orange pt"><title>Bulgária: 111,1</title></circle>
+<circle cx="325.8" cy="91.0" r="5.5" class="dot orange pt"><title>Chipre: 79,0</title></circle>
+<circle cx="485.6" cy="91.0" r="5.5" class="dot orange pt"><title>Tchéquia: 148,1</title></circle>
+<circle cx="717.0" cy="91.0" r="5.5" class="dot orange pt"><title>Estônia: 248,1</title></circle>
+<circle cx="377.1" cy="91.0" r="5.5" class="dot orange pt"><title>Grécia: 101,2</title></circle>
+<circle cx="271.6" cy="91.0" r="5.5" class="dot orange pt"><title>Croácia: 55,6</title></circle>
+<circle cx="143.0" cy="91.0" r="5.5" class="dot orange pt"><title>Hungria: 0,0</title></circle>
+<circle cx="551.4" cy="91.0" r="5.5" class="dot orange pt"><title>Lituânia: 176,5</title></circle>
+<circle cx="457.2" cy="91.0" r="5.5" class="dot orange pt"><title>Letônia: 135,8</title></circle>
+<circle cx="417.2" cy="91.0" r="5.5" class="dot orange pt"><title>Polônia: 118,5</title></circle>
+<circle cx="447.2" cy="91.0" r="5.5" class="dot orange pt"><title>Portugal: 131,5</title></circle>
+<circle cx="427.1" cy="91.0" r="5.5" class="dot orange pt"><title>Romênia: 122,8</title></circle>
+<circle cx="334.3" cy="91.0" r="5.5" class="dot orange pt"><title>Eslováquia: 82,7</title></circle>
+<line x1="411.8" x2="411.8" y1="81.0" y2="101.0" class="cbar"/>
+<text x="120.0" y="122" class="zlab" text-anchor="start">0,0</text>
+<text x="740.0" y="122" class="zlab" text-anchor="end">248,1</text>
+</svg></figure>
+<div class="note"><p><b>Dois exemplos de dispersão.</b> Em certificados ISO 14001, o cluster 2 tem centróide intermediário, mas
+6 dos 13 países estão individualmente na faixa superior e 2 na inferior. Em publicações, o cluster 3 aparece
+como superior, mas 2 dos 8 países (França, Alemanha) estão na faixa inferior: a média é puxada
+por valores muito altos, como os de Luxemburgo e Dinamarca.</p></div>
+
+<h2>6. Como o artigo lê cada perfil</h2>
+<section class="cl"><h3><span class="num-badge green">3</span>Cluster 3 · desempenho superior</h3>
+<p class="members">Alemanha, Áustria, Dinamarca, Eslovênia, Finlândia, França, Luxemburgo, Suécia.</p>
+<p><b>Superior em:</b> P&D gov., Pessoal P&D, Patentes, Publicações, Prod. energia, Exportações, Emprego amb., Valor adic. amb. <b>Intermediário em:</b> ISO 14001, Prod. materiais, Prod. água, Prod. GEE. <b>Nenhum indicador inferior.</b></p>
+<ul><li>Longa tradição em regulação ambiental, ecossistemas de inovação fortes, colaboração público-privada e adoção precoce de tecnologias verdes.</li>
+<li><b>ISO 14001</b> intermediário: países que certificaram cedo já têm uma base alta e migram para estruturas ESG mais avançadas.</li>
+<li><b>Produtividade de materiais</b>: ganhos de eficiência compensados pelo aumento do consumo (Agnolucci et al., 2017).</li>
+<li><b>Produtividade da água</b>: a escassez hídrica não é um motor forte de eficiência nesses países.</li>
+<li><b>Produtividade de GEE</b>: políticas e tecnologias verdes avançadas convivem com bases industriais fortes (Clodniţchi e Tudorache, 2022; Demiral e Akça, 2022).</li></ul>
+</section>
+<section class="cl"><h3><span class="num-badge blue">1</span>Cluster 1 · desempenho intermediário</h3>
+<p class="members">Bélgica, Espanha, Irlanda, Itália, Malta, Países Baixos.</p>
+<p><b>Superior em:</b> Prod. materiais, Prod. GEE. <b>Inferior em:</b> Exportações. Os demais 9 indicadores são intermediários.</p>
+<ul><li>Economias de alta renda, mas heterogêneas: muito globalizadas (Irlanda, Países Baixos, Bélgica), grandes economias com rigidez estrutural (Espanha, Itália) e uma pequena economia insular (Malta).</li>
+<li><b>Produtividade de GEE</b> alta: grandes setores de serviços com baixa emissão, desindustrialização parcial (Demiral e Akça, 2022), regulação e precificação de carbono da UE.</li>
+<li><b>Produtividade de materiais</b> alta: cadeias de suprimento eficientes e políticas de economia circular (Rodríguez-Mañay et al., 2026).</li>
+<li><b>Exportações ambientais</b> baixas: pouca presença nas cadeias de suprimento europeias do setor (Saucedo Acosta et al., 2016). Os países adotam tecnologia verde, mas não necessariamente a produzem ou exportam.</li></ul>
+</section>
+<section class="cl"><h3><span class="num-badge orange">2</span>Cluster 2 · desempenho inferior</h3>
+<p class="members">Bulgária, Chipre, Croácia, Eslováquia, Estônia, Grécia, Hungria, Letônia, Lituânia, Polônia, Portugal, Romênia, Tchéquia.</p>
+<p><b>Nenhum indicador superior.</b> <b>Inferior em:</b> Patentes, Prod. GEE. Os demais 10 são intermediários,
+vários deles colados no Q1 (seção 7).</p>
+<ul><li>Dois subgrupos: países do Leste europeu em reestruturação econômica desde os anos 1990 e economias da periferia sul (Grécia, Portugal, Chipre).</li>
+<li><b>Produtividade de GEE</b> baixa: altas emissões por unidade de produto, pela dependência do carvão (sobretudo Polônia e Bulgária) e de indústrias intensivas em energia (Szczubełek e Rzeczkowski, 2024).</li>
+<li><b>P&amp;D governamental</b>, o intermediário mais fraco: dificuldade de financiar a inovação ambiental de forma consistente (Meissner et al., 2024).</li>
+<li><b>ISO 14001</b>: adoção mais lenta por custos, menor pressão institucional e menor exposição a mercados internacionais (Mazzi et al., 2016; Citterio, 2026).</li></ul>
+</section>
+
+<h2>7. Cuidados na leitura</h2>
+<div class="card"><p><b>Células perto dos limites.</b> Estas 12 células estão a menos de 10% do intervalo interquartil de Q1 ou Q3;
+uma pequena mudança nos dados mudaria a cor:</p><ul><li>Cluster 1, Exportações: centróide 66,5, Q1 = 71,2 → <span class="tag t-bottom">Inferior</span></li><li>Cluster 2, P&amp;D gov.: centróide 29,8, Q1 = 23,9 → <span class="tag t-middle">Intermediário</span></li><li>Cluster 2, Pessoal P&amp;D: centróide 83,6, Q1 = 78,5 → <span class="tag t-middle">Intermediário</span></li><li>Cluster 2, Patentes: centróide 25,7, Q1 = 27,0 → <span class="tag t-bottom">Inferior</span></li><li>Cluster 2, Prod. materiais: centróide 88,9, Q1 = 86,8 → <span class="tag t-middle">Intermediário</span></li><li>Cluster 2, Prod. GEE: centróide 144,5, Q1 = 149,1 → <span class="tag t-bottom">Inferior</span></li><li>Cluster 3, Publicações: centróide 447,2, Q3 = 447,0 → <span class="tag t-top">Superior</span></li><li>Cluster 3, Prod. água: centróide 198,7, Q3 = 205,5 → <span class="tag t-middle">Intermediário</span></li><li>Cluster 3, Prod. energia: centróide 164,5, Q3 = 158,4 → <span class="tag t-top">Superior</span></li><li>Cluster 3, Prod. GEE: centróide 225,6, Q3 = 233,2 → <span class="tag t-middle">Intermediário</span></li><li>Cluster 3, Emprego amb.: centróide 191,0, Q3 = 180,1 → <span class="tag t-top">Superior</span></li><li>Cluster 3, Valor adic. amb.: centróide 169,4, Q3 = 162,9 → <span class="tag t-top">Superior</span></li></ul>
+<p>O cluster 2 é o caso mais marcante: além dos dois indicadores inferiores, tem vários intermediários praticamente no Q1. Já as Publicações
+do cluster 3 são superiores por apenas 0,2 ponto.</p></div>
+<div class="card"><ul>
+<li><b>O centróide é uma média.</b> A cor descreve o grupo, não cada país (seção 5).</li>
+<li><b>Régua relativa.</b> As categorias comparam com os 27 países em 2024. Não dizem se o desempenho é bom em termos absolutos nem se melhorou desde 2014.</li>
+<li><b>Peso dos temas.</b> Eficiência de recursos tem 4 dos 12 indicadores e Atividades só 1; ao usar os indicadores individuais, o K-means dá mais peso implícito aos temas com mais indicadores.</li>
+<li><b>Dados.</b> A produtividade da água de 5 países foi imputada pela média do cluster (Áustria, Finlândia, Irlanda, Itália, Portugal),
+o que puxa esses valores para o centróide. Emprego e valor adicionado em proteção ambiental valem zero para a Hungria, e a origem desses zeros não pôde ser rastreada.</li>
+<li><b>Indicador intermediário não é sinônimo de fraqueza.</b> Como o artigo observa, pode refletir efeitos de base, maturidade institucional ou estruturas industriais intensivas.</li>
+</ul></div>
+
+<h2>8. Dados</h2>
+<p>Os dados usados nesta página e na modelagem estão na pasta <code>dados/</code>, ao lado desta página (CSV com separador ponto e vírgula e vírgula decimal):
+<a href="dados/dados_modelagem_datasetC.csv">valores do Dataset C</a>,
+<a href="dados/dados_modelagem_datasetC_minmax.csv">valores normalizados (min-max)</a> e
+<a href="dados/centroides_e_quartis.csv">centróides e quartis</a>.
+Versões com os nomes dos indicadores em inglês: <a href="dados/modeling_data_datasetC_EN.csv">Dataset C</a>,
+<a href="dados/modeling_data_datasetC_minmax_EN.csv">min-max</a> e <a href="dados/centroids_and_quartiles_EN.csv">centroids and quartiles</a>.</p>
+
+<footer>LabDEC · Universidade Federal Fluminense</footer>
+</div></main>
+</body>
+</html>

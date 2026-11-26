@@ -1,0 +1,13 @@
+﻿indicator;min;Q1;Q3;max;centroid_cluster1;centroid_cluster2;centroid_cluster3;category_cluster1;category_cluster2;category_cluster3
+EI1.1 Governments environmental and energy R&D appropriations and outlays;2,6;23,9;90,0;155,8;54,8;29,8;117,0;middle;middle;top
+EI1.2 Total R&D personnel and researchers;13,7;78,5;163,7;216,8;133,3;83,6;183,5;middle;middle;top
+EI2.1 Number of ISO 14001 certificates;24,0;75,8;177,3;263,2;108,3;154,0;101,6;middle;middle;middle
+EI3.1 Eco-innovation related patents;6,1;27,0;79,1;151,7;53,8;25,7;97,2;middle;bottom;top
+EI3.2 Eco-innovation related academic publications;85,5;234,4;447,0;684,3;328,1;335,1;447,2;middle;middle;top
+EI4.1 Material productivity;24,3;86,8;218,4;248,2;239,5;88,9;151,1;top;middle;middle
+EI4.2 Water productivity (GDP/total fresh water abstraction);20,9;103,5;205,5;350,6;163,2;136,2;198,7;middle;middle;middle
+EI4.3 Energy productivity;7,9;65,5;158,4;240,7;141,8;75,0;164,5;middle;middle;top
+EI4.4 GHG productivity;66,3;149,1;233,2;276,8;241,8;144,5;225,6;top;bottom;middle
+EI5.1 Exports of environmental goods and service sector;12,5;71,2;127,8;197,9;66,5;101,6;134,7;bottom;middle;top
+EI5.2 Employment in environmental protection and resource management activities;0,0;63,9;180,1;280,6;90,6;113,4;191,0;middle;middle;top
+EI5.3 Value added in environmental protection and resource management activities;0,0;80,8;162,9;248,1;96,8;116,2;169,4;middle;middle;top

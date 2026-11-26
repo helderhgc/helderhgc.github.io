@@ -1,0 +1,42 @@
+[
+ {
+  "title": "Toward Intelligent Decision-Making: A systematic review of hybrid frameworks combining multi-criteria analysis and generative AI",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026, "type": "conference-paper", "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": ["Brunno e Souza Rodrigues", "Carla Martins Floriano", "Diogo Ferreira de Lima Silva", "Helder Gomes Costa"],
+  "cat": "nao_indexada"
+ },
+ {
+  "title": "Machine Learning applied to eco-innovation assessment",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026, "type": "conference-paper", "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": ["Isadora Valentim Vieira da Motta", "Edilvando Pereira Eufrazio", "Helder Gomes Costa"],
+  "cat": "nao_indexada"
+ },
+ {
+  "title": "Ranked-Clustering of Countries on SDG9 Indicators with a No-Code Visual Clustering Web Application",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026, "type": "conference-paper", "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": ["Helder Gomes Costa", "Leonardo Fernandes Costa", "Fábio Aquino da Silva"],
+  "cat": "nao_indexada"
+ },
+ {
+  "title": "Military Intelligence in the Analysis of Military Equipment Tenders: Modeling Using a Multicriteria Ranking Problem Structure",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026, "type": "conference-paper", "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": ["Leonardo Antonio Monteiro Pessôa", "Rodrigo José Pires Ferreira", "Marcelo Hazin Alencar", "Helder Gomes Costa"],
+  "cat": "nao_indexada"
+ },
+ {
+  "title": "Hierarchical Sorting under Parameter Uncertainty: An Experimental Study Using MCHP, ELECTRE TRI-B, and SMAA-TRI for Freedom and Prosperity Indicators",
+  "venue": "INSID 2026 – Local Proceedings, Recife-PE",
+  "year": 2026, "type": "conference-paper", "doi": null,
+  "url": "https://insidmeetings.org/insid2026/wp-content/uploads/2026/11/Local-Proceedings-INSID-2026.pdf",
+  "authors": ["Diogo Lima", "Brunno Rodrigues", "Helder Gomes Costa"],
+  "cat": "nao_indexada"
+ }
+]

@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de clusterização</title>
+<!--
+  Simulador de clusterização (LabDEC · INSID 2026). Arquivo único, sem dependências, funciona offline.
+  Três modos sobre os mesmos pontos (dois critérios, maior = melhor):
+    1. Categorização  — K-means passo a passo (atribuir / atualizar); grupos sem ordem.
+    2. Sorting Tipo B — os clusters do K-means ordenados pela média dos centróides.
+    3. Sorting Tipo A — perfis de referência b1, b2 (arrastáveis) definem categorias já ordenadas;
+                        regra conjuntiva: a instância fica acima de b se for >= b nos dois critérios.
+  Clique no gráfico para acrescentar pontos. ?lang=en abre em inglês.
+-->
+<style>
+  :root {
+    --navy: #0B1F4D; --blue: #1D5FBF; --slate: #51607A; --mist: #F4F6FB; --line: #D9E0EC; --white: #FFFFFF;
+    --green: #5DB52E; --orange: #F28C1C; --magenta: #D3187A; --cyan: #1BA3C6; --purple: #6B3FA0;
+    --greenD: #2E7D12; --greenT: #E6F3DE; --blueT: #DDE7F6; --orangeT: #FDEBD6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--white); color: var(--navy); font: 15px/1.45 Arial, Helvetica, sans-serif; }
+  header { background: var(--navy); color: var(--white); padding: 18px 28px 16px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 24px; letter-spacing: .2px; }
+  header p { margin: 2px 0 0; color: #B9C8EA; font-size: 14px; }
+  header .grow { flex: 1; min-width: 260px; }
+  .lang { background: transparent; color: var(--white); border: 1.5px solid #B9C8EA; border-radius: 16px; padding: 5px 12px; cursor: pointer; font-weight: 700; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 22px; padding: 20px 28px 28px; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; padding: 16px; } header { padding: 16px; } }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tab { border: 2px solid var(--line); background: var(--mist); color: var(--navy); border-radius: 22px; padding: 8px 16px; font-weight: 700; cursor: pointer; font-size: 14px; }
+  .tab[aria-selected="true"] { background: var(--navy); color: var(--white); border-color: var(--navy); }
+  .tab .tag { font-weight: 400; opacity: .8; }
+  .card { background: var(--mist); border-radius: 14px; padding: 14px 16px; }
+  #plot { width: 100%; height: auto; display: block; background: var(--white); border: 1px solid var(--line); border-radius: 14px; cursor: crosshair; touch-action: none; }
+  .pt { stroke: var(--white); stroke-width: 1.2; transition: cx .55s ease, cy .55s ease, fill .35s ease; }
+  .cent { stroke: var(--navy); stroke-width: 2.2; transition: transform .7s ease; }
+  .trail { stroke: var(--slate); stroke-width: 1.2; stroke-dasharray: 4 4; fill: none; opacity: .55; }
+  .link { stroke-width: 1; opacity: .28; }
+  .axis text { fill: var(--slate); font-size: 12px; }
+  .axis line, .axis path { stroke: var(--line); }
+  .axlab { fill: var(--slate); font-size: 13px; font-weight: 700; }
+  .prof { cursor: grab; }
+  .prof:active { cursor: grabbing; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  button.b { border: 0; border-radius: 9px; padding: 9px 14px; font-weight: 700; cursor: pointer; background: var(--blue); color: var(--white); font-size: 14px; }
+  button.b.sec { background: var(--white); color: var(--navy); border: 1.5px solid var(--line); }
+  button.b:disabled { opacity: .45; cursor: default; }
+  .k { display: flex; align-items: center; gap: 8px; margin-left: auto; font-weight: 700; }
+  .k input { width: 120px; accent-color: var(--blue); }
+  .step { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .muted { color: var(--slate); font-size: 13.5px; margin: 0; }
+  aside { display: flex; flex-direction: column; gap: 14px; }
+  aside h2 { font-size: 16px; margin: 0 0 6px; }
+  .def { border-left: 5px solid var(--blue); background: var(--white); border-radius: 10px; padding: 12px 14px; border: 1px solid var(--line); border-left-width: 5px; }
+  .def p { margin: 4px 0 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; color: var(--slate); font-weight: 700; padding: 4px 6px; border-bottom: 1.5px solid var(--line); }
+  td { padding: 5px 6px; border-bottom: 1px solid var(--line); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .sw { display: inline-block; width: 13px; height: 13px; border-radius: 50%; vertical-align: -2px; margin-right: 6px; border: 1px solid rgba(11,31,77,.25); }
+  .pill { display: inline-block; border-radius: 12px; padding: 1px 9px; font-size: 12px; font-weight: 700; color: var(--white); background: var(--greenD); }
+  .note { font-size: 13px; color: var(--slate); }
+  .kpi { display: flex; gap: 10px; }
+  .kpi div { flex: 1; background: var(--white); border-radius: 10px; padding: 8px 10px; border: 1px solid var(--line); }
+  .kpi b { display: block; font-size: 20px; }
+  .kpi span { font-size: 12px; color: var(--slate); }
+  footer { color: var(--slate); font-size: 12.5px; padding: 0 28px 22px; max-width: 1400px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<header>
+  <div class="grow">
+    <h1 id="t_title">Simulador de clusterização</h1>
+    <p id="t_sub">Mesmos pontos, três formas de formar grupos: categorização, sorting Tipo B e sorting Tipo A.</p>
+  </div>
+  <button class="lang" id="lang">EN</button>
+</header>
+
+<main>
+  <section>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-mode="cat" id="tab_cat"></button>
+      <button class="tab" role="tab" data-mode="sortB" id="tab_sortB"></button>
+      <button class="tab" role="tab" data-mode="sortA" id="tab_sortA"></button>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <p class="step" id="step"></p>
+      <p class="muted" id="stepSub"></p>
+    </div>
+    <svg id="plot" viewBox="0 0 760 560" role="img" aria-label="Instâncias no plano dos dois critérios"></svg>
+    <div class="controls">
+      <button class="b" id="btnStep"></button>
+      <button class="b" id="btnRun"></button>
+      <button class="b sec" id="btnReset"></button>
+      <button class="b sec" id="btnNew"></button>
+      <button class="b sec" id="btnClear"></button>
+      <label class="k"><span id="t_k">k</span> = <output id="kOut">3</output><input type="range" id="k" min="2" max="6" value="3"></label>
+    </div>
+  </section>
+
+  <aside>
+    <div class="def" id="defBox"><h2 id="defTitle"></h2><p id="defText"></p></div>
+    <div class="kpi" id="kpis"></div>
+    <div class="card"><h2 id="tblTitle"></h2><table id="tbl"></table><p class="note" id="tblNote"></p></div>
+    <div class="card"><h2 id="t_how">Como usar</h2><p class="note" id="howText"></p></div>
+  </aside>
+</main>
+<footer id="t_foot">LabDEC · Laboratório de Análise de Dados e Decisão (UFF) · INSID 2026. Distância euclidiana; centróides iniciais por k-means++ com semente fixa.</footer>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- text (PT / EN)
+const TXT = {
+  pt: {
+    title: "Simulador de clusterização",
+    sub: "Mesmos pontos, três formas de formar grupos: categorização, sorting Tipo B e sorting Tipo A.",
+    tab_cat: "Categorização", tab_sortB: "Sorting Tipo B", tab_sortA: "Sorting Tipo A",
+    tag_cat: "agrupar", tag_sortB: "agrupar e ordenar", tag_sortA: "comparar com perfis",
+    step: "Passo", run: "Rodar até convergir", reset: "Novos centróides", newData: "Novos dados", clear: "Limpar pontos",
+    k: "k", x: "Critério 1 (maior = melhor)", y: "Critério 2 (maior = melhor)",
+    s0: ["Início", "Centróides iniciais escolhidos por k-means++. Nenhuma instância foi atribuída ainda."],
+    sA: (it) => [`Iteração ${it} · atribuir`, "Cada instância vai para o centróide mais próximo (distância euclidiana)."],
+    sU: (it) => [`Iteração ${it} · atualizar`, "Cada centróide passa a ser a média das instâncias do seu grupo."],
+    sC: (it) => [`Convergiu em ${it} iterações`, "Nenhuma instância mudou de grupo. Os centróides descrevem o perfil médio de cada grupo."],
+    sB0: ["Primeiro agrupe", "O sorting Tipo B começa pelo K-means: use Passo ou Rodar até convergir."],
+    sB: (it) => [`Grupos formados (${it} iterações) e ordenados`, "Os clusters foram ordenados pela média dos centróides nos dois critérios (pesos iguais)."],
+    sA0: ["Perfis de referência b1 e b2", "As categorias existem antes da análise. Arraste os perfis e veja cada instância mudar de categoria."],
+    defT: { cat: "Categorização", sortB: "Sorting Tipo B", sortA: "Sorting Tipo A" },
+    def: {
+      cat: "Organizar as instâncias em grupos pela <b>semelhança</b> entre elas. Os grupos não têm ordem: as cores são só rótulos.",
+      sortB: "<b>Agrupar e depois ordenar</b>: o K-means forma os grupos pela semelhança; em seguida, os grupos são ordenados pelo desempenho dos centróides. O número de instâncias por grupo é livre.",
+      sortA: "Comparar cada instância com <b>perfis de referência já ordenados</b> (b1 &gt; b2). A instância fica acima de um perfil se for pelo menos tão boa quanto ele nos dois critérios. A semelhança entre as instâncias não importa."
+    },
+    tbl: { cat: "Grupos", sortB: "Ranking dos grupos", sortA: "Categorias" },
+    th_cat: ["Grupo", "n", "Centróide (C1, C2)"],
+    th_sortB: ["Posição", "Grupo", "n", "Média do centróide"],
+    th_sortA: ["Categoria", "Regra", "n"],
+    catNames: ["Superior", "Intermediária", "Inferior"],
+    rules: ["≥ b1 nos dois", "≥ b2 nos dois", "demais"],
+    note: {
+      cat: "Troque a semente (Novos centróides): o K-means pode chegar a outra partição, porque tem ótimos locais.",
+      sortB: "A ordem dos grupos vem depois do agrupamento. Grupos parecidos podem ficar em posições vizinhas mesmo com médias próximas.",
+      sortA: "Pontos de um mesmo grupo do K-means podem cair em categorias diferentes: aqui decide a comparação com b1 e b2, não a semelhança."
+    },
+    kpi: { wcss: "Soma de quadrados intragrupo", n: "Instâncias", it: "Iterações", agree: "Mesma posição que no Tipo B" },
+    how: "Clique no gráfico para acrescentar instâncias. Use <b>Passo</b> para ver o K-means atribuir e atualizar, um passo de cada vez. Mude <b>k</b> e compare as abas. No Sorting Tipo A, arraste os perfis b1 e b2.",
+    foot: "LabDEC · Laboratório de Análise de Dados e Decisão (UFF) · INSID 2026. Distância euclidiana; centróides iniciais por k-means++ com semente fixa.",
+    group: "Grupo", rank: "º", aria: "Instâncias no plano dos dois critérios"
+  },
+  en: {
+    title: "Clustering simulator",
+    sub: "Same points, three ways of forming groups: categorization, Sorting Type B and Sorting Type A.",
+    tab_cat: "Categorization", tab_sortB: "Sorting Type B", tab_sortA: "Sorting Type A",
+    tag_cat: "group", tag_sortB: "group, then rank", tag_sortA: "compare with profiles",
+    step: "Step", run: "Run to convergence", reset: "New centroids", newData: "New data", clear: "Clear points",
+    k: "k", x: "Criterion 1 (higher = better)", y: "Criterion 2 (higher = better)",
+    s0: ["Start", "Initial centroids chosen by k-means++. No instance has been assigned yet."],
+    sA: (it) => [`Iteration ${it} · assign`, "Each instance goes to the nearest centroid (Euclidean distance)."],
+    sU: (it) => [`Iteration ${it} · update`, "Each centroid becomes the mean of the instances in its group."],
+    sC: (it) => [`Converged in ${it} iterations`, "No instance changed group. The centroids describe the mean profile of each group."],
+    sB0: ["Cluster first", "Sorting Type B starts with K-means: use Step or Run to convergence."],
+    sB: (it) => [`Groups formed (${it} iterations) and ranked`, "The clusters were ranked by the mean of their centroids on the two criteria (equal weights)."],
+    sA0: ["Reference profiles b1 and b2", "The categories exist before the analysis. Drag the profiles and watch each instance change category."],
+    defT: { cat: "Categorization", sortB: "Sorting Type B", sortA: "Sorting Type A" },
+    def: {
+      cat: "Organize instances into groups by their <b>similarity</b>. The groups have no order: colours are just labels.",
+      sortB: "<b>Group, then rank</b>: K-means forms the groups by similarity; the groups are then ranked by the performance of their centroids. Group sizes are free.",
+      sortA: "Compare each instance with <b>reference profiles ordered beforehand</b> (b1 &gt; b2). An instance is above a profile if it is at least as good on both criteria. Similarity between instances does not matter."
+    },
+    tbl: { cat: "Groups", sortB: "Ranking of the groups", sortA: "Categories" },
+    th_cat: ["Group", "n", "Centroid (C1, C2)"],
+    th_sortB: ["Rank", "Group", "n", "Centroid mean"],
+    th_sortA: ["Category", "Rule", "n"],
+    catNames: ["Upper", "Intermediate", "Lower"],
+    rules: ["≥ b1 on both", "≥ b2 on both", "others"],
+    note: {
+      cat: "Change the seed (New centroids): K-means may reach another partition, because it has local optima.",
+      sortB: "The order of the groups comes after the clustering. Similar groups may end up in neighbouring ranks even with close means.",
+      sortA: "Points of the same K-means group can fall into different categories: here the comparison with b1 and b2 decides, not similarity."
+    },
+    kpi: { wcss: "Within-cluster sum of squares", n: "Instances", it: "Iterations", agree: "Same rank as Type B" },
+    how: "Click the chart to add instances. Use <b>Step</b> to watch K-means assign and update one step at a time. Change <b>k</b> and compare the tabs. In Sorting Type A, drag the profiles b1 and b2.",
+    foot: "LabDEC · Data Analysis and Decision Laboratory (UFF) · INSID 2026. Euclidean distance; initial centroids by k-means++ with a fixed seed.",
+    group: "Group", rank: "", aria: "Instances on the plane of the two criteria"
+  }
+};
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "pt";
+const L = () => TXT[lang];
+
+// ---------------------------------------------------------------- geometry and colours
+const W = 760, H = 560, M = { l: 62, r: 22, t: 18, b: 52 };
+const PW = W - M.l - M.r, PH = H - M.t - M.b;
+const sx = (v) => M.l + v / 100 * PW, sy = (v) => M.t + (100 - v) / 100 * PH;
+const ix = (px) => (px - M.l) / PW * 100, iy = (py) => 100 - (py - M.t) / PH * 100;
+const CAT = ["#1D5FBF", "#F28C1C", "#D3187A", "#1BA3C6", "#6B3FA0", "#51607A"];          // unordered labels
+const RANK = (r, k) => {                                                                   // ordered: green -> yellow -> red
+  const stops = [[46, 125, 18], [93, 181, 46], [242, 200, 60], [242, 140, 28], [165, 0, 37]];
+  const t = k === 1 ? 0 : r / (k - 1), p = t * (stops.length - 1), i = Math.min(Math.floor(p), stops.length - 2), f = p - i;
+  const c = stops[i].map((v, j) => Math.round(v + (stops[i + 1][j] - v) * f));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+};
+const A_COL = ["#2E7D12", "#F2C83C", "#A50025"];
+
+// ---------------------------------------------------------------- state
+let seed = 790, dataSeed = 11;
+let pts = [];          // {x, y}
+let k = 3, cents = [], labels = [], prevCents = [], phase = "init", iter = 0, converged = false;
+let mode = "cat";
+let prof = [{ x: 62, y: 62 }, { x: 36, y: 36 }];   // b1 (better), b2
+
+function rng(s) { return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(r) { let u = 0, v = 0; while (u === 0) u = r(); while (v === 0) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function makeData() {
+  const r = rng(dataSeed);
+  const blobs = [[24, 26, 7, 50], [52, 70, 8, 30], [78, 46, 7, 50], [76, 82, 6, 50], [34, 58, 7, 30]];
+  pts = [];
+  blobs.forEach(([cx, cy, sd, w]) => { const n = Math.round(10 + r() * 6 * (w / 50)); for (let i = 0; i < n; i++)
+    pts.push({ x: clamp(cx + gauss(r) * sd), y: clamp(cy + gauss(r) * sd) }); });
+}
+const clamp = (v) => Math.max(2, Math.min(98, v));
+const d2 = (a, b) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
+
+function initCents() {
+  const r = rng(seed); cents = [];
+  if (!pts.length) { phase = "init"; return; }
+  cents.push({ ...pts[Math.floor(r() * pts.length)] });
+  while (cents.length < Math.min(k, pts.length)) {                     // k-means++
+    const dd = pts.map((p) => Math.min(...cents.map((c) => d2(p, c)))), tot = dd.reduce((a, b) => a + b, 0);
+    let u = r() * tot, i = 0; while (i < pts.length - 1 && (u -= dd[i]) > 0) i++;
+    cents.push({ ...pts[i] });
+  }
+  labels = pts.map(() => -1); prevCents = cents.map((c) => ({ ...c })); phase = "init"; iter = 0; converged = false;
+}
+function assign() {
+  const nl = pts.map((p) => { let b = 0, bd = Infinity; cents.forEach((c, j) => { const v = d2(p, c); if (v < bd) { bd = v; b = j; } }); return b; });
+  const changed = nl.some((v, i) => v !== labels[i]); labels = nl; return changed;
+}
+function update() {
+  prevCents = cents.map((c) => ({ ...c }));
+  cents = cents.map((c, j) => { const m = pts.filter((_, i) => labels[i] === j); if (!m.length) return c;
+    return { x: m.reduce((a, p) => a + p.x, 0) / m.length, y: m.reduce((a, p) => a + p.y, 0) / m.length }; });
+}
+function step() {
+  if (!pts.length || converged) return;
+  if (phase === "init" || phase === "update") {
+    iter++; const ch = assign(); phase = "assign";
+    if (!ch && iter > 1) { converged = true; phase = "conv"; iter--; }
+  } else { update(); phase = "update"; }
+  render();
+}
+function runAll() {
+  let guard = 0; while (!converged && guard++ < 400) { if (phase === "init" || phase === "update") { iter++; const ch = assign(); phase = "assign"; if (!ch && iter > 1) { converged = true; phase = "conv"; iter--; } } else { update(); phase = "update"; } }
+  render();
+}
+function wcss() { return labels.some((l) => l < 0) ? null : pts.reduce((a, p, i) => a + d2(p, cents[labels[i]]), 0); }
+function rankOrder() {                                   // cluster indices from best to worst (mean of centroid coords)
+  return cents.map((c, j) => [j, (c.x + c.y) / 2]).sort((a, b) => b[1] - a[1]).map((v) => v[0]);
+}
+function catA(p) { return p.x >= prof[0].x && p.y >= prof[0].y ? 0 : p.x >= prof[1].x && p.y >= prof[1].y ? 1 : 2; }
+
+// ---------------------------------------------------------------- rendering
+const svg = document.getElementById("plot");
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent = svg) => { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); parent.appendChild(e); return e; };
+let gAxis, gRegion, gLinks, gTrail, gPts, gCent, gProf, ptEls = [], centEls = [];
+
+function buildStatic() {
+  svg.innerHTML = "";
+  gRegion = el("g"); gAxis = el("g", { class: "axis" }); gLinks = el("g"); gTrail = el("g"); gPts = el("g"); gCent = el("g"); gProf = el("g");
+  for (let v = 0; v <= 100; v += 20) {
+    el("line", { x1: sx(v), x2: sx(v), y1: sy(0), y2: sy(100) }, gAxis);
+    el("line", { x1: sx(0), x2: sx(100), y1: sy(v), y2: sy(v) }, gAxis);
+    el("text", { x: sx(v), y: sy(0) + 18, "text-anchor": "middle" }, gAxis).textContent = v;
+    el("text", { x: sx(0) - 10, y: sy(v) + 4, "text-anchor": "end" }, gAxis).textContent = v;
+  }
+  el("text", { x: sx(50), y: H - 10, "text-anchor": "middle", class: "axlab", id: "axX" }, gAxis);
+  el("text", { x: 16, y: sy(50), "text-anchor": "middle", class: "axlab", id: "axY", transform: `rotate(-90 16 ${sy(50)})` }, gAxis);
+  ptEls = []; centEls = [];
+}
+function syncPoints() {
+  while (ptEls.length < pts.length) { const c = el("circle", { r: 6.5, class: "pt" }, gPts); c.style.cx = sx(pts[ptEls.length].x) + "px"; c.style.cy = sy(pts[ptEls.length].y) + "px"; ptEls.push(c); }
+  while (ptEls.length > pts.length) ptEls.pop().remove();
+  pts.forEach((p, i) => { ptEls[i].style.cx = sx(p.x) + "px"; ptEls[i].style.cy = sy(p.y) + "px"; });
+}
+function syncCents() {
+  while (centEls.length < cents.length) {
+    const g = el("g", { class: "cent" }, gCent);
+    el("path", { d: "M-11,-4 L-4,-4 L-4,-11 L4,-11 L4,-4 L11,-4 L11,4 L4,4 L4,11 L-4,11 L-4,4 L-11,4 Z", "stroke-linejoin": "round" }, g);
+    centEls.push(g);
+  }
+  while (centEls.length > cents.length) centEls.pop().remove();
+}
+
+function render() {
+  const T = L();
+  document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
+  svg.setAttribute("aria-label", T.aria);
+  document.getElementById("axX").textContent = T.x; document.getElementById("axY").textContent = T.y;
+  syncPoints(); syncCents();
+  const order = rankOrder(), rankOf = {}; order.forEach((j, r) => rankOf[j] = r);
+  const assigned = !labels.some((l) => l < 0) && labels.length === pts.length;
+  const colourOf = (j) => mode === "sortB" ? RANK(rankOf[j], cents.length) : CAT[j % CAT.length];
+
+  // points
+  pts.forEach((p, i) => {
+    let fill = "#9AA7BD";
+    if (mode === "sortA") fill = A_COL[catA(p)];
+    else if (labels[i] >= 0 && (mode === "cat" || assigned)) fill = colourOf(labels[i]);
+    ptEls[i].setAttribute("fill", fill); ptEls[i].style.fill = fill;
+  });
+  // links from points to centroids during "assign"
+  gLinks.innerHTML = "";
+  if (mode !== "sortA" && phase === "assign") pts.forEach((p, i) => { if (labels[i] >= 0) el("line", { x1: sx(p.x), y1: sy(p.y), x2: sx(cents[labels[i]].x), y2: sy(cents[labels[i]].y), stroke: colourOf(labels[i]), class: "link" }, gLinks); });
+  // centroid trails during "update"
+  gTrail.innerHTML = "";
+  if (mode !== "sortA" && phase === "update") cents.forEach((c, j) => { const o = prevCents[j]; if (o && d2(o, c) > 0.01) el("line", { x1: sx(o.x), y1: sy(o.y), x2: sx(c.x), y2: sy(c.y), class: "trail" }, gTrail); });
+  // centroids
+  cents.forEach((c, j) => {
+    const g = centEls[j]; g.style.display = mode === "sortA" ? "none" : "";
+    g.style.transform = `translate(${sx(c.x)}px, ${sy(c.y)}px)`;
+    const f = mode === "sortB" && !assigned ? "#9AA7BD" : colourOf(j);
+    g.querySelector("path").setAttribute("fill", f);
+    let lab = g.querySelector("text"); if (!lab) { lab = el("text", { x: 14, y: -12, "font-size": 14, "font-weight": 700, fill: "#0B1F4D",
+      stroke: "#FFFFFF", "stroke-width": 3.5, "paint-order": "stroke", "stroke-linejoin": "round" }, g); }
+    lab.textContent = mode === "sortB" && assigned ? `${rankOf[j] + 1}${T.rank}` : "";
+  });
+  // Sorting Type A: dominance regions and draggable profiles
+  gRegion.innerHTML = ""; gProf.innerHTML = "";
+  if (mode === "sortA") {
+    el("rect", { x: sx(prof[1].x), y: sy(100), width: sx(100) - sx(prof[1].x), height: sy(prof[1].y) - sy(100), fill: "#F2C83C", opacity: .10 }, gRegion);
+    el("rect", { x: sx(prof[0].x), y: sy(100), width: sx(100) - sx(prof[0].x), height: sy(prof[0].y) - sy(100), fill: "#2E7D12", opacity: .12 }, gRegion);
+    prof.forEach((b, i) => {
+      const col = i === 0 ? "#2E7D12" : "#B4600A";
+      el("polyline", { points: `${sx(b.x)},${sy(100)} ${sx(b.x)},${sy(b.y)} ${sx(100)},${sy(b.y)}`, fill: "none", stroke: col, "stroke-width": 2.2, "stroke-dasharray": "7 5" }, gProf);
+      const g = el("g", { class: "prof", "data-i": i, transform: `translate(${sx(b.x)},${sy(b.y)})` }, gProf);
+      el("rect", { x: -13, y: -13, width: 26, height: 26, rx: 6, fill: col, stroke: "#fff", "stroke-width": 2 }, g);
+      el("text", { x: 0, y: 5, "text-anchor": "middle", fill: "#fff", "font-size": 12, "font-weight": 700 }, g).textContent = "b" + (i + 1);
+      g.addEventListener("pointerdown", startDrag);
+    });
+  }
+
+  // step panel
+  let st;
+  if (mode === "sortA") st = T.sA0;
+  else if (mode === "sortB") st = converged ? T.sB(iter) : (phase === "init" ? T.sB0 : (phase === "assign" ? T.sA(iter) : T.sU(iter)));
+  else st = phase === "init" ? T.s0 : phase === "assign" ? T.sA(iter) : phase === "update" ? T.sU(iter) : T.sC(iter);
+  document.getElementById("step").textContent = st[0]; document.getElementById("stepSub").textContent = st[1];
+
+  // side panel
+  document.getElementById("defBox").style.borderLeftColor = mode === "cat" ? "#51607A" : mode === "sortA" ? "#1D5FBF" : "#2E7D12";
+  document.getElementById("defTitle").innerHTML = T.defT[mode] + (mode === "sortB" ? ` <span class="pill">${lang === "pt" ? "como no estudo" : "as in the study"}</span>` : "");
+  document.getElementById("defText").innerHTML = T.def[mode];
+  const w = wcss();
+  const kp = [[pts.length, T.kpi.n]];
+  if (mode === "sortA") {
+    const agree = assigned && cents.length === 3 ? pts.filter((p, i) => catA(p) === rankOf[labels[i]]).length : null;
+    kp.push([agree === null ? "–" : Math.round(100 * agree / pts.length) + "%", T.kpi.agree]);
+  } else { kp.push([converged ? iter : iter || 0, T.kpi.it]); kp.push([w === null ? "–" : (w / 100).toFixed(1), T.kpi.wcss + " (÷100)"]); }
+  document.getElementById("kpis").innerHTML = kp.map(([v, t]) => `<div><b>${v}</b><span>${t}</span></div>`).join("");
+
+  const tb = document.getElementById("tbl"); document.getElementById("tblTitle").textContent = T.tbl[mode];
+  const cnt = (j) => labels.filter((l) => l === j).length;
+  if (mode === "cat") {
+    tb.innerHTML = `<tr><th>${T.th_cat[0]}</th><th class="num">${T.th_cat[1]}</th><th class="num">${T.th_cat[2]}</th></tr>` +
+      cents.map((c, j) => `<tr><td><span class="sw" style="background:${CAT[j % CAT.length]}"></span>${T.group} ${String.fromCharCode(65 + j)}</td><td class="num">${assigned ? cnt(j) : "–"}</td><td class="num">${c.x.toFixed(1)}, ${c.y.toFixed(1)}</td></tr>`).join("");
+  } else if (mode === "sortB") {
+    tb.innerHTML = `<tr><th>${T.th_sortB[0]}</th><th>${T.th_sortB[1]}</th><th class="num">${T.th_sortB[2]}</th><th class="num">${T.th_sortB[3]}</th></tr>` +
+      (assigned && converged ? order.map((j, r) => `<tr><td><span class="sw" style="background:${RANK(r, cents.length)}"></span>${r + 1}${T.rank}</td><td>${T.group} ${String.fromCharCode(65 + j)}</td><td class="num">${cnt(j)}</td><td class="num">${((cents[j].x + cents[j].y) / 2).toFixed(1)}</td></tr>`).join("")
+        : `<tr><td colspan="4" class="note">${T.sB0[1]}</td></tr>`);
+  } else {
+    const n = [0, 0, 0]; pts.forEach((p) => n[catA(p)]++);
+    tb.innerHTML = `<tr><th>${T.th_sortA[0]}</th><th>${T.th_sortA[1]}</th><th class="num">${T.th_sortA[2]}</th></tr>` +
+      T.catNames.map((c, i) => `<tr><td><span class="sw" style="background:${A_COL[i]}"></span>${c}</td><td>${T.rules[i]}</td><td class="num">${n[i]}</td></tr>`).join("");
+  }
+  document.getElementById("tblNote").textContent = T.note[mode];
+
+  // buttons
+  const dis = mode === "sortA";
+  ["btnStep", "btnRun", "btnReset"].forEach((id) => document.getElementById(id).disabled = dis || (id !== "btnReset" && converged));
+  document.getElementById("k").disabled = dis;
+}
+
+function applyText() {
+  const T = L();
+  document.getElementById("t_title").textContent = T.title; document.title = T.title;
+  document.getElementById("t_sub").textContent = T.sub;
+  ["cat", "sortB", "sortA"].forEach((m) => document.getElementById("tab_" + m).innerHTML = `${T["tab_" + m]} <span class="tag">· ${T["tag_" + m]}</span>`);
+  document.getElementById("btnStep").textContent = T.step; document.getElementById("btnRun").textContent = T.run;
+  document.getElementById("btnReset").textContent = T.reset; document.getElementById("btnNew").textContent = T.newData;
+  document.getElementById("btnClear").textContent = T.clear; document.getElementById("t_how").textContent = lang === "pt" ? "Como usar" : "How to use";
+  document.getElementById("howText").innerHTML = T.how; document.getElementById("t_foot").textContent = T.foot;
+  document.getElementById("lang").textContent = lang === "pt" ? "EN" : "PT";
+  render();
+}
+
+// ---------------------------------------------------------------- interaction
+let drag = null;
+function svgPoint(evt) { const r = svg.getBoundingClientRect(); return { x: (evt.clientX - r.left) / r.width * W, y: (evt.clientY - r.top) / r.height * H }; }
+function startDrag(evt) { evt.stopPropagation(); drag = +evt.currentTarget.getAttribute("data-i"); svg.setPointerCapture(evt.pointerId); }
+svg.addEventListener("pointermove", (evt) => {
+  if (drag === null) return;
+  const p = svgPoint(evt); let x = clamp(ix(p.x)), y = clamp(iy(p.y));
+  if (drag === 0) { x = Math.max(x, prof[1].x + 2); y = Math.max(y, prof[1].y + 2); } else { x = Math.min(x, prof[0].x - 2); y = Math.min(y, prof[0].y - 2); }
+  prof[drag] = { x, y }; render();
+});
+svg.addEventListener("pointerup", () => { drag = null; });
+svg.addEventListener("click", (evt) => {
+  if (drag !== null || evt.target.closest(".prof")) return;
+  const p = svgPoint(evt), x = ix(p.x), y = iy(p.y);
+  if (x < 0 || x > 100 || y < 0 || y > 100) return;
+  pts.push({ x: clamp(x), y: clamp(y) }); labels.push(-1);
+  converged = false; if (phase === "conv") phase = "update";
+  render();
+});
+document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => { mode = b.dataset.mode; document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", t === b)); render(); }));
+document.getElementById("btnStep").onclick = step;
+document.getElementById("btnRun").onclick = runAll;
+document.getElementById("btnReset").onclick = () => { seed++; initCents(); syncCents(); render(); };
+document.getElementById("btnNew").onclick = () => { dataSeed++; makeData(); syncPoints(); initCents(); render(); };
+document.getElementById("btnClear").onclick = () => { pts = []; labels = []; cents = []; phase = "init"; iter = 0; converged = false; render(); };
+document.getElementById("k").oninput = (e) => { k = +e.target.value; document.getElementById("kOut").textContent = k; initCents(); render(); };
+document.getElementById("lang").onclick = () => { lang = lang === "pt" ? "en" : "pt"; applyText(); };
+
+// ---------------------------------------------------------------- start
+buildStatic(); makeData(); initCents();
+document.getElementById("tab_cat").setAttribute("aria-selected", "true");
+applyText();
+</script>
+</body>
+</html>

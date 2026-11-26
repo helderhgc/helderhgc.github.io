@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Varredura de pesos (net zero) · LabDEC</title>
+<!--
+  Weight sweep — PROMETHEE II net flows for the 15 most connected countries of the IEA ETP
+  net-zero collaboration network (Linhares, Costa & Eufrazio, INSID 2026, Table 1).
+  V-shape preference function, q = 0, p = observed range, so
+  phi(a) = N/(N-1) * sum_j w_j (g_j(a) - m_j) / p_j   (Eq. 3 of the paper).
+  ?autoplay=1 plays S1 -> S3 -> S5 -> S2 -> S4 once (used to record the MP4).
+  LabDEC · Universidade Federal Fluminense
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f4f6fb; --ink: #0b1f4d; --muted: #51607a; --line: #d9e0ec;
+    --hub: #1d5fbf; --mat: #5db52e; --bra: #f28c1c; --oth: #b9c8ea; --neg: #d3187a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b1f4d; --panel: #13295e; --ink: #f4f6fb; --muted: #b9c8ea; --line: #2a4078;
+      --hub: #6aa9f0; --oth: #51607a; }
+  }
+  :root[data-theme="dark"] { --bg: #0b1f4d; --panel: #13295e; --ink: #f4f6fb; --muted: #b9c8ea; --line: #2a4078;
+      --hub: #6aa9f0; --oth: #51607a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+  main { max-width: 1600px; margin: 0 auto; padding: 22px 28px; display: grid; grid-template-columns: 430px 1fr; gap: 28px; }
+  main h1 { font-size: 26px; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: 15px; line-height: 1.45; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+  .scen { font-size: 30px; font-weight: 700; margin: 0; }
+  .scen small { display: block; font-size: 16px; font-weight: 400; color: var(--muted); margin-top: 4px; }
+  .w { display: grid; grid-template-columns: 120px 1fr 56px; align-items: center; gap: 10px; margin: 12px 0; font-size: 15px; }
+  .w .track { height: 18px; background: var(--line); border-radius: 9px; overflow: hidden; }
+  .w .fill { height: 100%; border-radius: 9px; }
+  .w output { font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
+  .legend { display: grid; gap: 8px; font-size: 15px; }
+  .legend span { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 8px; vertical-align: -2px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  button { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+           border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--hub); border-color: var(--hub); color: #fff; }
+  input[type=range] { width: 100%; accent-color: var(--mat); }
+  label.sl { font-size: 14px; color: var(--muted); display: block; margin-top: 12px; }
+  svg { width: 100%; height: auto; display: block; }
+  .cn { font-size: 17px; fill: var(--ink); text-anchor: end; dominant-baseline: central; }
+  .rk { font-size: 15px; font-weight: 700; fill: var(--muted); text-anchor: middle; dominant-baseline: central; }
+  .val { font-size: 15px; fill: var(--ink); dominant-baseline: central; font-variant-numeric: tabular-nums; }
+  .axis { stroke: var(--ink); stroke-width: 1.5; }
+  .grid { stroke: var(--line); stroke-width: 1; }
+  .tick { font-size: 13px; fill: var(--muted); text-anchor: middle; }
+  .top5 { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .top5 span { color: #fff; font-size: 15px; font-weight: 700; padding: 5px 10px; border-radius: 999px; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 16px; } }
+
+  /* ---- LabDEC identity: header and credits (same as the other LabDEC simulators) ---- */
+  :root { --night: #071637; --navy: #0B1F4D; --gold: #FFD75A; --lab-blue: #1D5FBF; --lab-line: #D9E0EC; }
+  body { font-family: "Inter", Arial, Helvetica, sans-serif; }
+  header.lab { background: var(--night); color: #fff; padding: 14px 28px; }
+  header.lab .lab-in { max-width: 1600px; margin: 0 auto; }
+  header.lab small { display: block; color: var(--gold); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+  header.lab h1 { font-family: "Sora", "Inter", sans-serif; font-size: 1.5rem; font-weight: 800; margin: 2px 0 6px; color: #fff; }
+  header.lab .cred { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .03em; font-style: normal;
+                     color: var(--night); background: var(--gold); border-radius: 999px; padding: 2px 10px; }
+  header.lab .lic { display: inline-block; margin-left: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .03em;
+                    color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 1px 10px; text-decoration: none; }
+  header.lab .lic:hover { background: var(--gold); color: var(--night); }
+  footer.credits { border-top: 1px solid var(--lab-line); background: #fff; color: #51607A; font-size: 13px; line-height: 1.5; padding: 16px 28px; margin: 0; }
+  footer.credits .in { max-width: 1600px; margin: 0 auto; display: flex; gap: 14px 24px; flex-wrap: wrap; }
+  footer.credits .in > div { flex: 1 1 260px; }
+  footer.credits small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--lab-blue); }
+  footer.credits b { color: var(--navy); }
+  footer.credits a { color: var(--lab-blue); font-weight: 600; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) footer.credits { background: #14171c; border-color: #39424e; color: #9aa4b2; }
+    :root:not([data-theme="light"]) footer.credits b { color: #e6e9ee; }
+  }
+</style>
+</head>
+<body>
+<header class="lab"><div class="lab-in">
+  <small>LabDEC · Material didático</small>
+  <h1>Varredura de pesos (net zero)</h1>
+  <em class="cred">Prof. Helder Gomes Costa · UFF</em><a class="lic" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Licença Creative Commons 4.0</a>
+</div></header>
+<main>
+  <section>
+    <h1>Como os pesos reordenam os parceiros</h1>
+    <p class="sub">Fluxo líquido φ do PROMETHEE II para 15 países candidatos, enquanto os pesos passam pelos cenários de política.
+      Função de preferência em V, q = 0, p = amplitude observada.</p>
+    <div class="panel">
+      <p class="scen" id="scen">S1 · Pesos iguais<small id="scenSub">Sem informação de preferência</small></p>
+      <div class="w"><span>C1 Grau</span><div class="track"><div class="fill" id="f1" style="background:var(--hub)"></div></div><output id="o1"></output></div>
+      <div class="w"><span>C2 Autovetor</span><div class="track"><div class="fill" id="f2" style="background:var(--hub);opacity:.6"></div></div><output id="o2"></output></div>
+      <div class="w"><span>C3 TRL médio</span><div class="track"><div class="fill" id="f3" style="background:var(--mat)"></div></div><output id="o3"></output></div>
+    </div>
+    <div class="panel legend">
+      <div><span style="background:var(--hub)"></span>Hubs de acesso (US, DE, NL, CN, JP)</div>
+      <div><span style="background:var(--mat)"></span>Especialistas em maturidade (KR, CA, DK)</div>
+      <div><span style="background:var(--bra)"></span>Brasil</div>
+      <div><span style="background:var(--oth)"></span>Outros candidatos</div>
+    </div>
+    <div class="panel"><b style="font-size:15px">Cinco primeiros agora</b><div id="top5" class="top5"></div></div>
+    <div class="panel" id="controls">
+      <div class="btns" id="btns"></div>
+      <label class="sl" for="trl">Peso em C3 (TRL), o resto dividido igualmente: <b id="trlv"></b></label>
+      <input type="range" id="trl" min="0" max="0.8" step="0.01" value="0.333">
+      <div class="btns" style="margin-top:12px"><button id="play">▶ Tocar a varredura</button></div>
+      <p class="note"><b>Como ler o gráfico:</b> φ = φ⁺ − φ⁻ é o saldo de cada país contra os outros 14. φ &gt; 0: o país mais supera do que é superado (acima da média do grupo); φ &lt; 0: é mais superado do que supera (abaixo da média). Os 15 fluxos somam zero.</p>
+      <p class="note">Dados: Tabela 1 de Linhares, Costa &amp; Eufrazio (INSID 2026), IEA ETP Clean Energy Technology Guide.</p>
+    </div>
+  </section>
+  <section><svg id="chart" viewBox="0 0 1000 790" role="img" aria-label="Barras do fluxo líquido por país"></svg></section>
+</main>
+<footer style="max-width:1600px;margin:0 auto;padding:0 28px 20px;font-size:13px;color:var(--muted)">Fonte dos dados: Agência Internacional de Energia (IEA), ETP Clean Energy Technology Guide — <a href="https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide" target="_blank" rel="noopener" style="color:var(--hub)">https://www.iea.org/data-and-statistics/data-tools/etp-clean-energy-technology-guide</a></footer>
+<footer class="credits"><div class="in">
+  <div><small>Autoria</small><b>Helder Gomes Costa</b> – Universidade Federal Fluminense (UFF).</div>
+  <div><small>Desenvolvimento</small><b>LabDEC</b> – Laboratório de Análise de Dados e Decisão, vinculado à <b>Universidade Federal Fluminense (UFF)</b>.</div>
+  <div><small>Licença de uso e citação</small>Licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Creative Commons 4.0 (CC BY 4.0)</a>, que autoriza o compartilhamento, o uso e a adaptação, <b>desde que citada a fonte</b>: Leonardo de Farias Linhares, Helder Gomes Costa, Edilvando Pereira Eufrazio. Integrating Social Network Analysis and PROMETHEE II for Prioritizing International Cooperation Partners in Net-Zero Technology Projects. Springer, 2027. <a href="https://doi.org/10.1007/978-3-032-43092-2_10">https://doi.org/10.1007/978-3-032-43092-2_10</a></div>
+</div></footer>
+<script>
+const A = ["United States","Germany","Netherlands","Norway","Australia","Italy","France","China","Denmark","Spain",
+  "United Kingdom","Japan","Canada","South Korea","Brazil"];
+const X = [[0.904,0.477,7.10],[0.808,0.355,7.03],[0.769,0.263,7.12],[0.712,0.159,6.92],[0.654,0.187,6.69],
+  [0.635,0.152,7.30],[0.635,0.239,7.33],[0.615,0.310,7.27],[0.615,0.133,7.43],[0.615,0.117,6.69],
+  [0.596,0.268,7.07],[0.596,0.309,7.40],[0.538,0.218,7.52],[0.462,0.194,7.70],[0.365,0.044,7.50]];
+const HUB = new Set(["United States","Germany","Netherlands","China","Japan"]);
+const MAT = new Set(["South Korea","Canada","Denmark"]);
+const SC = [
+  ["S1","Pesos iguais","Sem informação de preferência",[1/3,1/3,1/3]],
+  ["S2","Entropia","Objetivo: conteúdo de informação",[0.261,0.338,0.401]],
+  ["S3","Foco na rede","Acesso estrutural é o mais valorizado",[0.4,0.4,0.2]],
+  ["S4","Foco na maturidade","Maturidade tecnológica é a mais valorizada",[0.2,0.2,0.6]],
+  ["S5","Foco na influência","Inserção no núcleo é valorizada",[0.2,0.5,0.3]]];
+const N = A.length;
+const PTN = {"United States":"Estados Unidos",Germany:"Alemanha",Netherlands:"Países Baixos",Norway:"Noruega",Australia:"Austrália",Italy:"Itália",France:"França",China:"China",Denmark:"Dinamarca",Spain:"Espanha","United Kingdom":"Reino Unido",Japan:"Japão",Canada:"Canadá","South Korea":"Coreia do Sul",Brazil:"Brasil"};
+const fx = (v, d) => v.toFixed(d).replace(".", ",");
+const m = [0,1,2].map(j => X.reduce((s,r) => s + r[j], 0) / N);
+const p = [0,1,2].map(j => Math.max(...X.map(r => r[j])) - Math.min(...X.map(r => r[j])));
+const phi = w => X.map(r => N/(N-1) * [0,1,2].reduce((s,j) => s + w[j]*(r[j]-m[j])/p[j], 0));
+
+// chart geometry
+const svg = document.getElementById("chart"), NS = "http://www.w3.org/2000/svg";
+const X0 = 560, SCL = 780, TOP = 50, ROW = 46, BH = 30;          // zero axis at x=560, ±0.4 -> ±312 px
+const el = (t, a, parent = svg) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); parent.appendChild(e); return e; };
+for (const v of [-0.4,-0.2,0,0.2,0.4]) {
+  el("line", {x1: X0+v*SCL, x2: X0+v*SCL, y1: TOP-14, y2: TOP+N*ROW, class: v === 0 ? "axis" : "grid"});
+  el("text", {x: X0+v*SCL, y: TOP-22, class: "tick"}).textContent = (v > 0 ? "+" : "") + fx(v, 1);
+}
+el("text", {x: X0, y: TOP+N*ROW+30, class: "tick"}).textContent = "Fluxo líquido de sobreclassificação φ";
+const rows = A.map((a, i) => {
+  const g = el("g", {});
+  const col = a === "Brazil" ? "var(--bra)" : HUB.has(a) ? "var(--hub)" : MAT.has(a) ? "var(--mat)" : "var(--oth)";
+  const rk = el("text", {x: 22, y: 0, class: "rk"}, g);
+  const cn = el("text", {x: 228, y: 0, class: "cn"}, g); cn.textContent = PTN[a];
+  const bar = el("rect", {y: -BH/2, height: BH, rx: 6, fill: col}, g);
+  const val = el("text", {y: 0, class: "val"}, g);
+  return {g, rk, bar, val, y: null};
+});
+
+let W = SC[0][3].slice(), mode = "idle", t0 = 0, lastT = null, from = W, to = W, seqI = 0;
+const SEQ = [0, 2, 4, 1, 3];          // S1 -> S3 -> S5 -> S2 -> S4
+const HOLD = 2200, MOVE = 2600;
+const ease = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+
+function label(w) {
+  const k = SC.findIndex(s => s[3].every((v, j) => Math.abs(v - w[j]) < 0.004));
+  const s = document.getElementById("scen");
+  if (k >= 0) { s.firstChild.textContent = SC[k][0] + " · " + SC[k][1]; document.getElementById("scenSub").textContent = SC[k][2]; }
+  else { s.firstChild.textContent = "Passando entre cenários"; document.getElementById("scenSub").textContent = "w = (" + w.map(v => fx(v, 2)).join("; ") + ")"; }
+  [...document.querySelectorAll("#btns button")].forEach((b, i) => b.setAttribute("aria-pressed", i === k));
+}
+function draw(dt) {
+  const f = phi(W), order = f.map((v, i) => i).sort((a, b) => f[b] - f[a]);
+  const k = 1 - Math.exp(-dt / 140);                               // row-position smoothing
+  order.forEach((i, r) => {
+    const R = rows[i], ty = TOP + r*ROW + ROW/2;
+    R.y = R.y === null ? ty : R.y + (ty - R.y) * k;
+    R.g.setAttribute("transform", `translate(0,${R.y.toFixed(2)})`);
+    R.rk.textContent = r + 1;
+    const v = f[i], x = v >= 0 ? X0 : X0 + v*SCL;
+    R.bar.setAttribute("x", x.toFixed(2)); R.bar.setAttribute("width", Math.max(Math.abs(v*SCL), 1).toFixed(2));
+    R.val.setAttribute("x", (v >= 0 ? X0 + v*SCL + 8 : X0 + 8).toFixed(2));
+    R.val.textContent = (v >= 0 ? "+" : "−") + fx(Math.abs(v), 3);
+  });
+  [0,1,2].forEach(j => { document.getElementById("f"+(j+1)).style.width = (W[j]*100/0.8).toFixed(1) + "%";
+    document.getElementById("o"+(j+1)).textContent = fx(W[j], 3); });
+  document.getElementById("trlv").textContent = fx(W[2], 2);
+  label(W);
+  const t5 = order.slice(0, 5).map((i, r) => `<span style="background:${rows[i].bar.getAttribute("fill")}">${r+1}. ${PTN[A[i]]}</span>`).join("");
+  const box = document.getElementById("top5"); if (box.innerHTML !== t5) box.innerHTML = t5;
+}
+function frame(now) {
+  const dt = lastT === null ? 1000 : now - lastT; lastT = now;
+  if (mode === "move") {
+    const t = Math.min((now - t0) / MOVE, 1), e = ease(t);
+    W = from.map((v, j) => v + (to[j] - v) * e);
+    if (t >= 1) { W = to.slice(); mode = seqI >= 0 ? "hold" : "idle"; t0 = now; }
+  } else if (mode === "hold" && now - t0 > HOLD) {
+    seqI++;
+    if (seqI < SEQ.length) { from = W.slice(); to = SC[SEQ[seqI]][3].slice(); mode = "move"; t0 = now; }
+    else { mode = "idle"; seqI = -1; window.__done = true; }
+  }
+  draw(dt);
+  requestAnimationFrame(frame);
+}
+function goTo(w) { from = W.slice(); to = w; seqI = -1; mode = "move"; t0 = performance.now(); }
+SC.forEach((s, i) => { const b = document.createElement("button"); b.textContent = s[0] + " " + s[1];
+  b.onclick = () => goTo(s[3].slice()); document.getElementById("btns").appendChild(b); });
+document.getElementById("trl").oninput = e => { const v = +e.target.value; mode = "idle"; seqI = -1; W = [(1-v)/2, (1-v)/2, v]; };
+function play() { W = SC[0][3].slice(); seqI = 0; mode = "hold"; t0 = performance.now(); window.__done = false; }
+document.getElementById("play").onclick = play;
+if (new URLSearchParams(location.search).get("autoplay")) play();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voo da Sobreclassificação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+<!--
+  Animation of the outranking test of ELECTRE I as a flight through a corridor
+  with two barriers, after the figure of Costa (2016), J. Model. Manag. 11(1),
+  26-42, https://doi.org/10.1108/JM2-08-2013-0037.
+  The plane "AB" tests aSb: it flies at altitude c(a,b) over the barrier c^
+  (it must pass above: c(a,b) >= c^), then at altitude d(a,b) under the
+  barrier d^ (it must pass below: d(a,b) <= d^). If it gets through, the arc
+  a -> b appears in the graph; otherwise it explodes. Plane "BA" tests bSa.
+  Self-contained: no external files, works offline.
+-->
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f4f6fb; --ink: #0b1f4d; --muted: #51607a; --line: #d9e0ec;
+    --accent: #1d5fbf; --conc: #0b6e63; --disc: #c2410c; --bar: #e3e9f4; --barline: #0b1f4d;
+    --ok: #1a7f37; --bad: #cf222e; --ab: #2a78d6; --ba: #8250df; --node: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c; --panel: #1e232b; --ink: #e6e9ee; --muted: #9aa4b2; --line: #39424e;
+      --accent: #6aa9f0; --conc: #4fd1c0; --disc: #fb923c; --bar: #2b313b; --barline: #e6e9ee;
+      --ok: #4ac26b; --bad: #ff7b72; --ab: #6aa9f0; --ba: #b392f0; --node: #1e232b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171c; --panel: #1e232b; --ink: #e6e9ee; --muted: #9aa4b2; --line: #39424e;
+    --accent: #6aa9f0; --conc: #4fd1c0; --disc: #fb923c; --bar: #2b313b; --barline: #e6e9ee;
+    --ok: #4ac26b; --bad: #ff7b72; --ab: #6aa9f0; --ba: #b392f0; --node: #1e232b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.5; }
+  main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 16px; max-width: 75ch; }
+  button { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+           border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  .lang button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .panel { background: var(--panel); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+  .eq { font-family: "Cambria Math", Cambria, Georgia, serif; font-size: 1.08rem; text-align: center; margin: 2px 0; }
+  .eqnote { color: var(--muted); font-size: .92rem; margin: 6px 0 0; }
+  .controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 22px; }
+  .controls label { display: flex; flex-direction: column; font-size: .92rem; }
+  .controls .row { display: flex; justify-content: space-between; gap: 6px; }
+  .controls output { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .controls .c output { color: var(--conc); } .controls .d output { color: var(--disc); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .group-title { grid-column: 1 / -1; font-weight: 700; margin-top: 4px; font-size: .95rem; }
+  .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+  .presets span { color: var(--muted); font-size: .9rem; }
+  svg { width: 100%; height: auto; display: block; user-select: none; }
+  .wall { stroke: var(--ink); stroke-width: 2.2; }
+  .tick { font-size: 13px; fill: var(--muted); }
+  .bar { fill: var(--bar); stroke: var(--barline); stroke-width: 2; }
+  .barlabel { font-family: "Cambria Math", Cambria, Georgia, serif; font-size: 22px; fill: var(--ink); text-anchor: middle; }
+  .guide { stroke-width: 1.4; stroke-dasharray: 5 5; fill: none; opacity: .75; }
+  .trail { stroke: var(--muted); stroke-width: 2; fill: none; }
+  .planebody { stroke: var(--ink); stroke-width: 1.6; fill: var(--bg); }
+  .planetag { font-size: 10px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+  .two { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; }
+  .two .panel { margin: 0; }
+  .checks { list-style: none; padding: 0; margin: 0; }
+  .checks li { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--line);
+               font-variant-numeric: tabular-nums; }
+  .checks li:last-child { border-bottom: 0; }
+  .ok { color: var(--ok); font-weight: 700; } .bad { color: var(--bad); font-weight: 700; } .wait { color: var(--muted); }
+  .verdict { margin-top: 10px; font-size: 1.05rem; min-height: 3em; }
+  .verdict b { font-size: 1.15rem; }
+  .node { fill: var(--node); stroke: var(--ink); stroke-width: 2; }
+  .nodelabel { font-size: 22px; font-style: italic; text-anchor: middle; dominant-baseline: central; fill: var(--ink);
+               font-family: "Cambria Math", Cambria, Georgia, serif; }
+  .arc { fill: none; stroke-width: 3; transition: opacity .5s; }
+  .arclabel { font-size: 15px; text-anchor: middle; font-family: "Cambria Math", Cambria, Georgia, serif; transition: opacity .5s; }
+  .cases { width: 100%; border-collapse: collapse; font-size: .93rem; }
+  .cases th, .cases td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .cases tr.on td { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  footer { color: var(--muted); font-size: .85rem; margin-top: 18px; }
+  footer a { color: var(--accent); }
+  @media (max-width: 760px) {
+    .controls { grid-template-columns: 1fr 1fr; }
+    .two { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 460px) { .controls { grid-template-columns: 1fr; } }
+
+  /* ---- LabDEC identity: header and credits (after the LabDEC thesis simulator) ---- */
+  :root { --night: #071637; --navy: #0B1F4D; --gold: #FFD75A; --lab-blue: #1D5FBF; --lab-line: #D9E0EC; }
+  body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header.lab { background: var(--night); color: #fff; padding: 14px 16px; display: block; margin: 0; }
+  header.lab .lab-in { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between;
+                       align-items: center; gap: 12px 20px; flex-wrap: wrap; }
+  header.lab .brand { flex: 1; min-width: 240px; }
+  header.lab small { display: block; color: var(--gold); font-size: 11px; letter-spacing: .08em;
+                     text-transform: uppercase; font-weight: 700; }
+  header.lab h1 { font-family: "Sora", "Inter", sans-serif; font-size: 1.5rem; font-weight: 800; margin: 2px 0 6px; color: #fff; }
+  header.lab .cred { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .03em; font-style: normal;
+                     color: var(--night); background: var(--gold); border-radius: 999px; padding: 2px 10px; }
+  header.lab .lic { display: inline-block; margin-left: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .03em;
+                    color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 1px 10px; text-decoration: none; }
+  header.lab .lic:hover { background: var(--gold); color: var(--night); }
+  header.lab .lang button { background: transparent; color: #fff; border-color: rgba(255,255,255,.45); }
+  header.lab .lang button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--night); }
+  footer.credits { border-top: 1px solid var(--lab-line); background: #fff; color: #51607A; font-size: 13px;
+                   line-height: 1.5; padding: 16px; margin: 0; }
+  footer.credits .in { max-width: 1000px; margin: 0 auto; display: flex; gap: 14px 24px; flex-wrap: wrap; }
+  footer.credits .in > div { flex: 1 1 260px; }
+  footer.credits small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--lab-blue); }
+  footer.credits b { color: var(--navy); }
+  footer.credits a { color: var(--lab-blue); font-weight: 600; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) footer.credits { background: #14171c; border-color: #39424e; color: #9aa4b2; }
+    :root:not([data-theme="light"]) footer.credits b { color: #e6e9ee; }
+  }
+
+  /* d^: the combining circumflex sits too low on the tall letter d */
+  .dh { position: relative; display: inline-block; line-height: 1; }
+  .dh::before { content: "^"; position: absolute; left: 0; right: 0; text-align: center;
+                top: -0.42em; font-size: 0.75em; line-height: 1; font-weight: inherit; }
+  /* (i) reminders with the formulas */
+  .info { display: inline-flex; align-items: center; justify-content: center; width: 1.15em; height: 1.15em;
+          margin-left: 4px; border-radius: 50%; border: 1.5px solid currentColor; font: italic 700 0.72em Georgia, serif;
+          cursor: pointer; vertical-align: 0.15em; user-select: none; opacity: .85; }
+  .info:hover, .info:focus-visible { opacity: 1; outline: 2px solid var(--accent); outline-offset: 1px; }
+  #infopop { position: absolute; z-index: 50; max-width: min(420px, calc(100vw - 32px)); background: var(--bg);
+             color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+             box-shadow: 0 10px 30px rgba(7, 22, 55, .22); font-size: .92rem; line-height: 1.45; }
+  #infopop[hidden] { display: none; }
+  #infopop .t { font-weight: 700; margin-bottom: 6px; }
+  #infopop .fx { font-family: "Cambria Math", Cambria, Georgia, serif; font-size: 1.08rem; text-align: center;
+                 margin: 6px 0 8px; white-space: nowrap; overflow-x: auto; }
+  #infopop .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; }
+  #infopop .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 4px 1px; }
+  #infopop .frac > span:last-child { padding: 1px 4px 0; }
+  #infopop .r { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="lab"><div class="lab-in">
+  <div class="brand">
+    <small data-t="eyebrow"></small>
+    <h1 data-t="title"></h1>
+    <em class="cred" data-t="author"></em><a class="lic" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license" data-t="license"></a>
+  </div>
+    <div class="lang">
+      <button type="button" data-lang="pt" aria-pressed="true">PT</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+</div></header>
+<main>
+  <p class="sub" data-t="sub"></p>
+
+  <div class="panel">
+    <div class="eq">a S b &nbsp;⇔&nbsp; <span style="color:var(--conc)">c(a,b) ≥ ĉ<span class="info" role="button" tabindex="0" data-info="conc" aria-label="formula">i</span></span> &nbsp;and&nbsp; <span style="color:var(--disc)">d(a,b) ≤ d̂<span class="info" role="button" tabindex="0" data-info="disc" aria-label="formula">i</span></span></div>
+    <p class="eqnote" data-t="eqnote"></p>
+  </div>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="group-title" data-t="gCuts"></div>
+      <label class="c"><span class="row"><span data-t="cut"></span><output id="o-cut"></output></span>
+        <input type="range" id="cut" min="0" max="1" step="0.05" value="0.70"></label>
+      <label class="d"><span class="row"><span data-t="dut"></span><output id="o-dut"></output></span>
+        <input type="range" id="dut" min="0" max="1" step="0.05" value="0.30"></label>
+      <span></span>
+      <div class="group-title" data-t="gAB"></div>
+      <label class="c"><span class="row"><span>c(a,b)<span class="info" role="button" tabindex="0" data-info="conc" aria-label="formula">i</span></span><output id="o-cab"></output></span>
+        <input type="range" id="cab" min="0" max="1" step="0.05" value="0.80"></label>
+      <label class="d"><span class="row"><span>d(a,b)<span class="info" role="button" tabindex="0" data-info="disc" aria-label="formula">i</span></span><output id="o-dab"></output></span>
+        <input type="range" id="dab" min="0" max="1" step="0.05" value="0.20"></label>
+      <span></span>
+      <div class="group-title" data-t="gBA"></div>
+      <label class="c"><span class="row"><span>c(b,a)<span class="info" role="button" tabindex="0" data-info="conc" aria-label="formula">i</span></span><output id="o-cba"></output></span>
+        <input type="range" id="cba" min="0" max="1" step="0.05" value="0.40"></label>
+      <label class="d"><span class="row"><span>d(b,a)<span class="info" role="button" tabindex="0" data-info="disc" aria-label="formula">i</span></span><output id="o-dba"></output></span>
+        <input type="range" id="dba" min="0" max="1" step="0.05" value="0.50"></label>
+      <span></span>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="fly-ab" data-t="flyAB"></button>
+      <button type="button" class="btn primary" id="fly-ba" data-t="flyBA"></button>
+      <button type="button" class="btn" id="fly-both" data-t="flyBoth"></button>
+      <button type="button" class="btn" id="reset" data-t="reset"></button>
+    </div>
+    <div class="presets">
+      <span data-t="presets"></span>
+      <button type="button" data-preset="P"  data-t="caseP"></button>
+      <button type="button" data-preset="Pi" data-t="casePi"></button>
+      <button type="button" data-preset="I"  data-t="caseI"></button>
+      <button type="button" data-preset="R"  data-t="caseR"></button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <svg id="sky" viewBox="0 0 900 300" role="img" aria-labelledby="sky-title">
+      <title id="sky-title">Corridor with the barriers ĉ and d̂</title>
+      <g id="sky-static"></g>
+      <path id="trail" class="trail" d=""></path>
+      <g id="plane"></g>
+      <g id="boom"></g>
+    </svg>
+  </div>
+
+  <div class="two">
+    <div class="panel">
+      <h2 data-t="checksTitle"></h2>
+      <ul class="checks" id="checks"></ul>
+      <div class="verdict" id="verdict"></div>
+    </div>
+    <div class="panel">
+      <h2 data-t="graphTitle"></h2>
+      <svg id="graph" viewBox="0 0 420 220" role="img" aria-labelledby="graph-title">
+        <title id="graph-title">Graph with the alternatives a and b</title>
+        <defs>
+          <marker id="head-ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ab)"></path></marker>
+          <marker id="head-ba" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ba)"></path></marker>
+        </defs>
+        <path id="arc-ab" class="arc" d="M 110 92 Q 210 30 310 92" stroke="var(--ab)" marker-end="url(#head-ab)" opacity="0"></path>
+        <text id="lab-ab" class="arclabel" x="210" y="48" fill="var(--ab)" opacity="0">a S b</text>
+        <path id="arc-ba" class="arc" d="M 310 128 Q 210 190 110 128" stroke="var(--ba)" marker-end="url(#head-ba)" opacity="0"></path>
+        <text id="lab-ba" class="arclabel" x="210" y="186" fill="var(--ba)" opacity="0">b S a</text>
+        <circle class="node" cx="80" cy="110" r="30"></circle><text class="nodelabel" x="80" y="110">a</text>
+        <circle class="node" cx="340" cy="110" r="30"></circle><text class="nodelabel" x="340" y="110">b</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <h2 data-t="casesTitle"></h2>
+    <table class="cases" id="cases"></table>
+  </div>
+
+  <footer data-t="footer"></footer>
+</main>
+<footer class="credits"><div class="in"><div><small data-t="credAuthorH"></small><span data-t="credAuthor"></span></div><div><small data-t="credDevH"></small><span data-t="credDev"></span></div><div><small data-t="credLicH"></small><span data-t="credLic"></span></div></div></footer>
+
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- texts ----------
+  const T = {
+    pt: {
+      title: "O voo da sobreclassificação",
+      infoConcT: "Concordância c(a,b)",
+      infoConc: "Parcela do peso total dos critérios em que a é pelo menos tão bom quanto b, com J(a,b) = { j : g<sub>j</sub>(a) &ge; g<sub>j</sub>(b) } e w<sub>j</sub> o peso do critério j. Varia de 0 a 1; os empates contam para os dois lados. Para a S b é preciso c(a,b) &ge; ĉ.",
+      infoDiscT: "Discordância d(a,b)",
+      infoDisc: "A maior desvantagem de a em relação a b, medida na amplitude de cada critério (melhor menos pior desempenho entre as alternativas). Vale 0 se a for pelo menos tão bom quanto b em todos os critérios; perto de 1, um único critério se opõe fortemente (veto). Para a S b é preciso d(a,b) &le; d̂.",
+      eyebrow: 'LabDEC · Visual OutDecK · Material didático',
+      author: 'Prof. Helder Gomes Costa · UFF',
+      license: 'Licença Creative Commons 4.0',
+      credAuthorH: 'Autoria',
+      credAuthor: '<b>Helder Gomes Costa</b> – Universidade Federal Fluminense (UFF).',
+      credDevH: 'Desenvolvimento',
+      credDev: '<b>LabDEC</b> – Laboratório de Análise de Dados e Decisão, vinculado à <b>Universidade Federal Fluminense (UFF)</b>.',
+      credLicH: 'Licença de uso',
+      credLic: 'Licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Creative Commons 4.0 (CC BY 4.0)</a>, que autoriza o compartilhamento, o uso e a adaptação, <b>desde que citada a fonte</b>.',
+      sub: "Para que exista o arco a → b no grafo do ELECTRE I (a S b, “a sobreclassifica b”), o avião AB precisa atravessar o corredor. Ele voa na altitude da concordância c(a,b) e precisa passar POR CIMA da barreira ĉ. Depois desce até a altitude da discordância d(a,b) e precisa passar POR BAIXO da barreira d̂. Se bater em qualquer barreira, explode e o arco não aparece. O avião BA faz o mesmo teste para b S a.",
+      eqnote: "A barreira ĉ sobe do chão até a altura ĉ: só passa por cima quem tem concordância suficiente. A barreira d̂ desce do teto até a altura d̂: só passa por baixo quem tem discordância pequena o bastante. A concordância diz quanto do peso dos critérios apoia a afirmação; a discordância diz o quanto o pior critério a contradiz. Como os empates contam para os dois lados, c(a,b) + c(b,a) ≥ 1.",
+      gCuts: "Barreiras (níveis de corte)", cut: "ĉ — corte de concordância", dut: "d̂ — corte de discordância",
+      gAB: "Avião AB: testa a S b", gBA: "Avião BA: testa b S a",
+      flyAB: "Voar AB", flyBA: "Voar BA", flyBoth: "Voar os dois", reset: "Recomeçar",
+      presets: "Casos:", caseP: "a → b", casePi: "b → a", caseI: "a ⇄ b", caseR: "sem arco",
+      checksTitle: "Os testes", graphTitle: "O grafo",
+      cConc: (p, x, y, c) => `c(${x},${y}) = ${f(c)} ≥ ĉ = ${f(p)} ?`,
+      cDisc: (p, x, y, d) => `d(${x},${y}) = ${f(d)} ≤ d̂ = ${f(p)} ?`,
+      yes: "sim", no: "não", pending: "—",
+      crashC: (x, y) => `O avião ${x.toUpperCase()}${y.toUpperCase()} bateu na barreira ĉ: a concordância c(${x},${y}) é baixa demais. Não há arco ${x} → ${y}.`,
+      crashD: (x, y) => `O avião ${x.toUpperCase()}${y.toUpperCase()} passou por cima de ĉ, mas bateu na barreira d̂: a discordância d(${x},${y}) é alta demais (veto). Não há arco ${x} → ${y}.`,
+      pass: (x, y) => `O avião ${x.toUpperCase()}${y.toUpperCase()} atravessou as duas barreiras: ${x} S ${y}, e o arco ${x} → ${y} aparece no grafo.`,
+      casesTitle: "O que o grafo diz sobre a e b",
+      casesHead: ["a S b", "b S a", "Grafo", "Leitura"],
+      cases: [
+        ["sim", "não", "a → b", "a sobreclassifica b, e b não sobreclassifica a."],
+        ["não", "sim", "b → a", "b sobreclassifica a, e a não sobreclassifica b."],
+        ["sim", "sim", "a ⇄ b", "a e b são indiferentes (a I b)."],
+        ["não", "não", "sem arco", "a e b são incomparáveis (a R b): os dados não sustentam nenhuma afirmação."],
+      ],
+      footer: "Baseado na figura de Helder Gomes Costa, Graphical interpretation of outranking principles, <i>Journal of Modelling in Management</i>, Volume 11, Issue 1, 2016, Pages 26-42, ISSN 1746-5664, <a href=\"https://doi.org/10.1108/JM2-08-2013-0037\">https://doi.org/10.1108/JM2-08-2013-0037</a>. (<a href=\"https://www.sciencedirect.com/science/article/pii/S1746566416000287\">https://www.sciencedirect.com/science/article/pii/S1746566416000287</a>)",
+      and: "e",
+    },
+    en: {
+      title: "The outranking flight",
+      infoConcT: "Concordance c(a,b)",
+      infoConc: "Share of the total criteria weight on which a is at least as good as b, with J(a,b) = { j : g<sub>j</sub>(a) &ge; g<sub>j</sub>(b) } and w<sub>j</sub> the weight of criterion j. It lies between 0 and 1; ties count for both sides. a S b requires c(a,b) &ge; ĉ.",
+      infoDiscT: "Discordance d(a,b)",
+      infoDisc: "The largest disadvantage of a with respect to b, measured on the range of each criterion (best minus worst performance among the alternatives). It is 0 if a is at least as good as b on every criterion; close to 1, a single criterion strongly opposes (veto). a S b requires d(a,b) &le; d̂.",
+      eyebrow: 'LabDEC · Visual OutDecK · Teaching material',
+      author: 'Prof. Helder Gomes Costa · UFF',
+      license: 'Creative Commons 4.0 license',
+      credAuthorH: 'Author',
+      credAuthor: '<b>Helder Gomes Costa</b> – Universidade Federal Fluminense (UFF), Brazil.',
+      credDevH: 'Development',
+      credDev: '<b>LabDEC</b> – Data Analysis and Decision Laboratory, <b>Universidade Federal Fluminense (UFF)</b>.',
+      credLicH: 'License',
+      credLic: '<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Creative Commons 4.0 (CC BY 4.0)</a> license: sharing, use and adaptation are allowed, <b>provided the source is cited</b>.',
+      sub: "For the arc a → b to exist in the ELECTRE I graph (a S b, “a outranks b”), plane AB must fly through the corridor. It flies at the altitude of the concordance c(a,b) and must pass ABOVE the barrier ĉ. Then it descends to the altitude of the discordance d(a,b) and must pass BELOW the barrier d̂. If it hits either barrier it explodes and the arc does not appear. Plane BA makes the same test for b S a.",
+      eqnote: "The barrier ĉ rises from the floor up to the height ĉ: only a plane with enough concordance flies over it. The barrier d̂ hangs from the ceiling down to the height d̂: only a plane with small enough discordance flies under it. Concordance is how much of the criteria weight supports the statement; discordance is how strongly the worst criterion contradicts it. Ties count for both sides, so c(a,b) + c(b,a) ≥ 1.",
+      gCuts: "Barriers (cut levels)", cut: "ĉ — concordance cut", dut: "d̂ — discordance cut",
+      gAB: "Plane AB: tests a S b", gBA: "Plane BA: tests b S a",
+      flyAB: "Fly AB", flyBA: "Fly BA", flyBoth: "Fly both", reset: "Start over",
+      presets: "Cases:", caseP: "a → b", casePi: "b → a", caseI: "a ⇄ b", caseR: "no arc",
+      checksTitle: "The tests", graphTitle: "The graph",
+      cConc: (p, x, y, c) => `c(${x},${y}) = ${f(c)} ≥ ĉ = ${f(p)} ?`,
+      cDisc: (p, x, y, d) => `d(${x},${y}) = ${f(d)} ≤ d̂ = ${f(p)} ?`,
+      yes: "yes", no: "no", pending: "—",
+      crashC: (x, y) => `Plane ${x.toUpperCase()}${y.toUpperCase()} hit the barrier ĉ: the concordance c(${x},${y}) is too low. There is no arc ${x} → ${y}.`,
+      crashD: (x, y) => `Plane ${x.toUpperCase()}${y.toUpperCase()} flew over ĉ but hit the barrier d̂: the discordance d(${x},${y}) is too high (veto). There is no arc ${x} → ${y}.`,
+      pass: (x, y) => `Plane ${x.toUpperCase()}${y.toUpperCase()} got through both barriers: ${x} S ${y}, and the arc ${x} → ${y} appears in the graph.`,
+      casesTitle: "What the graph says about a and b",
+      casesHead: ["a S b", "b S a", "Graph", "Reading"],
+      cases: [
+        ["yes", "no", "a → b", "a outranks b, and b does not outrank a."],
+        ["no", "yes", "b → a", "b outranks a, and a does not outrank b."],
+        ["yes", "yes", "a ⇄ b", "a and b are indifferent (a I b)."],
+        ["no", "no", "no arc", "a and b are incomparable (a R b): the data support neither statement."],
+      ],
+      footer: "After the figure of Helder Gomes Costa, Graphical interpretation of outranking principles, <i>Journal of Modelling in Management</i>, Volume 11, Issue 1, 2016, Pages 26-42, ISSN 1746-5664, <a href=\"https://doi.org/10.1108/JM2-08-2013-0037\">https://doi.org/10.1108/JM2-08-2013-0037</a>. (<a href=\"https://www.sciencedirect.com/science/article/pii/S1746566416000287\">https://www.sciencedirect.com/science/article/pii/S1746566416000287</a>)",
+      and: "and",
+    },
+  };
+  const DEFAULT_LANG = document.documentElement.lang === "en" ? "en" : "pt";
+  let lang = DEFAULT_LANG;
+  const f = (v) => Number(v).toFixed(2);
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- geometry of the corridor ----------
+  const TOP = 40, BOTTOM = 260;                  // value 1 at TOP, 0 at BOTTOM
+  const Y = (v) => BOTTOM - (BOTTOM - TOP) * v;
+  const C_X0 = 290, C_X1 = 322;                  // barrier c^ (rises from the floor)
+  const D_X0 = 560, D_X1 = 592;                  // barrier d^ (hangs from the ceiling)
+  const NOSE = 24;                               // plane centre to nose
+
+  const val = (id) => parseFloat($(id).value);
+  const state = { ab: null, ba: null, busy: false };   // null | "pass" | "crashC" | "crashD"
+
+  function drawStatic() {
+    const g = $("sky-static");
+    g.innerHTML = "";
+    el("line", { x1: 30, y1: TOP, x2: 880, y2: TOP, class: "wall" }, g);
+    el("line", { x1: 30, y1: BOTTOM, x2: 880, y2: BOTTOM, class: "wall" }, g);
+    [[0, "0"], [0.5, "0.5"], [1, "1"]].forEach(([v, s]) => {
+      const t = el("text", { x: 22, y: Y(v) + 4, class: "tick", "text-anchor": "end" }, g);
+      t.textContent = s;
+    });
+    const cut = val("cut"), dut = val("dut");
+    // c^: from the floor up to Y(cut)
+    el("rect", { x: C_X0, y: Y(cut), width: C_X1 - C_X0, height: BOTTOM - Y(cut), class: "bar" }, g);
+    const lc = el("text", { x: (C_X0 + C_X1) / 2, y: Math.min(Y(cut) + 26, BOTTOM - 6), class: "barlabel" }, g);
+    lc.textContent = "ĉ";
+    // d^: from the ceiling down to Y(dut)
+    el("rect", { x: D_X0, y: TOP, width: D_X1 - D_X0, height: Y(dut) - TOP, class: "bar" }, g);
+    const ld = el("text", { x: (D_X0 + D_X1) / 2, y: Math.max(Y(dut) - 10, TOP + 20), class: "barlabel" }, g);
+    ld.textContent = "d";
+    const lh = el("text", { x: (D_X0 + D_X1) / 2, y: Math.max(Y(dut) - 10, TOP + 20) - 15, class: "barlabel", "font-size": 18 }, g);
+    lh.textContent = "^";
+    // planned altitudes of the next flight are shown as dashed guides
+    guides(g);
+  }
+
+  let lastPlane = "ab";
+  function guides(g) {
+    const [c, d] = lastPlane === "ab" ? [val("cab"), val("dab")] : [val("cba"), val("dba")];
+    el("line", { x1: 200, y1: Y(c), x2: C_X1 + 60, y2: Y(c), class: "guide", stroke: "var(--conc)" }, g);
+    el("line", { x1: 470, y1: Y(d), x2: D_X1 + 60, y2: Y(d), class: "guide", stroke: "var(--disc)" }, g);
+    const tc = el("text", { x: 200, y: Y(c) - 6, class: "tick", fill: "var(--conc)" }, g);
+    tc.textContent = `c(${lastPlane[0]},${lastPlane[1]})`;
+    const td = el("text", { x: 470, y: Y(d) - 6, class: "tick", fill: "var(--disc)" }, g);
+    td.textContent = `d(${lastPlane[0]},${lastPlane[1]})`;
+  }
+
+  // flight path and where it ends
+  function flight(c, d, cut, dut) {
+    const pts = [[30, Y(0.5)], [220, Y(c)]];
+    if (c < cut - 1e-9) { pts.push([C_X0 - NOSE, Y(c)]); return { pts, outcome: "crashC" }; }
+    pts.push([380, Y(c)], [480, Y(d)]);
+    if (d > dut + 1e-9) { pts.push([D_X0 - NOSE, Y(d)]); return { pts, outcome: "crashD" }; }
+    pts.push([660, Y(d)], [820, Y(0.5)], [880, Y(0.5)]);
+    return { pts, outcome: "pass" };
+  }
+
+  function drawPlane(tag, colour) {
+    const g = $("plane");
+    g.innerHTML = "";
+    // a paper plane pointing right, with an oval tag, as in the figure
+    el("path", { d: `M ${NOSE} 0 L -20 -15 L -12 0 L -20 15 Z`, class: "planebody" }, g);
+    el("ellipse", { cx: -4, cy: 0, rx: 13, ry: 8, fill: "var(--bg)", stroke: colour, "stroke-width": 1.8 }, g);
+    const t = el("text", { x: -4, y: 0.5, class: "planetag", fill: colour }, g);
+    t.textContent = tag;
+  }
+
+  function placePlane(x, y, ang) {
+    $("plane").setAttribute("transform", `translate(${x},${y}) rotate(${ang})`);
+  }
+
+  function explode(x, y) {
+    const g = $("boom");
+    g.innerHTML = "";
+    if (reduceMotion) {
+      el("circle", { cx: x, cy: y, r: 20, fill: "var(--bad)", opacity: 0.6 }, g);
+      return Promise.resolve();
+    }
+    const parts = [];
+    for (let i = 0; i < 18; i++) {
+      const a = (Math.PI * 2 * i) / 18 + Math.random() * 0.3;
+      const sp = 40 + Math.random() * 50;
+      parts.push({ a, sp, e: el("circle", { cx: x, cy: y, r: 3 + Math.random() * 3,
+        fill: i % 3 ? "#f59e0b" : "#ef4444" }, g) });
+    }
+    const flash = el("circle", { cx: x, cy: y, r: 4, fill: "#fde68a", opacity: 0.9 }, g);
+    return new Promise((done) => {
+      const t0 = performance.now();
+      function step(t) {
+        const k = Math.min((t - t0) / 800, 1);
+        flash.setAttribute("r", 4 + 36 * k);
+        flash.setAttribute("opacity", 0.9 * (1 - k));
+        parts.forEach((p) => {
+          p.e.setAttribute("cx", x + Math.cos(p.a) * p.sp * k);
+          p.e.setAttribute("cy", y + Math.sin(p.a) * p.sp * k + 30 * k * k);
+          p.e.setAttribute("opacity", 1 - k);
+        });
+        if (k < 1) requestAnimationFrame(step); else done();
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  function fly(which) {
+    const [x, y] = which === "ab" ? ["a", "b"] : ["b", "a"];
+    const c = val("c" + which), d = val("d" + which), cut = val("cut"), dut = val("dut");
+    const colour = which === "ab" ? "var(--ab)" : "var(--ba)";
+    lastPlane = which;
+    drawStatic();
+    $("boom").innerHTML = "";
+    state[which] = null;
+    showArcs();
+    renderChecks(which, "flying");
+    const { pts, outcome } = flight(c, d, cut, dut);
+    drawPlane(which.toUpperCase(), colour);
+
+    // polyline lengths
+    const seg = [];
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const L = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      seg.push(L); total += L;
+    }
+    const at = (s) => {
+      let i = 0;
+      while (i < seg.length - 1 && s > seg[i]) { s -= seg[i]; i++; }
+      const k = seg[i] ? Math.min(s / seg[i], 1) : 1;
+      const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+      return [x0 + (x1 - x0) * k, y0 + (y1 - y0) * k,
+              Math.atan2(y1 - y0, x1 - x0) * 180 / Math.PI];
+    };
+    const trail = $("trail");
+    trail.setAttribute("stroke", colour);
+
+    return new Promise((done) => {
+      const finish = () => {
+        const end = at(total);
+        if (outcome === "pass") {
+          state[which] = "pass";
+          $("plane").innerHTML = "";
+          finishFlight(which, outcome); done();
+        } else {
+          $("plane").innerHTML = "";
+          explode(end[0] + NOSE, end[1]).then(() => {
+            state[which] = outcome; finishFlight(which, outcome); done();
+          });
+        }
+      };
+      if (reduceMotion) {
+        trail.setAttribute("d", "M " + pts.map((p) => p.join(" ")).join(" L "));
+        finish(); return;
+      }
+      const speed = 0.32;                         // px per ms
+      const t0 = performance.now();
+      function step(t) {
+        const s = Math.min((t - t0) * speed, total);
+        const [px, py, ang] = at(s);
+        placePlane(px, py, ang);
+        // trail up to the plane
+        let acc = 0, d = `M ${pts[0][0]} ${pts[0][1]}`;
+        for (let i = 0; i < seg.length; i++) {
+          if (acc + seg[i] <= s) { d += ` L ${pts[i + 1][0]} ${pts[i + 1][1]}`; acc += seg[i]; }
+          else { d += ` L ${px} ${py}`; break; }
+        }
+        trail.setAttribute("d", d);
+        if (s < total) requestAnimationFrame(step); else finish();
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  function finishFlight(which, outcome) {
+    showArcs();
+    renderChecks(which, outcome);
+    renderVerdict();
+    markCase();
+  }
+
+  // one line per plane already flown, then the relation once both have flown
+  function renderVerdict() {
+    const lines = [["ab", "a", "b"], ["ba", "b", "a"]]
+      .filter(([w]) => state[w] !== null)
+      .map(([w, x, y]) => T[lang][state[w]](x, y));
+    $("verdict").innerHTML = lines.join("<br>") + relationText();
+  }
+
+  function showArcs() {
+    $("arc-ab").setAttribute("opacity", state.ab === "pass" ? 1 : 0);
+    $("lab-ab").setAttribute("opacity", state.ab === "pass" ? 1 : 0);
+    $("arc-ba").setAttribute("opacity", state.ba === "pass" ? 1 : 0);
+    $("lab-ba").setAttribute("opacity", state.ba === "pass" ? 1 : 0);
+  }
+
+  function relationText() {
+    if (state.ab === null || state.ba === null) return "";
+    const i = caseIndex();
+    return `<br><br><b>${T[lang].cases[i][2]}</b> — ${T[lang].cases[i][3]}`;
+  }
+  function caseIndex() {
+    const ab = state.ab === "pass", ba = state.ba === "pass";
+    return ab && !ba ? 0 : !ab && ba ? 1 : ab && ba ? 2 : 3;
+  }
+
+  function renderChecks(active, phase) {
+    const L = T[lang], ul = $("checks");
+    ul.innerHTML = "";
+    const cut = val("cut"), dut = val("dut");
+    [["ab", "a", "b"], ["ba", "b", "a"]].forEach(([w, x, y]) => {
+      const c = val("c" + w), d = val("d" + w), st = state[w];
+      const known = st !== null;
+      const okC = c >= cut - 1e-9, okD = d <= dut + 1e-9;
+      const mark = (shown, ok) => !shown ? `<span class="wait">${L.pending}</span>`
+        : ok ? `<span class="ok">✓ ${L.yes}</span>` : `<span class="bad">✗ ${L.no}</span>`;
+      // the discordance test is reached only by a plane that flew over c^
+      const li1 = document.createElement("li");
+      li1.innerHTML = `<span>${L.cConc(cut, x, y, c)}</span>${mark(known, okC)}`;
+      const li2 = document.createElement("li");
+      li2.innerHTML = `<span>${L.cDisc(dut, x, y, d)}</span>${mark(known && okC, okD)}`;
+      ul.append(li1, li2);
+    });
+  }
+
+  function renderCases() {
+    const L = T[lang], tb = $("cases");
+    tb.innerHTML = "<tr>" + L.casesHead.map((h) => `<th>${h}</th>`).join("") + "</tr>" +
+      L.cases.map((r, i) => `<tr data-i="${i}">` + r.map((c) => `<td>${c}</td>`).join("") + "</tr>").join("");
+    markCase();
+  }
+  function markCase() {
+    const known = state.ab !== null && state.ba !== null;
+    const i = known ? caseIndex() : -1;
+    document.querySelectorAll("#cases tr[data-i]").forEach((tr) =>
+      tr.classList.toggle("on", +tr.dataset.i === i));
+  }
+
+  function resetFlights() {
+    state.ab = state.ba = null;
+    $("plane").innerHTML = ""; $("boom").innerHTML = ""; $("trail").setAttribute("d", "");
+    $("verdict").innerHTML = "";
+    showArcs(); renderChecks(); markCase(); drawStatic();
+  }
+
+  function setBusy(b) {
+    state.busy = b;
+    ["fly-ab", "fly-ba", "fly-both", "reset"].forEach((id) => { $(id).disabled = b; });
+    document.querySelectorAll("[data-preset]").forEach((x) => { x.disabled = b; });
+    document.querySelectorAll("input[type=range]").forEach((x) => { x.disabled = b; });
+  }
+  async function run(list) {
+    if (state.busy) return;
+    setBusy(true);
+    try { for (const w of list) await fly(w); } finally { setBusy(false); }
+  }
+
+  // ---------- controls ----------
+  const sliders = ["cut", "dut", "cab", "dab", "cba", "dba"];
+  function syncOutputs() { sliders.forEach((id) => { $("o-" + id).textContent = f(val(id)); }); }
+  sliders.forEach((id) => $(id).addEventListener("input", () => {
+    syncOutputs();
+    // a changed value invalidates the flights already made
+    resetFlights();
+  }));
+  $("fly-ab").addEventListener("click", () => run(["ab"]));
+  $("fly-ba").addEventListener("click", () => run(["ba"]));
+  $("fly-both").addEventListener("click", () => { resetFlights(); run(["ab", "ba"]); });
+  $("reset").addEventListener("click", resetFlights);
+
+  const PRESETS = {           // cut, dut, c(a,b), d(a,b), c(b,a), d(b,a)
+    P:  [0.70, 0.30, 0.80, 0.20, 0.40, 0.50],
+    Pi: [0.70, 0.30, 0.50, 0.60, 0.75, 0.10],
+    I:  [0.60, 0.40, 0.70, 0.20, 0.65, 0.30],
+    R:  [0.70, 0.30, 0.75, 0.55, 0.45, 0.20],
+  };
+  document.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("click", () => {
+    PRESETS[b.dataset.preset].forEach((v, i) => { $(sliders[i]).value = v; });
+    syncOutputs(); resetFlights(); run(["ab", "ba"]);
+  }));
+
+  function applyLang(l) {
+    lang = l;
+    document.documentElement.lang = l;
+    document.querySelectorAll("[data-t]").forEach((e) => {
+      const v = T[l][e.dataset.t];
+      if (typeof v === "string") e.innerHTML = v;
+    });
+    document.querySelectorAll(".eq").forEach((e) => {
+      e.innerHTML = e.innerHTML.replace(/&nbsp;(and|e)&nbsp;/, `&nbsp;${T[l].and}&nbsp;`);
+    });
+    document.querySelectorAll("[data-lang]").forEach((b) =>
+      b.setAttribute("aria-pressed", b.dataset.lang === l ? "true" : "false"));
+    renderCases();
+    renderChecks();
+    renderVerdict();
+  }
+  document.querySelectorAll("[data-lang]").forEach((b) =>
+    b.addEventListener("click", () => applyLang(b.dataset.lang)));
+
+
+  // ---------- d^: put the hat above the letter in every HTML text ----------
+  const HAT = /d\u0302/g;
+  function hatFix(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (HAT.test(n.nodeValue) && !n.parentNode.closest("svg, .dh, title"))
+        ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((n) => {
+      const frag = document.createDocumentFragment();
+      n.nodeValue.split(HAT).forEach((part, i) => {
+        if (i) { const s = document.createElement("span"); s.className = "dh"; s.textContent = "d"; frag.appendChild(s); }
+        if (part) frag.appendChild(document.createTextNode(part));
+      });
+      n.parentNode.replaceChild(frag, n);
+    });
+  }
+  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => {
+    if (n.nodeType === 1) hatFix(n); else if (n.nodeType === 3 && n.parentNode) hatFix(n.parentNode);
+  }))).observe(document.body, { childList: true, subtree: true });
+
+  // ---------- (i) reminders with the formulas ----------
+  const FORM = { conc: 'c(a,b) = <span class="frac"><span>&sum;<sub>j &isin; J(a,b)</sub> w<sub>j</sub></span><span>&sum;<sub>j</sub> w<sub>j</sub></span></span>', disc: 'd(a,b) = max<sub>j</sub> <span class="frac"><span>g<sub>j</sub>(b) &minus; g<sub>j</sub>(a)</span><span>g<sub>j</sub><sup>max</sup> &minus; g<sub>j</sub><sup>min</sup></span></span>' };
+  const pop = document.createElement("div");
+  pop.id = "infopop"; pop.hidden = true; pop.setAttribute("role", "dialog");
+  document.body.appendChild(pop);
+  let popFor = null;
+  function openInfo(icon) {
+    const k = icon.dataset.info, L = T[lang];
+    const [t, r] = k === "conc" ? [L.infoConcT, L.infoConc] : [L.infoDiscT, L.infoDisc];
+    pop.innerHTML = `<div class="t">${t}</div><div class="fx">${FORM[k]}</div><div class="r">${r}</div>`;
+    pop.hidden = false; popFor = icon;
+    const b = icon.getBoundingClientRect(), w = pop.offsetWidth;
+    const left = Math.max(8, Math.min(window.scrollX + b.left - 20, window.scrollX + document.documentElement.clientWidth - w - 8));
+    pop.style.left = left + "px"; pop.style.top = (window.scrollY + b.bottom + 8) + "px";
+  }
+  function closeInfo() { pop.hidden = true; popFor = null; }
+  document.addEventListener("click", (e) => {
+    const icon = e.target.closest(".info");
+    if (icon) { e.preventDefault(); e.stopPropagation(); if (popFor === icon) closeInfo(); else openInfo(icon); return; }
+    if (!pop.contains(e.target)) closeInfo();
+  }, true);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeInfo();
+    const icon = e.target.closest && e.target.closest(".info");
+    if (icon && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openInfo(icon); }
+  });
+
+  syncOutputs();
+  drawStatic();
+  applyLang(DEFAULT_LANG);
+})();
+</script>
+</body>
+</html>

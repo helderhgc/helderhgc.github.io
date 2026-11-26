@@ -143,3 +143,52 @@ main section:last-child { border-bottom: 0; }
   .timeline li { grid-template-columns: 1fr; gap: 0; }
   .site-header .wrap { flex-wrap: wrap; padding-top: .5rem; padding-bottom: .5rem; }
 }
+
+/* ---------- Palestras ---------- */
+.event-date { margin: 0 0 .3rem; color: var(--accent); font-weight: 600; font-size: .92rem; letter-spacing: .02em; }
+.muted-text { color: var(--muted); }
+.subhead { margin-top: 2.5rem; font-size: 1.25rem; }
+.talk { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.2rem 1.4rem; margin: 1rem 0; }
+.talk h3 { margin: 0 0 .4rem; font-size: 1.1rem; }
+.talk-main { border-left: 4px solid var(--accent); }
+.talk-main h3 { font-size: 1.3rem; }
+.kicker { margin: 0 0 .3rem; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+.authors { margin: 0 0 .6rem; color: var(--muted); font-size: .94rem; }
+.authors b { color: var(--text); }
+.materials { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem 1.5rem; margin-top: 1rem; }
+.materials h4 { margin: 0 0 .4rem; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.materials ul, .inline-links { list-style: none; padding: 0; margin: 0; font-size: .94rem; }
+.materials li { padding: .2rem 0; }
+.inline-links { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; }
+.lang-tag { font-size: .7rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 .3rem; vertical-align: 1px; }
+.pub-list.plain ul { margin: .4rem 0 0; padding-left: 1.2rem; }
+.pub-list.plain ul li { margin: .3rem 0; }
+.news { list-style: none; padding: 0; margin: 0; }
+.news li { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; padding: .55rem 0; }
+.news .when { color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .news li { grid-template-columns: 1fr; gap: 0; } }
+.ref-note { margin: 1.2rem 0 0; overflow-wrap: anywhere; }
+
+/* ---------- Publicações: categorias ---------- */
+.cat-tabs { display: flex; flex-wrap: wrap; gap: .3rem; border-bottom: 1px solid var(--line); margin: 1.2rem 0 .4rem; }
+.cat-tab { padding: .5rem .9rem; color: var(--muted); text-decoration: none; font-weight: 600; font-size: .95rem;
+           border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.cat-tab:hover { color: var(--text); }
+.cat-tab[aria-current="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.pub-cat { padding: 0 !important; border: 0 !important; margin-top: 2rem; }
+.cat-title { font-size: 1.4rem; margin: 0 0 .2rem; }
+.cat-n { font-family: var(--sans); font-size: .85rem; font-weight: 600; color: var(--accent); background: var(--accent-soft);
+         border-radius: 999px; padding: .1rem .55rem; vertical-align: 3px; }
+.cat-desc { color: var(--muted); font-size: .92rem; margin: 0 0 .5rem; }
+.badge.idx { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+
+/* ---------- Submenu de Publicações ---------- */
+.nav-drop { position: relative; }
+.nav-drop .drop { display: none; position: absolute; top: 100%; left: -.8rem; z-index: 20; min-width: 12rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: .4rem 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.nav-drop:hover .drop, .nav-drop:focus-within .drop { display: block; }
+.nav-drop .drop a { display: block; padding: .35rem .9rem; white-space: nowrap; }
+.nav-drop .drop a:hover { background: var(--accent-soft); color: var(--accent); }
+.nav-drop > a { display: inline-block; padding: .4rem 0; }
+.pub-cat { scroll-margin-top: 80px; }
