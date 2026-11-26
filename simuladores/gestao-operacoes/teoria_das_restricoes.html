@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O gargalo em movimento · Teoria das Restrições · LabDEC</title>
+<meta name="description" content="Simulador didático da Teoria das Restrições (TOC): gargalo, cinco passos de focalização e tambor-pulmão-corda numa linha de produção.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap">
+<style>
+/* Layout: chão de fábrica em faixa larga (canvas) + painel de narração ao lado; cenas em sequência como os 5 passos */
+:root {
+  --bg: #ffffff;
+  --panel: #f4f6fb;
+  --ink: #0b1f4d;
+  --muted: #51607a;
+  --line: #d9e0ec;
+  --brown: #0b1f4d;
+  --steel: #1d5fbf;
+  --item: #3f6fa8;
+  --alert: #b8401f;
+  --ok: #2f6b45;
+  --belt: #d9e0ec;
+  --soft: #e8edf6;
+  --f-display: "Source Serif 4", "Times New Roman", Georgia, serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1716; --panel: #24201e; --ink: #ede6df; --muted: #a99c90; --line: #3e3632;
+    --brown: #dba98f; --steel: #9cc0cf; --item: #7fb0c3; --alert: #f0835a; --ok: #7cc79a;
+    --belt: #4a413b; --soft: #302a27; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1716; --panel: #24201e; --ink: #ede6df; --muted: #a99c90; --line: #3e3632;
+  --brown: #dba98f; --steel: #9cc0cf; --item: #7fb0c3; --alert: #f0835a; --ok: #7cc79a;
+  --belt: #4a413b; --soft: #302a27; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.55;
+}
+.wrap {
+  max-width: 1200px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 40px;
+  display: grid; gap: 20px;
+}
+header { display: grid; gap: 6px; }
+.eyebrow {
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600;
+}
+.pagetitle {
+  font-family: var(--f-display); font-weight: 700; font-size: clamp(28px, 4.2vw, 42px);
+  line-height: 1.1; margin: 0; color: var(--brown); text-wrap: balance;
+}
+.lede { margin: 0; max-width: 68ch; color: var(--muted); }
+
+nav.scenes {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+nav.scenes button {
+  flex: none; font: 500 13px/1 var(--f-body); color: var(--ink);
+  background: transparent; border: 1px solid var(--line); border-radius: 999px;
+  padding: 8px 13px; cursor: pointer; white-space: nowrap;
+}
+nav.scenes button .n {
+  font-family: var(--f-mono); font-weight: 600; color: var(--alert); margin-right: 5px;
+}
+nav.scenes button.sep { margin-left: 10px; }
+nav.scenes button:hover { border-color: var(--brown); }
+nav.scenes button[aria-current="step"] {
+  background: var(--brown); border-color: var(--brown); color: var(--bg);
+}
+nav.scenes button[aria-current="step"] .n { color: var(--bg); }
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--steel); outline-offset: 2px;
+}
+
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+@media (max-width: 960px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+.floor { display: grid; gap: 14px; min-width: 0; }
+.canvas-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  min-width: 0;
+}
+.canvas-scroll { overflow-x: auto; }
+canvas { display: block; width: 100%; min-width: 760px; }
+.controls {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  padding: 10px 12px; border-top: 1px solid var(--line);
+}
+.btn {
+  font: 600 13px/1 var(--f-body); color: var(--ink); background: var(--soft);
+  border: 1px solid var(--line); border-radius: 4px; padding: 9px 14px; cursor: pointer;
+}
+.btn:hover { border-color: var(--brown); }
+.btn.primary { background: var(--brown); color: var(--bg); border-color: var(--brown); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.seg button {
+  font: 500 12px/1 var(--f-mono); background: transparent; color: var(--muted);
+  border: 0; padding: 9px 10px; cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--steel); color: var(--bg); }
+.clock { margin-left: auto; font: 500 13px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.metric {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 12px 14px; display: grid; gap: 2px; min-width: 0;
+}
+.metric .k { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.metric .v { font: 600 24px/1.2 var(--f-mono); font-variant-numeric: tabular-nums; }
+.metric .s { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.metric.t .v { color: var(--steel); }
+.v.pos { color: var(--ok); }
+.v.neg { color: var(--alert); }
+
+.story {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 20px; display: grid; gap: 14px; min-width: 0;
+}
+.story .tag { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--alert); font-weight: 600; }
+.story h2 {
+  font-family: var(--f-display); font-weight: 700; font-size: 25px; line-height: 1.2;
+  margin: 0; color: var(--brown); text-wrap: balance;
+}
+.story p { margin: 0; }
+.story blockquote {
+  margin: 0; padding-left: 12px; border-left: 3px solid var(--line);
+  font-family: var(--f-display); font-style: italic; color: var(--muted);
+}
+.story h3 { margin: 0; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.changes { display: flex; flex-wrap: wrap; gap: 6px; }
+.changes span {
+  font: 500 12.5px var(--f-mono); background: var(--soft); border: 1px solid var(--line);
+  border-radius: 3px; padding: 4px 8px;
+}
+.story ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.pager { display: flex; justify-content: space-between; gap: 10px; padding-top: 4px; border-top: 1px solid var(--line); padding-top: 14px; }
+
+.lab {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 16px; display: grid; gap: 14px;
+}
+.lab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px 18px; }
+.lab label { display: grid; gap: 4px; font-size: 13px; font-weight: 500; }
+.lab label output { font-family: var(--f-mono); color: var(--steel); }
+.lab input[type="range"] { width: 100%; accent-color: var(--brown); }
+.lab-groups { display: grid; gap: 18px; }
+.lab-group { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.lab-group h4 { margin: 0; font-family: var(--f-display); font-size: 17px; color: var(--brown); }
+.lab-group .note { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 75ch; }
+.st-cell { display: grid; gap: 8px; padding: 10px; background: var(--soft); border-radius: 4px; }
+.st-cell strong { font-size: 13px; }
+.lab input[type="range"]:disabled { opacity: .4; }
+.lab select { font: inherit; padding: 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--ink); }
+
+footer { font-size: 12.5px; color: var(--muted); max-width: 90ch; }
+
+[hidden] { display: none !important; }
+/* ---- LabDEC identity: header and credits (same as the other LabDEC simulators) ---- */
+.labhead { display: block; background: #071637; color: #fff; padding: 14px 16px; }
+.labhead .in { max-width: 1200px; margin: 0 auto; }
+.labhead small { display: block; color: #FFD75A; font: 700 11px/1.4 "Inter", sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.labhead h1 { font-family: "Sora", "Inter", sans-serif; font-size: 1.5rem; font-weight: 800; margin: 2px 0 6px; color: #fff; }
+.labhead .cred { display: inline-block; font: 700 11.5px/1.4 "Inter", sans-serif; letter-spacing: .03em; font-style: normal;
+                 color: #071637; background: #FFD75A; border-radius: 999px; padding: 2px 10px; }
+.labhead .lic { display: inline-block; margin-left: 6px; font: 700 11.5px/1.4 "Inter", sans-serif; letter-spacing: .03em;
+                color: #FFD75A; border: 1px solid #FFD75A; border-radius: 999px; padding: 1px 10px; text-decoration: none; }
+.labhead .lic:hover { background: #FFD75A; color: #071637; }
+footer.credits { border-top: 1px solid #D9E0EC; background: #fff; color: #51607A; font: 13px/1.5 "Inter", sans-serif; padding: 16px; max-width: none; }
+footer.credits .in { max-width: 1200px; margin: 0 auto; display: flex; gap: 14px 24px; flex-wrap: wrap; }
+footer.credits .in > div { flex: 1 1 260px; }
+footer.credits small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #1D5FBF; }
+footer.credits b { color: #0B1F4D; }
+footer.credits a { color: #1D5FBF; font-weight: 600; }
+@media (prefers-color-scheme: dark) { footer.credits { background: #14171c; border-color: #39424e; color: #9aa4b2; } footer.credits b { color: #e6e9ee; } }
+</style>
+</head>
+<body>
+<header class="labhead"><div class="in">
+  <small>LabDEC · Material didático · Gestão de operações</small>
+  <h1>O gargalo em movimento: Teoria das Restrições</h1>
+  <em class="cred">Prof. Helder Gomes Costa · UFF</em><a class="lic" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Licença Creative Commons 4.0</a>
+</div></header>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">PCP · Teoria das Restrições (TOC)</div>
+    <h2 class="pagetitle">Uma linha, cinco estações e um gargalo</h2>
+    <p class="lede">Uma linha de produção simulada em tempo real. Avance pelas cenas para ver por que o recurso mais lento define o resultado da fábrica inteira e como os cinco passos de focalização lidam com ele.</p>
+  </header>
+
+  <nav class="scenes" id="scenes" aria-label="Cenas"></nav>
+
+  <div class="stage">
+    <div class="floor">
+      <div class="canvas-card">
+        <div class="canvas-scroll"><canvas id="cv" aria-label="Simulação da linha de produção"></canvas></div>
+        <div class="controls">
+          <button class="btn primary" id="play">Pausar</button>
+          <button class="btn" id="reset">Reiniciar cena</button>
+          <div class="seg" id="speed" role="group" aria-label="Velocidade">
+            <button data-s="0.5" aria-pressed="false">½×</button>
+            <button data-s="1" aria-pressed="true">1×</button>
+            <button data-s="2" aria-pressed="false">2×</button>
+            <button data-s="4" aria-pressed="false">4×</button>
+          </div>
+          <span class="clock" id="clock">0,0 h</span>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric t"><span class="k">Ganho (T)</span><span class="v" id="mT">–</span><span class="s" id="mT2">&nbsp;</span></div>
+        <div class="metric"><span class="k">Inventário (I)</span><span class="v" id="mI">–</span><span class="s" id="mI2">&nbsp;</span></div>
+        <div class="metric"><span class="k">Despesa operacional</span><span class="v" id="mO">–</span><span class="s">fixa no curto prazo</span></div>
+        <div class="metric"><span class="k">Lucro líquido</span><span class="v" id="mL">–</span><span class="s">Ganho − Despesa</span></div>
+      </div>
+
+      <div class="lab" id="lab" hidden>
+        <h3 style="margin:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Ajustes do laboratório</h3>
+        <div class="lab-groups" id="labGrid"></div>
+      </div>
+    </div>
+
+    <aside class="story" id="story" aria-live="polite">
+      <span class="tag" id="sTag"></span>
+      <h2 id="sTitle"></h2>
+      <div id="sBody" style="display:grid;gap:10px"></div>
+      <div id="sChangesWrap" style="display:grid;gap:6px">
+        <h3>O que mudou</h3>
+        <div class="changes" id="sChanges"></div>
+      </div>
+      <div style="display:grid;gap:6px">
+        <h3>O que observar</h3>
+        <ul id="sWatch"></ul>
+      </div>
+      <div class="pager">
+        <button class="btn" id="prev">← Anterior</button>
+        <button class="btn primary" id="next">Próxima →</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    Premissas da simulação: preço de venda R$ 100 por peça, matéria-prima R$ 40, único custo totalmente variável (ganho unitário R$ 60), despesa operacional de R$ 250/h.
+    Nas cenas, os tempos de processamento são determinísticos, o fornecimento é ilimitado e toda peça produzida é vendida; no Laboratório é possível incluir variação estatística nas estações, no fornecimento e na demanda. O Ganho é medido pelas vendas das últimas 6 horas simuladas. Atalhos: ← → trocam de cena, espaço pausa.
+  </footer>
+</div>
+
+<script>
+(() => {
+  const NAMES = ['Corte', 'Dobra', 'Solda', 'Pintura', 'Montagem'];
+  const N = 5, PRICE = 100, MAT = 40, OE_BASE = 250, RATE_WIN = 6, TRANSIT = 0.12;
+
+  const SCENES = [
+    { chip: 'O fluxo', tag: 'Introdução', title: 'Uma linha, cinco estações',
+      caps: [10, 8, 4, 9, 6], mode: 'push', highlight: false,
+      body: ['<p>A matéria-prima entra pela esquerda, passa por Corte, Dobra, Solda, Pintura e Montagem e sai pela Expedição. Cada estação tem uma capacidade diferente. Nas cenas, os tempos são determinísticos: toda peça leva exatamente o mesmo tempo em cada estação.</p>',
+             '<p>A liberação é <strong>empurrada</strong>: o Corte nunca para e despacha peças para a linha o mais rápido que consegue.</p>'],
+      watch: ['Onde as peças começam a se acumular?', 'Quais estações ficam ociosas de vez em quando?', 'Quantas peças por hora a linha realmente entrega?'] },
+    { chip: 'O gargalo', tag: 'Conceito central', title: 'O elo mais fraco dita o ritmo',
+      caps: [10, 8, 4, 9, 6], mode: 'push', highlight: true,
+      body: ['<p>Uma corrente é tão forte quanto seu elo mais fraco. A Solda faz 4 peças por hora, e por isso a linha inteira entrega 4 peças por hora, mesmo com estações capazes de fazer 8, 9 ou 10.</p>',
+             '<p>Esse recurso é a <strong>restrição</strong> do sistema. Com 4 pç/h, o ganho de R$ 240/h não cobre a despesa operacional de R$ 250/h.</p>'],
+      watch: ['O Ganho converge para a capacidade da Solda.', 'A fila na frente da Solda cresce sem parar.', 'Pintura e Montagem passam parte do tempo esperando peças.'] },
+    { chip: 'Ótimo local', tag: 'Armadilha', title: 'Melhorar fora do gargalo é miragem',
+      caps: [14, 8, 4, 9, 6], mode: 'push', highlight: true,
+      changes: ['Corte: 10 → 14 pç/h'],
+      body: ['<p>A fábrica investe no Corte e eleva sua capacidade de 10 para 14 peças por hora. A eficiência local melhora, mas o Ganho continua em 4 pç/h. O que aumenta é o inventário parado no chão.</p>',
+             '<blockquote>Uma hora ganha num recurso não-gargalo é só uma miragem. (Goldratt)</blockquote>'],
+      watch: ['O Ganho não se mexe.', 'O inventário cresce mais rápido do que antes.', 'O Corte trabalha 100% do tempo produzindo estoque.'] },
+    { chip: 'Identificar', step: 1, tag: 'Passo 1 de 5', title: 'Identificar a restrição',
+      caps: [10, 8, 4, 9, 6], mode: 'push', highlight: true,
+      body: ['<p>Procure o recurso cuja capacidade é menor que a demanda que passa por ele. No chão de fábrica, a restrição costuma se revelar por três sinais.</p>'],
+      watch: ['Fila acumulada à frente da Solda.', 'Utilização da Solda perto de 100%.', 'Estações depois dela esperando material.'] },
+    { chip: 'Explorar', step: 2, tag: 'Passo 2 de 5', title: 'Explorar a restrição',
+      caps: [10, 8, 5, 9, 6], mode: 'push', highlight: true,
+      changes: ['Solda: 4 → 5 pç/h'],
+      body: ['<p>Tire o máximo da restrição com o que já existe, sem comprar máquinas. A Solda perdia tempo com setups longos, parava no almoço e soldava peças que já vinham com defeito.</p>',
+             '<p>Com troca rápida de ferramenta (SMED), revezamento nos intervalos e inspeção <em>antes</em> da Solda, a capacidade efetiva sobe para 5 pç/h.</p>'],
+      watch: ['O Ganho sobe para cerca de 5 pç/h.', 'O lucro passa a ser positivo.', 'Cada hora ganha no gargalo é uma hora ganha pelo sistema inteiro.'] },
+    { chip: 'Subordinar', step: 3, tag: 'Passo 3 de 5', title: 'Subordinar tudo à restrição',
+      caps: [10, 8, 5, 9, 6], mode: 'rope', ropeAt: 2, buffer: 6, highlight: true, carry: true,
+      changes: ['Liberação: empurrada → corda', 'Pulmão: 6 peças'],
+      body: ['<p>Os demais recursos passam a seguir o ritmo da restrição. É a lógica <strong>Tambor-Pulmão-Corda</strong>:</p>',
+             '<p>a Solda é o <strong>tambor</strong> que marca o compasso; um <strong>pulmão</strong> de peças à sua frente garante que ela nunca pare; a <strong>corda</strong> só libera matéria-prima quando uma peça sai da Solda. O número do pulmão na simulação limita todas as peças entre a liberação e a restrição: ele soma a corda e a proteção.</p>'],
+      watch: ['O inventário escoa e se estabiliza.', 'O Ganho se mantém em cerca de 5 pç/h.', 'Corte e Dobra ficam ociosos de propósito. Ociosidade fora do gargalo é saudável.'] },
+    { chip: 'Elevar', step: 4, tag: 'Passo 4 de 5', title: 'Elevar a restrição',
+      caps: [10, 8, 10, 9, 6], mode: 'rope', ropeAt: 2, buffer: 6, highlight: true, carry: true,
+      elevated: 2, oe: 280,
+      changes: ['Solda: 5 → 10 pç/h (2 máquinas)', 'Despesa: R$ 250 → 280/h'],
+      body: ['<p>Só depois de explorar e subordinar vale investir. A fábrica compra uma segunda máquina de solda: a capacidade dobra, com R$ 30/h a mais de despesa operacional.</p>',
+             '<p>O Ganho sobe, mas observe a Montagem.</p>'],
+      watch: ['A fila agora cresce na frente da Montagem.', 'A restrição migrou: a Solda deixou de ser o gargalo.', 'A corda continua amarrada à Solda, e o inventário volta a crescer.'] },
+    { chip: 'Recomeçar', step: 5, tag: 'Passo 5 de 5', title: 'Voltar ao passo 1',
+      caps: [10, 8, 10, 9, 6], mode: 'rope', ropeAt: 'auto', buffer: 10, highlight: true, carry: true,
+      elevated: 2, oe: 280,
+      changes: ['Corda: Solda → Montagem', 'Pulmão: 10 peças'],
+      body: ['<p>Quebrada a restrição, o ciclo recomeça. A Montagem, com 6 pç/h, é a nova restrição, e a corda passa a ser amarrada a ela.</p>',
+             '<p>Cuidado com a inércia: as regras criadas para a restrição antiga não podem virar a próxima restrição.</p>'],
+      watch: ['O Ganho chega a cerca de 6 pç/h.', 'O inventário volta a ficar sob controle.', 'Lucro de R$ 80/h, contra o prejuízo do início.'] },
+    { chip: 'Laboratório', tag: 'Experimente', title: 'Laboratório da linha', lab: true,
+      caps: [10, 8, 4, 9, 6], mode: 'rope', ropeAt: 'auto', buffer: 8, highlight: true,
+      body: ['<p>Ajuste abaixo da simulação a capacidade e a variação estatística de cada estação, o modo de liberação, o pulmão e a flutuação do fornecimento de matéria-prima e da demanda.</p>',
+             '<p>A variação de ±X% sorteia cada tempo de forma uniforme entre (1 − X) e (1 + X) vezes o valor médio. Com demanda limitada, o Ganho passa a contar <strong>vendas</strong>: peça pronta parada na expedição é inventário. O número do pulmão na simulação limita todas as peças entre a liberação e a restrição: ele soma a corda e a proteção.</p>'],
+      watch: ['Com variação, um pulmão pequeno deixa o gargalo sem peças e o Ganho cai abaixo da sua capacidade.', 'Pulmão grande demais: mais inventário sem ganho extra.', 'Fornecimento ou demanda abaixo da capacidade do gargalo: a restrição passa a ser externa (fornecedor ou mercado).', 'Demanda com flutuação: surgem pedidos em atraso mesmo com capacidade média suficiente.'] },
+  ];
+
+  // ---------- simulação ----------
+  let cfg = {}, S = [], transit = [], simT = 0, t0 = 0, comp = [], busyT = [], released = 0, shipped = 0;
+  let mpStock = 0, fgStock = 0, backlog = 0, nextSupply = null, nextDemand = null;
+  let sceneIdx = 0, running = true, speed = 1;
+  const labCfg = {
+    caps: [10, 8, 4, 9, 6], vars: [0, 0, 0, 0, 0], mode: 'rope', buffer: 8,
+    supply: { on: false, rate: 6, v: 0 }, demand: { on: false, rate: 5, v: 0 },
+  };
+
+  const argmin = a => a.reduce((m, v, i) => v < a[m] ? i : m, 0);
+  const ropeIndex = () => cfg.ropeAt === 'auto' || cfg.ropeAt == null ? argmin(cfg.caps) : cfg.ropeAt;
+  // fator aleatório uniforme em [1 − v, 1 + v]; v = 0 → determinístico
+  const jitter = v => v > 0 ? Math.max(0.05, 1 + v * (2 * Math.random() - 1)) : 1;
+  const ia = src => (1 / src.rate) * jitter(src.v);
+  // restrição do sistema: estação mais lenta, ou fornecedor/mercado se forem mais lentos que ela
+  function constraintOf() {
+    const ci = argmin(cfg.caps); let best = cfg.caps[ci], who = ci;
+    if (cfg.supply.on && cfg.supply.rate < best) { best = cfg.supply.rate; who = 'supply'; }
+    if (cfg.demand.on && cfg.demand.rate < best) { who = 'demand'; }
+    return who;
+  }
+
+  function freshLine() {
+    S = Array.from({ length: N }, () => ({ q: 1, busy: false, rem: 0, dur: 1 }));
+    transit = []; released = N; shipped = 0;
+    mpStock = 5; fgStock = 0; backlog = 0; nextSupply = null; nextDemand = null;
+  }
+  function resetMetrics() { t0 = simT; comp = []; busyT = new Array(N).fill(0); }
+  function wipUpTo(r) {
+    let w = 0;
+    for (let i = 0; i <= r; i++) w += S[i].q + (S[i].busy ? 1 : 0);
+    for (const it of transit) if (it.to <= r) w++;
+    return w;
+  }
+  function totalWip() { return wipUpTo(N - 1); }
+  let gateOpen = true, lastRelease = 0;
+
+  function step(dt) {
+    const sup = cfg.supply, dem = cfg.demand;
+    if (sup.on) {
+      if (nextSupply == null) nextSupply = simT + ia(sup);
+      while (simT >= nextSupply) { mpStock++; nextSupply += ia(sup); }
+    } else nextSupply = null;
+    if (dem.on) {
+      if (nextDemand == null) nextDemand = simT + ia(dem);
+      while (simT >= nextDemand) {
+        if (fgStock > 0) { fgStock--; comp.push(simT); } else backlog++;
+        nextDemand += ia(dem);
+      }
+    } else nextDemand = null;
+
+    const canRelease = () => !sup.on || mpStock > 0;
+    const take = () => { S[0].q++; released++; lastRelease = simT; if (sup.on) mpStock--; };
+    if (cfg.mode === 'push') {
+      while (S[0].q < 2 && canRelease()) take();
+      gateOpen = canRelease() || S[0].q > 0;
+    } else {
+      const r = ropeIndex(); let g = 0;
+      while (wipUpTo(r) < cfg.buffer && canRelease() && g++ < 60) take();
+      gateOpen = simT - lastRelease < 0.15;
+    }
+    for (let i = N - 1; i >= 0; i--) {
+      const s = S[i];
+      let spare = 0; // fração do passo que sobrou ao terminar a peça
+      if (s.busy) {
+        busyT[i] += dt; s.rem -= dt;
+        if (s.rem <= 0) { spare = -s.rem; s.busy = false; transit.push({ to: i + 1, t: 0 }); }
+      }
+      if (!s.busy && s.q > 0) {
+        s.q--; s.busy = true;
+        s.dur = (1 / cfg.caps[i]) * jitter(cfg.vars[i]);
+        s.rem = s.dur - spare;
+      }
+    }
+    for (let k = transit.length - 1; k >= 0; k--) {
+      const it = transit[k]; it.t += dt;
+      if (it.t >= TRANSIT) {
+        transit.splice(k, 1);
+        if (it.to >= N) {
+          shipped++;
+          if (!dem.on) comp.push(simT);
+          else if (backlog > 0) { backlog--; comp.push(simT); }
+          else fgStock++;
+        } else S[it.to].q++;
+      }
+    }
+    simT += dt;
+  }
+
+  // ---------- cenas ----------
+  function applyScene(i, forceFresh) {
+    sceneIdx = i;
+    const sc = SCENES[i];
+    if (sc.lab) {
+      cfg = { caps: labCfg.caps.slice(), vars: labCfg.vars, mode: labCfg.mode, ropeAt: 'auto', buffer: labCfg.buffer,
+              highlight: true, oe: OE_BASE, supply: labCfg.supply, demand: labCfg.demand };
+    } else {
+      cfg = { caps: sc.caps.slice(), vars: [0, 0, 0, 0, 0], mode: sc.mode, ropeAt: sc.ropeAt, buffer: sc.buffer || 6,
+              highlight: sc.highlight, elevated: sc.elevated, oe: sc.oe || OE_BASE,
+              supply: { on: false }, demand: { on: false } };
+    }
+    if (!cfg.demand.on) { fgStock = 0; backlog = 0; }
+    if (forceFresh || !sc.carry || !S.length) freshLine();
+    resetMetrics();
+    renderStory();
+    document.getElementById('lab').hidden = !sc.lab;
+    try { localStorage.setItem('toc-cena', String(i)); } catch (e) {}
+  }
+
+  const navEl = document.getElementById('scenes');
+  SCENES.forEach((sc, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = sc.step ? `<span class="n">${sc.step}</span>${sc.chip}` : sc.chip;
+    if (sc.step === 1 || sc.lab) b.classList.add('sep');
+    b.addEventListener('click', () => applyScene(i));
+    navEl.appendChild(b);
+  });
+
+  function renderStory() {
+    const sc = SCENES[sceneIdx];
+    document.getElementById('sTag').textContent = sc.tag;
+    document.getElementById('sTitle').textContent = sc.title;
+    document.getElementById('sBody').innerHTML = sc.body.join('');
+    const ch = document.getElementById('sChanges');
+    ch.innerHTML = (sc.changes || []).map(c => `<span>${c}</span>`).join('');
+    document.getElementById('sChangesWrap').hidden = !(sc.changes && sc.changes.length);
+    document.getElementById('sWatch').innerHTML = sc.watch.map(w => `<li>${w}</li>`).join('');
+    [...navEl.children].forEach(b => b.removeAttribute('aria-current'));
+    navEl.children[sceneIdx].setAttribute('aria-current', 'step');
+    navEl.children[sceneIdx].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    document.getElementById('prev').disabled = sceneIdx === 0;
+    document.getElementById('next').disabled = sceneIdx === SCENES.length - 1;
+  }
+
+  // ---------- laboratório ----------
+  const labGrid = document.getElementById('labGrid');
+  const inLab = () => SCENES[sceneIdx].lab;
+  const pct = v => v === 0 ? 'determinístico' : '±' + v + '%';
+  function group(title, note) {
+    const d = document.createElement('section'); d.className = 'lab-group';
+    d.innerHTML = `<h4>${title}</h4>${note ? `<p class="note">${note}</p>` : ''}<div class="lab-grid"></div>`;
+    labGrid.appendChild(d); return d.querySelector('.lab-grid');
+  }
+  function slider(parent, id, label, min, max, stepv, val, fmt, onInput) {
+    const l = document.createElement('label');
+    l.innerHTML = `<span>${label}: <output>${fmt(val)}</output></span><input type="range" id="${id}" min="${min}" max="${max}" step="${stepv}" value="${val}">`;
+    const inp = l.querySelector('input'), out = l.querySelector('output');
+    inp.addEventListener('input', () => { const v = +inp.value; out.textContent = fmt(v); onInput(v); if (inLab()) resetMetrics(); });
+    parent.appendChild(l); return inp;
+  }
+  function select(parent, id, label, opts, val, onChange) {
+    const l = document.createElement('label');
+    l.innerHTML = `<span>${label}</span><select id="${id}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select>`;
+    const sel = l.querySelector('select'); sel.value = val;
+    sel.addEventListener('change', () => { onChange(sel.value); if (inLab()) resetMetrics(); });
+    parent.appendChild(l); return sel;
+  }
+
+  const gSt = group('Estações de trabalho', 'Capacidade média e variação do tempo de processamento de cada estação.');
+  NAMES.forEach((nm, i) => {
+    const cell = document.createElement('div'); cell.className = 'st-cell';
+    cell.innerHTML = `<strong>${nm}</strong>`;
+    gSt.appendChild(cell);
+    slider(cell, 'cap' + i, 'Capacidade', 1, 15, 1, labCfg.caps[i], v => v + ' pç/h', v => {
+      labCfg.caps[i] = v; if (inLab()) cfg.caps[i] = v;
+    });
+    slider(cell, 'var' + i, 'Variação', 0, 100, 5, labCfg.vars[i] * 100, pct, v => { labCfg.vars[i] = v / 100; });
+  });
+
+  const gRel = group('Liberação de material');
+  select(gRel, 'modo', 'Modo', [['rope', 'Corda (TPC)'], ['push', 'Empurrada']], labCfg.mode, v => {
+    labCfg.mode = v; if (inLab()) cfg.mode = v;
+  });
+  slider(gRel, 'pulmao', 'Pulmão (corda)', 1, 20, 1, labCfg.buffer, v => v + ' pç', v => {
+    labCfg.buffer = v; if (inLab()) cfg.buffer = v;
+  });
+
+  function sourceGroup(title, note, key, labels, onToggle) {
+    const g = group(title, note), src = labCfg[key];
+    const sel = select(g, key + 'Modo', 'Tipo', labels, src.on ? 'on' : 'off', v => {
+      src.on = v === 'on'; sync(); if (inLab()) onToggle(src.on);
+    });
+    const r = slider(g, key + 'Taxa', 'Taxa média', 1, 15, 0.5, src.rate, v => String(v).replace('.', ',') + ' pç/h', v => { src.rate = v; });
+    const vv = slider(g, key + 'Var', 'Flutuação', 0, 100, 5, src.v * 100, v => v === 0 ? 'constante' : '±' + v + '%', v => { src.v = v / 100; });
+    function sync() { r.disabled = vv.disabled = !src.on; }
+    sync();
+  }
+  sourceGroup('Fornecimento de matéria-prima', 'Chegadas do fornecedor ao estoque de matéria-prima. A flutuação varia o intervalo entre entregas.',
+    'supply', [['off', 'Ilimitado'], ['on', 'Limitado (taxa)']], on => { if (on) mpStock = 5; });
+  sourceGroup('Demanda do mercado', 'Pedidos dos clientes atendidos pelo estoque de produto acabado; sem estoque, o pedido fica em atraso.',
+    'demand', [['off', 'Ilimitada (tudo é vendido)'], ['on', 'Limitada (taxa)']], on => { if (!on) { fgStock = 0; backlog = 0; } });
+
+  // ---------- controles ----------
+  const playBtn = document.getElementById('play');
+  function setRunning(v) { running = v; playBtn.textContent = v ? 'Pausar' : 'Continuar'; }
+  playBtn.addEventListener('click', () => setRunning(!running));
+  document.getElementById('reset').addEventListener('click', () => applyScene(sceneIdx, true));
+  document.getElementById('prev').addEventListener('click', () => sceneIdx > 0 && applyScene(sceneIdx - 1));
+  document.getElementById('next').addEventListener('click', () => sceneIdx < SCENES.length - 1 && applyScene(sceneIdx + 1));
+  document.querySelectorAll('#speed button').forEach(b => b.addEventListener('click', () => {
+    speed = +b.dataset.s;
+    document.querySelectorAll('#speed button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input, select, textarea')) return;
+    if (e.key === 'ArrowRight' && sceneIdx < SCENES.length - 1) applyScene(sceneIdx + 1);
+    else if (e.key === 'ArrowLeft' && sceneIdx > 0) applyScene(sceneIdx - 1);
+    else if (e.key === ' ' && !e.target.closest('button')) { e.preventDefault(); setRunning(!running); }
+  });
+
+  // ---------- métricas ----------
+  const nf1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const nf0 = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
+  const brl = v => (v < 0 ? '−' : '') + 'R$ ' + nf0.format(Math.abs(v));
+  const $ = id => document.getElementById(id);
+  function updateMetrics() {
+    const el = simT - t0;
+    while (comp.length && comp[0] < simT - RATE_WIN) comp.shift();
+    $('clock').textContent = nf1.format(el) + ' h simuladas';
+    const wip = totalWip() + (cfg.supply.on ? mpStock : 0) + (cfg.demand.on ? fgStock : 0);
+    $('mI').textContent = wip + ' pç';
+    $('mI2').textContent = brl(wip * MAT) + ' em material';
+    $('mO').textContent = brl(cfg.oe) + '/h';
+    if (el < 1) {
+      $('mT').textContent = '…'; $('mT2').textContent = 'medindo';
+      $('mL').textContent = '…'; $('mL').className = 'v';
+      return;
+    }
+    const rate = comp.length / Math.min(RATE_WIN, el);
+    const g = rate * (PRICE - MAT);
+    $('mT').textContent = nf1.format(rate) + ' pç/h';
+    $('mT2').textContent = brl(g) + '/h' + (cfg.demand.on ? ' · ' + backlog + ' pedidos em atraso' : '');
+    const lucro = g - cfg.oe;
+    $('mL').textContent = brl(lucro) + '/h';
+    $('mL').className = 'v ' + (lucro >= 0 ? 'pos' : 'neg');
+  }
+
+  // ---------- desenho ----------
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  const W = 1000, H = 330;
+  let scale = 1, dpr = 1;
+  function resize() {
+    const w = cv.clientWidth; dpr = window.devicePixelRatio || 1;
+    scale = w / W;
+    cv.style.height = (H * scale) + 'px';
+    cv.width = Math.round(w * dpr); cv.height = Math.round(H * scale * dpr);
+  }
+  new ResizeObserver(resize).observe(cv);
+  resize();
+
+  const C = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement);
+    for (const k of ['panel', 'ink', 'muted', 'line', 'brown', 'steel', 'item', 'alert', 'ok', 'belt', 'soft'])
+      C[k] = cs.getPropertyValue('--' + k).trim();
+  }
+  const F = (w, s, fam) => `${w} ${s}px ${fam === 'm' ? '"IBM Plex Mono", ui-monospace, monospace' : '"IBM Plex Sans", system-ui, sans-serif'}`;
+
+  const BELT_Y = 244, QX0 = 104, SLOT = 160, QW = 55, BOX_W = 72, BOX_H = 72, IT = 8, GAP = 11;
+  const qx = i => QX0 + i * SLOT;
+  const bx = i => qx(i) + 60;
+  const SINK_X = 912;
+
+  function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); }
+  function item(x, y, color) { ctx.fillStyle = color || C.item; rr(x, y, IT, IT, 1.5); ctx.fill(); }
+  function text(s, x, y, font, color, align) {
+    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align || 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillText(s, x, y);
+  }
+
+  function pile(x, n, maxRows) {
+    const cols = 5, cap = cols * maxRows, show = Math.min(n, cap);
+    for (let k = 0; k < show; k++) {
+      const c = k % cols, r = Math.floor(k / cols);
+      item(x + c * GAP + 1, BELT_Y - IT - 2 - r * GAP);
+    }
+    if (n > cap) text('+' + (n - cap), x + QW / 2, BELT_Y - 8 - maxRows * GAP, F(600, 12, 'm'), C.alert);
+  }
+
+  function draw(now) {
+    readColors();
+    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const who = cfg.highlight ? constraintOf() : -1;
+    const constraint = typeof who === 'number' ? who : -1;
+    function tag(cx, y) {
+      ctx.globalAlpha = 0.75 + 0.25 * pulse;
+      ctx.fillStyle = C.alert; rr(cx - 40, y, 80, 16, 8); ctx.fill();
+      ctx.globalAlpha = 1;
+      text('RESTRIÇÃO', cx, y + 12, F(600, 10), C.panel);
+    }
+    const rope = cfg.mode === 'rope' ? ropeIndex() : -1;
+    const pulse = 0.5 + 0.5 * Math.sin(now / 260);
+
+    // pulmão
+    if (rope >= 0) {
+      const x = qx(rope) - 5;
+      ctx.fillStyle = C.soft; rr(x, 96, QW + 8, BELT_Y - 96, 4); ctx.fill();
+      ctx.setLineDash([4, 4]); ctx.strokeStyle = C.brown; ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+      text('pulmão ' + cfg.buffer, x + (QW + 8) / 2, 110, F(600, 11), C.brown);
+    }
+
+    // esteira
+    ctx.fillStyle = C.belt; ctx.fillRect(84, BELT_Y, SINK_X - 84, 7);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    const off = (simT * 40) % 14;
+    for (let x = 84 + off; x < SINK_X; x += 14) { ctx.beginPath(); ctx.moveTo(x, BELT_Y + 1); ctx.lineTo(x - 3, BELT_Y + 6); ctx.stroke(); }
+
+    // matéria-prima + portão
+    const mpShow = cfg.supply.on ? Math.min(mpStock, 12) : 12;
+    for (let k = 0; k < mpShow; k++) item(22 + (k % 4) * GAP, BELT_Y - IT - 2 - Math.floor(k / 4) * GAP, C.muted);
+    if (cfg.supply.on && mpStock > 12) text('+' + (mpStock - 12), 42, BELT_Y - 40, F(600, 12, 'm'), C.muted);
+    text('Matéria-', 42, 270, F(500, 12), C.muted);
+    text('prima', 42, 284, F(500, 12), C.muted);
+    if (cfg.supply.on) text('estoque ' + mpStock, 42, 300, F(600, 11, 'm'), mpStock === 0 ? C.alert : C.ink);
+    if (who === 'supply') tag(46, BELT_Y - BOX_H - 24);
+    ctx.strokeStyle = gateOpen ? C.ok : C.alert; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(90, BELT_Y + 7); ctx.lineTo(90, gateOpen ? BELT_Y - 10 : BELT_Y - 36); ctx.stroke();
+    text(cfg.mode === 'rope' ? 'corda' : 'empurra', 90, 318, F(600, 11), C.muted);
+
+    // estações
+    for (let i = 0; i < N; i++) {
+      const s = S[i], x = bx(i), y = BELT_Y - BOX_H;
+      const isC = i === constraint;
+      pile(qx(i), s.q, 12);
+      text('fila ' + s.q, qx(i) + QW / 2, 272, F(500, 12, 'm'), isC ? C.alert : C.muted);
+
+      if (cfg.elevated === i) {
+        ctx.fillStyle = C.soft; rr(x + 5, y - 5, BOX_W, BOX_H, 4); ctx.fill();
+        ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.stroke();
+      }
+      ctx.fillStyle = s.busy ? C.panel : C.soft;
+      rr(x, y, BOX_W, BOX_H, 4); ctx.fill();
+      ctx.lineWidth = isC ? 2 + 1.5 * pulse : 1.2;
+      ctx.strokeStyle = isC ? C.alert : C.line; ctx.stroke();
+      text(NAMES[i], x + BOX_W / 2, y + 17, F(600, 12), C.ink);
+      if (s.busy) {
+        ctx.fillStyle = C.item; rr(x + BOX_W / 2 - 6, y + 28, 12, 12, 2); ctx.fill();
+        const p = 1 - Math.max(0, s.rem) / s.dur;
+        ctx.fillStyle = C.line; ctx.fillRect(x + 10, y + 52, BOX_W - 20, 4);
+        ctx.fillStyle = isC ? C.alert : C.steel; ctx.fillRect(x + 10, y + 52, (BOX_W - 20) * p, 4);
+      } else {
+        text('ociosa', x + BOX_W / 2, y + 42, F(500, 11), C.muted);
+      }
+      if (cfg.elevated === i) text('2 máq.', x + BOX_W - 2, y - 9, F(600, 10), C.brown, 'right');
+
+      text(cfg.caps[i] + ' pç/h', x + BOX_W / 2, 272, F(600, 13, 'm'), isC ? C.alert : C.ink);
+      const el = Math.max(1e-6, simT - t0), u = Math.min(1, busyT[i] / el);
+      ctx.fillStyle = C.line; ctx.fillRect(x, 281, BOX_W, 5);
+      ctx.fillStyle = isC ? C.alert : C.steel; ctx.fillRect(x, 281, BOX_W * u, 5);
+      text('util. ' + Math.round(u * 100) + '%', x + BOX_W / 2, 300, F(500, 11, 'm'), C.muted);
+      if (cfg.vars[i] > 0) text('±' + Math.round(cfg.vars[i] * 100) + '%', x + BOX_W / 2, 316, F(600, 11, 'm'), C.steel);
+
+      if (isC) tag(x + BOX_W / 2, y - 24);
+    }
+
+    // tambor e corda
+    if (rope >= 0) {
+      const dx = bx(rope) + BOX_W / 2, dy = BELT_Y - BOX_H - 44;
+      ctx.strokeStyle = C.brown; ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]); ctx.lineDashOffset = -simT * 30;
+      ctx.beginPath(); ctx.moveTo(dx, dy - 8);
+      ctx.bezierCurveTo(dx - 60, 34, 140, 34, 90, BELT_Y - 40); ctx.stroke();
+      ctx.setLineDash([]); ctx.lineDashOffset = 0;
+      // tambor
+      ctx.fillStyle = C.brown;
+      rr(dx - 14, dy - 8, 28, 16, 3); ctx.fill();
+      ctx.strokeStyle = C.panel; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(dx - 14, dy); ctx.lineTo(dx + 14, dy); ctx.stroke();
+      text('tambor', dx + 20, dy + 4, F(600, 11), C.brown, 'left');
+      text('corda', (dx + 90) / 2, 40, F(600, 11), C.brown);
+    }
+
+    // em trânsito
+    for (const it of transit) {
+      const from = bx(it.to - 1) + BOX_W;
+      const to = it.to >= N ? SINK_X : qx(it.to);
+      const x = from + (to - from) * Math.min(1, it.t / TRANSIT);
+      item(x - IT / 2, BELT_Y - IT - 1);
+    }
+
+    // expedição
+    ctx.fillStyle = C.soft; rr(SINK_X, BELT_Y - BOX_H, 76, BOX_H, 4); ctx.fill();
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1.2; ctx.stroke();
+    text(String(shipped), SINK_X + 38, BELT_Y - 30, F(600, 22, 'm'), C.steel);
+    text('peças', SINK_X + 38, BELT_Y - 13, F(500, 11), C.muted);
+    text('Expedição', SINK_X + 38, 272, F(600, 12), C.ink);
+    if (cfg.demand.on) {
+      text('estoque ' + fgStock, SINK_X + 38, 288, F(600, 11, 'm'), C.ink);
+      text('atraso ' + backlog, SINK_X + 38, 304, F(600, 11, 'm'), backlog > 0 ? C.alert : C.muted);
+    }
+    if (who === 'demand') tag(SINK_X + 38, BELT_Y - BOX_H - 24);
+  }
+
+  // ---------- loop ----------
+  let last = performance.now(), lastM = 0;
+  function frame(now) {
+    const real = Math.min(0.1, (now - last) / 1000); last = now;
+    if (running) {
+      let simDt = real * speed;
+      while (simDt > 0) { const d = Math.min(0.005, simDt); step(d); simDt -= d; }
+    }
+    draw(now);
+    if (now - lastM > 200) { updateMetrics(); lastM = now; }
+    requestAnimationFrame(frame);
+  }
+
+  let start = 0;
+  try { const v = parseInt(localStorage.getItem('toc-cena'), 10); if (v >= 0 && v < SCENES.length) start = v; } catch (e) {}
+  applyScene(start, true);
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) setRunning(false);
+  // aquece a cena inicial para o primeiro quadro já mostrar fila e métricas
+  for (let k = 0; k < 600; k++) step(0.005);
+  requestAnimationFrame(frame);
+})();
+</script>
+<footer class="credits"><div class="in">
+  <div><small>Autoria</small><b>Helder Gomes Costa</b> – Universidade Federal Fluminense (UFF).</div>
+  <div><small>Desenvolvimento</small><b>LabDEC</b> – Laboratório de Análise de Dados e Decisão, vinculado à <b>Universidade Federal Fluminense (UFF)</b>.</div>
+  <div><small>Licença de uso</small>Licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener license">Creative Commons 4.0 (CC BY 4.0)</a>, que autoriza o compartilhamento, o uso e a adaptação, <b>desde que citada a fonte</b>.</div>
+</div></footer>
+</body>
+</html>
