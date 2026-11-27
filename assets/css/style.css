@@ -207,3 +207,4 @@ main section:last-child { border-bottom: 0; }
                border-radius: 999px; padding: .15rem .7rem; }
 .sim-links a:hover { border-color: var(--accent); background: var(--accent-soft); }
 .nav { align-items: center; }
+.card-wide { grid-column: 1 / -1; max-width: 760px; }
